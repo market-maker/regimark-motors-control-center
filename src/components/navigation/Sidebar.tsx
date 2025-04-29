@@ -11,6 +11,7 @@ import {
   Database,
   LogOut
 } from 'lucide-react';
+import { useTheme } from '@/providers/ThemeProvider';
 
 const menuItems = [
   { path: '/', label: 'Dashboard', icon: BarChart },
@@ -24,10 +25,19 @@ const menuItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const { theme } = useTheme();
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
-      <div className="p-4 border-b border-gray-200">
+    <div className={cn(
+      "w-64 border-r h-full flex flex-col",
+      theme === 'dark' 
+        ? "bg-gray-900 border-gray-800" 
+        : "bg-white border-gray-200"
+    )}>
+      <div className={cn(
+        "p-4 border-b",
+        theme === 'dark' ? "border-gray-800" : "border-gray-200"
+      )}>
         <h1 className="text-xl font-bold text-regimark-primary flex items-center">
           <span className="mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-regimark-secondary">
@@ -54,7 +64,9 @@ const Sidebar = () => {
                     "flex items-center px-4 py-3 text-sm font-medium rounded-md",
                     isActive 
                       ? "bg-regimark-primary text-white" 
-                      : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary"
+                      : theme === "dark"
+                        ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                        : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary"
                   )}
                 >
                   <Icon className="mr-3 h-5 w-5" />
@@ -65,8 +77,16 @@ const Sidebar = () => {
           })}
         </ul>
       </nav>
-      <div className="p-4 border-t border-gray-200">
-        <button className="flex items-center px-4 py-2 text-sm font-medium text-regimark-dark hover:text-regimark-secondary w-full">
+      <div className={cn(
+        "p-4 border-t",
+        theme === 'dark' ? "border-gray-800" : "border-gray-200"
+      )}>
+        <button className={cn(
+          "flex items-center px-4 py-2 text-sm font-medium w-full",
+          theme === 'dark' 
+            ? "text-gray-300 hover:text-white"
+            : "text-regimark-dark hover:text-regimark-secondary"
+        )}>
           <LogOut className="mr-3 h-5 w-5" />
           Sign Out
         </button>

@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const Header = () => {
   const [notifications] = useState(3);
 
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
+    <header className="bg-background border-b border-border py-4 px-6 flex items-center justify-between">
       <div className="flex items-center">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -21,6 +22,8 @@ const Header = () => {
         </div>
       </div>
       <div className="flex items-center space-x-4">
+        <ThemeToggle />
+        
         <div className="relative">
           <Button variant="ghost" size="icon" className="relative">
             <Bell size={20} />
