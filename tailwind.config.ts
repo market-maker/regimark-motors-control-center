@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Regimark Motors custom colors
+				regimark: {
+					primary: '#1A365D',    // Deep blue
+					secondary: '#E53E3E',  // Accent red
+					light: '#EDF2F7',      // Light gray for backgrounds
+					dark: '#2D3748',       // Dark gray for text
+					accent: '#4299E1',     // Light blue for highlights
+					success: '#38A169',    // Green for success states
+					warning: '#F6AD55',    // Orange for warnings
+					error: '#F56565',      // Red for errors
+				},
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +99,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out'
 			}
 		}
 	},
