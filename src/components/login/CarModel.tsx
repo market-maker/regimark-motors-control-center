@@ -55,7 +55,7 @@ const CarModel: React.FC<CarModelProps> = ({ theme }) => {
     currentScene.add(group);
 
     // Simple car representations using primitive shapes
-    function createCar(color: string, x: number, z: number, rotation: number) {
+    function createCar(color: number, x: number, z: number, rotation: number) {
       const car = new THREE.Group();
       
       // Car body
