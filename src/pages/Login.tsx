@@ -22,10 +22,22 @@ const Login = () => {
     // Simulate login process
     setTimeout(() => {
       setIsLoading(false);
-      // For demo purposes, any email/password combination works
-      toast.success("Login successful");
-      navigate('/');
+      
+      if (email && password) {
+        toast.success("Login successful");
+        // Store user session in localStorage for the demo
+        localStorage.setItem('user', JSON.stringify({ email, isLoggedIn: true }));
+        navigate('/');
+      } else {
+        toast.error("Please enter both email and password");
+        setIsLoading(false);
+      }
     }, 1500);
+  };
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast.info("Password reset link sent to your email");
   };
 
   return (
@@ -121,7 +133,7 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-sm text-regimark-accent hover:underline">
+              <a href="#" onClick={handleForgotPassword} className="text-sm text-regimark-accent hover:underline">
                 Forgot password?
               </a>
             </div>
