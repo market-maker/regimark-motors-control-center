@@ -107,13 +107,128 @@
 }
 
 .dashboard-card {
-  @apply bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200;
+  @apply bg-white/90 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 backdrop-blur-sm;
 }
 
 .stats-value {
-  @apply text-2xl font-bold text-regimark-primary;
+  @apply text-2xl font-bold bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent;
 }
 
 .stats-label {
   @apply text-sm font-medium text-regimark-dark/70;
+}
+
+/* Glow effects */
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(26, 54, 93, 0.2);
+}
+
+.dashboard-card-glow {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.dashboard-card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.25rem;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.dashboard-card-glow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* Glowing card variants */
+.blue-glow {
+  background: linear-gradient(to bottom right, rgba(26, 54, 93, 0.05), rgba(66, 153, 225, 0.05));
+  box-shadow: 0 8px 32px rgba(26, 54, 93, 0.15);
+}
+
+.blue-glow:hover {
+  box-shadow: 0 12px 28px rgba(26, 54, 93, 0.25), 0 0 10px rgba(26, 54, 93, 0.1);
+}
+
+.green-glow {
+  background: linear-gradient(to bottom right, rgba(38, 108, 55, 0.05), rgba(56, 161, 105, 0.05));
+  box-shadow: 0 8px 32px rgba(56, 161, 105, 0.15);
+}
+
+.green-glow:hover {
+  box-shadow: 0 12px 28px rgba(56, 161, 105, 0.25), 0 0 10px rgba(56, 161, 105, 0.1);
+}
+
+.purple-glow {
+  background: linear-gradient(to bottom right, rgba(90, 24, 154, 0.05), rgba(124, 58, 237, 0.05));
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.15);
+}
+
+.purple-glow:hover {
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.25), 0 0 10px rgba(124, 58, 237, 0.1);
+}
+
+.amber-glow {
+  background: linear-gradient(to bottom right, rgba(180, 83, 9, 0.05), rgba(217, 119, 6, 0.05));
+  box-shadow: 0 8px 32px rgba(217, 119, 6, 0.15);
+}
+
+.amber-glow:hover {
+  box-shadow: 0 12px 28px rgba(217, 119, 6, 0.25), 0 0 10px rgba(217, 119, 6, 0.1);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Add additional keyframes */
+@layer keyframes {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer animation {
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
 }
