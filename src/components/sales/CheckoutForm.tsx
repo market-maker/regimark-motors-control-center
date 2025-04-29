@@ -16,6 +16,7 @@ import { Search, Trash2, Plus, CreditCard, Banknote } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
+import Receipt from "./Receipt";
 
 interface CartItem {
   id: string;
@@ -123,6 +124,8 @@ const CheckoutForm = () => {
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = useState(false);
   const [productSearchTerm, setProductSearchTerm] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [completedSaleData, setCompletedSaleData] = useState<any>(null);
 
   const handleRemoveItem = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
@@ -184,26 +187,53 @@ const CheckoutForm = () => {
     // Show processing state
     setIsProcessing(true);
 
+    // Generate a random receipt number
+    const receiptNumber = `INV-${Date.now().toString().slice(-6)}`;
+    
+    // Get current date in readable format
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Prepare sale data for receipt
+    const saleData = {
+      saleId: receiptNumber,
+      date: currentDate,
+      customerName: customerName,
+      customerEmail: customerEmail,
+      paymentMethod: paymentMethod,
+      items: cartItems,
+      subtotal: subtotal,
+      tax: tax,
+      total: total,
+      cashReceived: paymentMethod === "cash" ? cashReceived : undefined,
+      change: paymentMethod === "cash" ? cashReceived - total : undefined
+    };
+
     // Simulate processing delay
     setTimeout(() => {
-      // Reset form state
       setIsProcessing(false);
-      toast.success("Sale completed successfully!");
-      
-      // Calculate change if cash payment
-      if (paymentMethod === "cash" && cashReceived > total) {
-        const change = cashReceived - total;
-        toast.info(`Change due: $${change.toFixed(2)}`);
-      }
-
-      // Clear the form after successful completion
-      setCartItems([]);
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerEmail("");
-      setCashReceived(0);
-      setCardNumber("");
+      setCompletedSaleData(saleData);
+      setShowReceipt(true);
     }, 1500);
+  };
+
+  const handleCloseReceipt = () => {
+    setShowReceipt(false);
+    
+    // Clear the form after successful completion
+    setCartItems([]);
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerEmail("");
+    setCashReceived(0);
+    setCardNumber("");
+    
+    toast.success("Sale completed successfully!");
   };
 
   const subtotal = cartItems.reduce(
@@ -504,6 +534,11 @@ const CheckoutForm = () => {
           </CardFooter>
         </Card>
       </div>
+
+      {/* Receipt Modal */}
+      {showReceipt && completedSaleData && (
+        <Receipt saleData={completedSaleData} onClose={handleCloseReceipt} />
+      )}
     </div>
   );
 };

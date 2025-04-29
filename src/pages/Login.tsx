@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/providers/ThemeProvider';
 import { toast } from '@/components/ui/sonner';
 import { LogIn, User, Key } from 'lucide-react';
+import CarModel from '@/components/login/CarModel';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -41,14 +42,20 @@ const Login = () => {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-regimark-light to-white'}`}>
+    <div className="relative min-h-screen flex items-center justify-center p-4">
+      {/* 3D Car Model Background */}
+      <CarModel theme={theme === 'dark' ? 'dark' : 'light'} />
+      
+      {/* Overlay gradient for better readability */}
+      <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-black/40' : 'bg-white/40'} z-0`}></div>
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`w-full max-w-md ${theme === 'dark' ? 'blue-glow' : 'dashboard-card-glow'} rounded-xl overflow-hidden`}
+        className={`w-full max-w-md ${theme === 'dark' ? 'blue-glow' : 'dashboard-card-glow'} rounded-xl overflow-hidden z-10`}
       >
-        <div className="p-8">
+        <div className="p-8 backdrop-blur-md bg-background/90">
           <div className="flex justify-center mb-6">
             <motion.div
               initial={{ scale: 0 }}
