@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const data = [
   { name: 'Jan', sales: 4000 },
@@ -16,6 +17,7 @@ const data = [
 
 const SalesChart = () => {
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
+  const { theme } = useTheme();
 
   return (
     <motion.div
@@ -23,9 +25,17 @@ const SalesChart = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="overflow-hidden border border-white/20 backdrop-blur-sm">
-        <CardHeader className="pb-2 border-b border-white/10">
-          <CardTitle className="text-xl font-semibold">Monthly Sales</CardTitle>
+      <Card className={`overflow-hidden backdrop-blur-sm shadow-xl ${theme === 'dark' ? 'border-gray-700' : 'border-white/20'}`}>
+        <CardHeader className={`pb-2 ${theme === 'dark' ? 'border-gray-700' : 'border-white/10'}`}>
+          <CardTitle className="text-xl font-semibold flex items-center">
+            <motion.span 
+              initial={{ x: -20, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              Monthly Sales
+            </motion.span>
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="h-80">
@@ -50,13 +60,13 @@ const SalesChart = () => {
                 <YAxis stroke="#94a3b8" />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                     backdropFilter: 'blur(8px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    border: theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '0.5rem',
                     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                   }}
-                  cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                  cursor={{ fill: 'rgba(227, 6, 19, 0.1)' }}
                 />
                 <Bar 
                   dataKey="sales" 
@@ -80,8 +90,8 @@ const SalesChart = () => {
                 </Bar>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1A365D" stopOpacity={0.9}/>
-                    <stop offset="95%" stopColor="#4299E1" stopOpacity={0.8}/>
+                    <stop offset="5%" stopColor="#E30613" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#FF5A5A" stopOpacity={0.8}/>
                   </linearGradient>
                 </defs>
               </BarChart>

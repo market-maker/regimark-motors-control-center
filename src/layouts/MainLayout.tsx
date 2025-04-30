@@ -13,7 +13,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const { theme } = useTheme();
   
   return (
-    <div className={`flex h-screen ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-regimark-light to-white'}`}>
+    <div className={`flex h-screen ${theme === 'dark' ? 'bg-black' : 'bg-gradient-to-br from-regimark-light to-white'}`}>
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />

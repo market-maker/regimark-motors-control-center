@@ -7,16 +7,47 @@ import { motion } from "framer-motion";
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
 
+  const variants = {
+    light: { rotate: 0, scale: 1 },
+    dark: { rotate: 180, scale: 1 }
+  };
+
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={toggleTheme}
-      className="relative"
+    <motion.div
+      animate={theme}
+      variants={variants}
+      transition={{ duration: 0.5, type: "spring" }}
     >
-      <Sun className={`h-5 w-5 transition-all ${theme === 'dark' ? 'opacity-0 scale-0' : 'opacity-100 scale-100'}`} />
-      <Moon className={`absolute h-5 w-5 transition-all ${theme === 'light' ? 'opacity-0 scale-0' : 'opacity-100 scale-100'}`} />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        className="relative rounded-full overflow-hidden"
+      >
+        <motion.div
+          initial={false}
+          animate={{ 
+            scale: theme === 'dark' ? 0 : 1,
+            opacity: theme === 'dark' ? 0 : 1
+          }}
+          transition={{ duration: 0.3 }}
+          className="absolute"
+        >
+          <Sun className="h-5 w-5" />
+        </motion.div>
+        <motion.div
+          initial={false}
+          animate={{ 
+            scale: theme === 'light' ? 0 : 1,
+            opacity: theme === 'light' ? 0 : 1
+          }}
+          transition={{ duration: 0.3 }}
+          className="absolute"
+        >
+          <Moon className="h-5 w-5" />
+        </motion.div>
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    </motion.div>
   );
 }

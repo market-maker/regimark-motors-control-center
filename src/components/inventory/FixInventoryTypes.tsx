@@ -4,6 +4,7 @@
 // but we can provide this helper file with the correct types that should be used.
 
 import { ReceiptStatus } from "@/types/receipt";
+import { InventoryItem } from "@/utils/inventoryUtils";
 
 // The original error is because the inventory items are using a string type for status
 // but the InventoryItem type expects a union type of "In Stock" | "Low Stock" | "Out of Stock"
@@ -16,7 +17,7 @@ export const mapImportedStatus = (status: string): ReceiptStatus => {
 };
 
 // This helper function should be used when importing inventory data
-export const transformImportedInventory = (items: any[]) => {
+export const transformImportedInventory = (items: any[]): InventoryItem[] => {
   return items.map(item => ({
     ...item,
     status: mapImportedStatus(item.status)

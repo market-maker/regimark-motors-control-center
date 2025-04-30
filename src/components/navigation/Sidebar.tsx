@@ -10,19 +10,19 @@ import {
   Settings, 
   Database,
   Receipt,
-  User
 } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
+import { motion } from 'framer-motion';
 
 const menuItems = [
   { path: '/', label: 'Dashboard', icon: BarChart },
   { path: '/inventory', label: 'Inventory', icon: Package },
   { path: '/sales', label: 'Sales', icon: ShoppingCart },
   { path: '/customers', label: 'Customers', icon: Users },
-  { path: '/suppliers', label: 'Suppliers', icon: Database }, // Added suppliers menu item
+  { path: '/suppliers', label: 'Suppliers', icon: Database },
   { path: '/reports', label: 'Reports', icon: FileText },
   { path: '/accounting', label: 'Accounting', icon: Database },
-  { path: '/receipt-templates', label: 'Receipt Templates', icon: Receipt }, // Added receipt templates
+  { path: '/receipt-templates', label: 'Receipt Templates', icon: Receipt },
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -34,17 +34,36 @@ const Sidebar = () => {
     <div className={cn(
       "w-64 border-r h-full flex flex-col",
       theme === 'dark' 
-        ? "bg-gray-900 border-gray-800" 
+        ? "bg-black border-gray-800" 
         : "bg-white border-gray-200"
     )}>
       <div className={cn(
         "p-4 border-b",
         theme === 'dark' ? "border-gray-800" : "border-gray-200"
       )}>
-        <h1 className="text-xl font-bold text-regimark-primary flex items-center">
-          <img src="/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png" alt="Regimark Autoelectrics" className="h-8 mr-2" />
-          <span className="hidden lg:inline">Regimark Autoelectrics</span>
-        </h1>
+        <motion.div 
+          whileHover={{ scale: 1.05 }}
+          className="flex items-center"
+        >
+          <img 
+            src="/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png" 
+            alt="Logo" 
+            className={cn(
+              "h-8 mr-2",
+              theme === 'dark' ? "mix-blend-screen" : ""
+            )}
+          />
+          {/* Only show name in light mode */}
+          {theme === 'light' && (
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-xl font-bold text-regimark-primary hidden lg:inline"
+            >
+              Regimark Autoelectrics
+            </motion.span>
+          )}
+        </motion.div>
       </div>
       <nav className="flex-1 pt-4 pb-4 overflow-y-auto">
         <ul className="space-y-1 px-2">
@@ -53,22 +72,31 @@ const Sidebar = () => {
             const isActive = location.pathname === item.path;
             
             return (
-              <li key={item.path}>
+              <motion.li 
+                key={item.path}
+                whileHover={{ scale: 1.03, x: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center px-4 py-3 text-sm font-medium rounded-md",
+                    "flex items-center px-4 py-3 text-sm font-medium rounded-md transition-all duration-300",
                     isActive 
-                      ? "bg-regimark-primary text-white" 
+                      ? "bg-regimark-primary text-white shadow-lg" 
                       : theme === "dark"
                         ? "text-gray-300 hover:bg-gray-800 hover:text-white"
                         : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary"
                   )}
                 >
-                  <Icon className="mr-3 h-5 w-5" />
+                  <motion.div
+                    whileHover={{ rotate: isActive ? 0 : 10 }}
+                    className="mr-3"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </motion.div>
                   {item.label}
                 </Link>
-              </li>
+              </motion.li>
             );
           })}
         </ul>

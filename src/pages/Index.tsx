@@ -6,8 +6,11 @@ import LowStockAlert from "../components/dashboard/LowStockAlert";
 import SalesChart from "../components/dashboard/SalesChart";
 import { ShoppingCart, Package, Users, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const Index = () => {
+  const { theme } = useTheme();
+  
   const containerAnimation = {
     hidden: { opacity: 0 },
     show: {
@@ -32,46 +35,46 @@ const Index = () => {
         variants={containerAnimation}
       >
         <motion.h1 
-          className="text-3xl font-bold mb-8 text-regimark-primary bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent"
+          className="text-3xl font-bold mb-8 bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent"
           variants={itemAnimation}
         >
           Dashboard Overview
         </motion.h1>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <motion.div variants={itemAnimation}>
+          <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Total Sales" 
               value="$12,452.75" 
               icon={<ShoppingCart className="h-5 w-5" />} 
               trend={{ value: 12.5, isPositive: true }}
-              className="dashboard-card-glow blue-glow"
+              className="dashboard-card-glow red-glow"
             />
           </motion.div>
-          <motion.div variants={itemAnimation}>
+          <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Inventory Items" 
               value="1,245" 
               icon={<Package className="h-5 w-5" />}
-              className="dashboard-card-glow green-glow"
+              className="dashboard-card-glow black-glow"
             />
           </motion.div>
-          <motion.div variants={itemAnimation}>
+          <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Active Customers" 
               value="348" 
               icon={<Users className="h-5 w-5" />} 
               trend={{ value: 8.2, isPositive: true }}
-              className="dashboard-card-glow purple-glow"
+              className="dashboard-card-glow red-glow"
             />
           </motion.div>
-          <motion.div variants={itemAnimation}>
+          <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Net Profit" 
               value="$4,325.90" 
               icon={<DollarSign className="h-5 w-5" />} 
               trend={{ value: 2.1, isPositive: false }}
-              className="dashboard-card-glow amber-glow"
+              className="dashboard-card-glow black-glow"
             />
           </motion.div>
         </div>
@@ -80,10 +83,16 @@ const Index = () => {
           <motion.div 
             className="lg:col-span-2"
             variants={itemAnimation}
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
             <SalesChart />
           </motion.div>
-          <motion.div variants={itemAnimation}>
+          <motion.div 
+            variants={itemAnimation}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <LowStockAlert />
           </motion.div>
         </div>
@@ -91,6 +100,9 @@ const Index = () => {
         <motion.div 
           className="grid grid-cols-1 gap-6"
           variants={itemAnimation}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
         >
           <RecentSales />
         </motion.div>
