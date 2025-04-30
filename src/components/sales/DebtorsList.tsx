@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Table, 
@@ -19,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/components/ui/sonner";
 import { motion } from "framer-motion";
 import { Customer, DebtRecord } from "@/types/customer";
+import { useNotifications } from "@/providers/NotificationsProvider";
 
 // Mock customers with debts
 const mockCustomers: Customer[] = [
@@ -77,6 +77,7 @@ const mockCustomers: Customer[] = [
 ];
 
 const DebtorsList = () => {
+  const { addNotification } = useNotifications();
   const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -89,6 +90,42 @@ const DebtorsList = () => {
   const [debtDueDate, setDebtDueDate] = useState("");
   const [debtNotes, setDebtNotes] = useState("");
   const [paymentAmount, setPaymentAmount] = useState("");
+  
+  // Check for overdue debts and highlight them
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    let hasOverdueDebts = false;
+    
+    const updatedCustomers = customers.map(customer => {
+      if (!customer.debtRecords) return customer;
+      
+      const updatedRecords = customer.debtRecords.map(debt => {
+        // Check if debt is overdue and not paid
+        if (debt.dueDate < today && debt.status !== "Paid") {
+          hasOverdueDebts = true;
+          return { ...debt, highlighted: true, status: "Overdue" as const };
+        }
+        return debt;
+      });
+      
+      return {
+        ...customer,
+        debtRecords: updatedRecords
+      };
+    });
+    
+    if (hasOverdueDebts) {
+      // Send notification about overdue debts
+      addNotification({
+        title: "Overdue Debts Alert",
+        message: "There are customers with overdue debts that need attention.",
+        type: "debtor",
+        linkTo: "/sales?tab=debtors"
+      });
+    }
+    
+    setCustomers(updatedCustomers);
+  }, [addNotification]);
   
   // Filter customers based on search term
   const filteredCustomers = customers.filter(customer => 
@@ -187,7 +224,11 @@ const DebtorsList = () => {
     toast.success(`Payment recorded successfully`);
   };
   
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, highlighted: boolean = false) => {
+    if (highlighted) {
+      return "bg-red-100 text-red-800 font-bold animate-pulse";
+    }
+    
     switch (status) {
       case "Paid":
         return "bg-green-100 text-green-800";
@@ -218,12 +259,14 @@ const DebtorsList = () => {
   };
 
   return (
+    
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
       className="space-y-6"
     >
+      
       <motion.div variants={itemVariants}>
         <div className="flex justify-between items-center mb-6">
           <div className="relative">
@@ -282,13 +325,19 @@ const DebtorsList = () => {
                     else if (hasPending) status = "Pending";
                     else if (hasPartial) status = "Partially Paid";
                     
+                    // Determine if this row should be highlighted
+                    const isHighlighted = hasOverdue;
+                    
                     return (
-                      <TableRow key={customer.id}>
+                      <TableRow 
+                        key={customer.id}
+                        className={isHighlighted ? "bg-red-50 dark:bg-red-900/20" : ""}
+                      >
                         <TableCell>{customer.name}</TableCell>
                         <TableCell>{customer.phone}</TableCell>
                         <TableCell>${outstandingAmount.toFixed(2)}</TableCell>
                         <TableCell>
-                          <Badge className={getStatusColor(status)}>
+                          <Badge className={getStatusColor(status, isHighlighted)}>
                             {status}
                           </Badge>
                         </TableCell>
@@ -336,6 +385,7 @@ const DebtorsList = () => {
           </CardContent>
         </Card>
 
+        
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle>Debts Summary</CardTitle>
@@ -373,6 +423,7 @@ const DebtorsList = () => {
         </Card>
       </motion.div>
 
+      
       {selectedCustomer && (
         <motion.div variants={itemVariants}>
           <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -408,7 +459,7 @@ const DebtorsList = () => {
                         <TableCell>${debt.amount.toFixed(2)}</TableCell>
                         <TableCell>{debt.dueDate}</TableCell>
                         <TableCell>
-                          <Badge className={getStatusColor(debt.status)}>
+                          <Badge className={getStatusColor(debt.status, debt.highlighted)}>
                             {debt.status}
                           </Badge>
                         </TableCell>
@@ -444,6 +495,7 @@ const DebtorsList = () => {
         </motion.div>
       )}
 
+      
       {/* Add Debt Dialog */}
       <Dialog open={showAddDebtDialog} onOpenChange={setShowAddDebtDialog}>
         <DialogContent>
@@ -489,6 +541,7 @@ const DebtorsList = () => {
         </DialogContent>
       </Dialog>
 
+      
       {/* Record Payment Dialog */}
       <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent>

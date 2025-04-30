@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Search, Trash2, Plus, CreditCard, Banknote, User } from "lucide-react";
+import { Search, Trash2, Plus, CreditCard, Banknote, User, Percent } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { Customer } from "@/types/customer";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNotifications } from "@/providers/NotificationsProvider";
 
 interface CartItem {
   id: string;
@@ -136,6 +136,7 @@ const mockCustomers: Customer[] = [
 const CheckoutForm = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { addNotification } = useNotifications();
   
   const [cartItems, setCartItems] = useState<CartItem[]>([
     {
@@ -173,6 +174,17 @@ const CheckoutForm = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [customerSearchTerm, setCustomerSearchTerm] = useState("");
+
+  // New states for discounts
+  const [discountType, setDiscountType] = useState<"none" | "percentage" | "fixed">("none");
+  const [discountValue, setDiscountValue] = useState<number>(0);
+  
+  // New state for sale status
+  const [saleStatus, setSaleStatus] = useState<"Completed" | "Pending" | "Revoked">("Completed");
+  
+  // New state for advice sections
+  const [showAdviceDialog, setShowAdviceDialog] = useState(false);
+  const [adviceType, setAdviceType] = useState<"job" | "card" | "vehicle">("job");
 
   const handleRemoveItem = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
@@ -267,6 +279,20 @@ const CheckoutForm = () => {
       minute: '2-digit'
     });
 
+    // Calculate discounted total
+    let discountedTotal = total;
+    let discountAmount = 0;
+    
+    if (discountType === "percentage" && discountValue > 0) {
+      discountAmount = total * (discountValue / 100);
+      discountedTotal = total - discountAmount;
+    } else if (discountType === "fixed" && discountValue > 0) {
+      discountAmount = discountValue;
+      discountedTotal = total - discountValue;
+      // Make sure discounted total is not negative
+      if (discountedTotal < 0) discountedTotal = 0;
+    }
+
     // Prepare sale data for receipt
     const saleData = {
       saleId: receiptNumber,
@@ -278,18 +304,44 @@ const CheckoutForm = () => {
       subtotal: subtotal,
       tax: tax,
       total: total,
+      discountType: discountType !== "none" ? discountType : undefined,
+      discountValue: discountType !== "none" ? discountValue : undefined,
+      discountAmount: discountType !== "none" ? discountAmount : undefined,
+      finalTotal: discountType !== "none" ? discountedTotal : total,
       cashReceived: paymentMethod === "cash" && !isCredit ? cashReceived : undefined,
-      change: paymentMethod === "cash" && !isCredit ? cashReceived - total : undefined,
+      change: paymentMethod === "cash" && !isCredit ? cashReceived - (discountType !== "none" ? discountedTotal : total) : undefined,
       isCredit: isCredit,
-      dueDate: isCredit ? dueDate : undefined
+      dueDate: isCredit ? dueDate : undefined,
+      status: saleStatus
     };
 
     // If this is a credit sale, add it to the customer's debt records
     if (isCredit && selectedCustomer) {
       // This would normally update a database
-      toast.info(`Added ${total.toFixed(2)} to ${selectedCustomer.name}'s account as credit`);
+      toast.info(`Added ${discountType !== "none" ? discountedTotal.toFixed(2) : total.toFixed(2)} to ${selectedCustomer.name}'s account as credit`);
       
-      // In a real app, we would update the customer's debt records here
+      // Add notification for credit sale
+      addNotification({
+        title: "New Credit Sale",
+        message: `A credit sale of $${discountType !== "none" ? discountedTotal.toFixed(2) : total.toFixed(2)} has been added to ${selectedCustomer.name}'s account.`,
+        type: "sale",
+        linkTo: "/sales?tab=debtors"
+      });
+    }
+
+    // Add notification based on sale status
+    if (saleStatus === "Pending") {
+      addNotification({
+        title: "Pending Sale",
+        message: `Sale #${receiptNumber} has been marked as pending.`,
+        type: "sale"
+      });
+    } else if (saleStatus === "Completed") {
+      addNotification({
+        title: "Sale Completed",
+        message: `Sale #${receiptNumber} has been completed successfully.`,
+        type: "sale"
+      });
     }
 
     // Simulate processing delay
@@ -352,6 +404,18 @@ const CheckoutForm = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
+
+  // Calculate discounted total
+  let finalTotal = total;
+  let discountAmount = 0;
+  
+  if (discountType === "percentage" && discountValue > 0) {
+    discountAmount = total * (discountValue / 100);
+    finalTotal = total - discountAmount;
+  } else if (discountType === "fixed" && discountValue > 0) {
+    discountAmount = Math.min(discountValue, total); // Prevent negative total
+    finalTotal = total - discountAmount;
+  }
 
   return (
     <motion.div
@@ -604,10 +668,77 @@ const CheckoutForm = () => {
                 <span className="text-muted-foreground">Tax (7%)</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
-              <Separator />
-              <div className="flex justify-between font-medium">
-                <span>Total</span>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Total</span>
                 <span>${total.toFixed(2)}</span>
+              </div>
+              
+              {/* Discount section */}
+              <div className="pt-2">
+                <Label htmlFor="discount-type">Discount</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Select 
+                    value={discountType} 
+                    onValueChange={(value) => setDiscountType(value as any)}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Discount type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No Discount</SelectItem>
+                      <SelectItem value="percentage">Percentage (%)</SelectItem>
+                      <SelectItem value="fixed">Fixed Amount</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <div className="relative flex-1">
+                    <Input
+                      type="number"
+                      min="0"
+                      step={discountType === "percentage" ? "1" : "0.01"}
+                      max={discountType === "percentage" ? "100" : undefined}
+                      value={discountValue || ""}
+                      onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
+                      disabled={discountType === "none"}
+                      className={discountType === "percentage" ? "pl-7" : ""}
+                    />
+                    {discountType === "percentage" && (
+                      <Percent className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {discountType !== "none" && discountValue > 0 && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Discount</span>
+                    <span className="text-red-500">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-between font-medium">
+                    <span>Final Total</span>
+                    <span>${finalTotal.toFixed(2)}</span>
+                  </div>
+                </>
+              )}
+              
+              {/* Sale status section */}
+              <div className="pt-2">
+                <Label htmlFor="sale-status">Sale Status</Label>
+                <Select 
+                  value={saleStatus} 
+                  onValueChange={(value) => setSaleStatus(value as any)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sale status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Completed">Completed</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Revoked">Revoked</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -670,12 +801,22 @@ const CheckoutForm = () => {
                 />
               </div>
             )}
+
+            {/* Customer advice button */}
+            <Button 
+              variant="outline" 
+              type="button" 
+              className="w-full" 
+              onClick={() => setShowAdviceDialog(true)}
+            >
+              Show Customer Advice
+            </Button>
           </CardContent>
           <CardFooter>
             <Button 
               className="w-full" 
               onClick={handleCompleteSale}
-              disabled={isProcessing || cartItems.length === 0}
+              disabled={isProcessing || cartItems.length === 0 || saleStatus === "Revoked"}
             >
               {isProcessing ? (
                 <span className="flex items-center">
@@ -686,7 +827,7 @@ const CheckoutForm = () => {
                   Processing...
                 </span>
               ) : (
-                `Complete ${isCredit ? "Credit " : ""}Sale`
+                `Complete ${isCredit ? "Credit " : ""}Sale (${saleStatus})`
               )}
             </Button>
           </CardFooter>
@@ -743,13 +884,18 @@ const CheckoutForm = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Receipt Modal */}
-      {showReceipt && completedSaleData && (
-        <Receipt saleData={completedSaleData} onClose={handleCloseReceipt} />
-      )}
-    </motion.div>
-  );
-};
-
-export default CheckoutForm;
+      
+      {/* Customer Advice Dialog */}
+      <Dialog open={showAdviceDialog} onOpenChange={setShowAdviceDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Customer Advice</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <Select
+              value={adviceType}
+              onValueChange={(value: any) => setAdviceType(value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select advice type"

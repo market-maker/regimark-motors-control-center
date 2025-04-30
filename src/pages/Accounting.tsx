@@ -1,211 +1,245 @@
 
+import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Download, FileText, Plus } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/sonner";
+import { PersonalExpense } from "@/types/customer";
+import { Plus, Trash2, FileText } from "lucide-react";
 
-interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  type: "income" | "expense";
-  amount: number;
-  category: string;
-  status: "completed" | "pending";
-}
-
-const mockTransactions: Transaction[] = [
+const initialExpenses: PersonalExpense[] = [
   {
-    id: "tx-001",
-    date: "2023-04-28",
-    description: "Sale #34928",
-    type: "income",
-    amount: 789.95,
-    category: "Sales",
-    status: "completed",
+    id: "1",
+    date: "2023-05-01",
+    category: "Office Supplies",
+    amount: 125.50,
+    description: "Printer ink and paper",
+    userId: "admin"
   },
   {
-    id: "tx-002",
-    date: "2023-04-27",
-    description: "Inventory Restock",
-    type: "expense",
-    amount: 1250.00,
-    category: "Inventory",
-    status: "completed",
+    id: "2",
+    date: "2023-05-03",
+    category: "Travel",
+    amount: 350.00,
+    description: "Client meeting travel expenses",
+    userId: "admin"
   },
   {
-    id: "tx-003",
-    date: "2023-04-26",
-    description: "Utility Bill",
-    type: "expense",
-    amount: 145.78,
-    category: "Utilities",
-    status: "completed",
-  },
-  {
-    id: "tx-004",
-    date: "2023-04-25",
-    description: "Sale #34897",
-    type: "income",
-    amount: 329.99,
-    category: "Sales",
-    status: "completed",
-  },
-  {
-    id: "tx-005",
-    date: "2023-04-25",
-    description: "Employee Wages",
-    type: "expense",
-    amount: 2450.00,
-    category: "Payroll",
-    status: "pending",
-  },
+    id: "3",
+    date: "2023-05-10",
+    category: "Meals",
+    amount: 45.75,
+    description: "Lunch with supplier",
+    userId: "admin"
+  }
 ];
 
 const Accounting = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [personalExpenses, setPersonalExpenses] = useState<PersonalExpense[]>(initialExpenses);
+  const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false);
+  
+  // New expense form fields
+  const [expenseDate, setExpenseDate] = useState("");
+  const [expenseCategory, setExpenseCategory] = useState("");
+  const [expenseAmount, setExpenseAmount] = useState("");
+  const [expenseDescription, setExpenseDescription] = useState("");
+  
+  const handleAddExpense = () => {
+    if (!expenseDate || !expenseCategory || !expenseAmount || !expenseDescription) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    const newExpense: PersonalExpense = {
+      id: Date.now().toString(),
+      date: expenseDate,
+      category: expenseCategory,
+      amount: parseFloat(expenseAmount),
+      description: expenseDescription,
+      userId: "admin" // In a real app, this would be the logged-in user's ID
+    };
+    
+    setPersonalExpenses([...personalExpenses, newExpense]);
+    setShowAddExpenseDialog(false);
+    resetExpenseForm();
+    toast.success("Personal expense added successfully");
+  };
+  
+  const handleDeleteExpense = (id: string) => {
+    setPersonalExpenses(personalExpenses.filter(expense => expense.id !== id));
+    toast.success("Expense deleted successfully");
+  };
+  
+  const resetExpenseForm = () => {
+    setExpenseDate("");
+    setExpenseCategory("");
+    setExpenseAmount("");
+    setExpenseDescription("");
+  };
+  
+  const totalExpenses = personalExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  
+  const expensesByCategory = personalExpenses.reduce((acc, expense) => {
+    if (!acc[expense.category]) {
+      acc[expense.category] = 0;
+    }
+    acc[expense.category] += expense.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
     <MainLayout>
-      <div className="page-container">
+      <motion.div 
+        className="page-container"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <h1 className="text-3xl font-bold mb-8 text-regimark-primary">Accounting</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-regimark-primary">$24,567.89</div>
-              <p className="text-sm text-green-500">+12.5% from last month</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-regimark-primary">$15,234.56</div>
-              <p className="text-sm text-red-500">+8.2% from last month</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Net Profit</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-regimark-primary">$9,333.33</div>
-              <p className="text-sm text-green-500">+18.7% from last month</p>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <Tabs defaultValue="transactions">
-          <TabsList className="mb-6">
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="reports">Financial Reports</TabsTrigger>
-            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-3 mb-8">
+            <TabsTrigger value="overview" className="text-lg">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="expenses" className="text-lg">
+              Personal Expenses
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="text-lg">
+              Financial Reports
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="transactions">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Recent Transactions</CardTitle>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Transaction
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {mockTransactions.map((tx) => (
-                      <TableRow key={tx.id}>
-                        <TableCell>{tx.date}</TableCell>
-                        <TableCell>{tx.description}</TableCell>
-                        <TableCell>{tx.category}</TableCell>
-                        <TableCell className={`text-right ${tx.type === "income" ? "text-green-600" : "text-red-600"}`}>
-                          {tx.type === "income" ? "+" : "-"}${tx.amount.toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={tx.status === "completed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
-                          >
-                            {tx.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Sales</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$12,450.75</div>
+                  <p className="text-muted-foreground text-sm">Last 30 days</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Outstanding Debts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$3,245.50</div>
+                  <p className="text-muted-foreground text-sm">From 5 customers</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Expenses</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">$4,125.00</div>
+                  <p className="text-muted-foreground text-sm">Including inventory purchases</p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
-          <TabsContent value="reports">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
+          <TabsContent value="expenses">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="md:col-span-3">
                 <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Income Statement</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
+                  <CardTitle>Personal Expenses</CardTitle>
+                  <Button onClick={() => setShowAddExpenseDialog(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Expense
                   </Button>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-6 flex items-center justify-center border-2 border-dashed rounded-md">
-                    <div className="text-center">
-                      <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-                      <h3 className="mt-2 text-sm font-semibold">Income Statement</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        For the period ending Apr 30, 2023
-                      </p>
-                      <Button variant="link" size="sm">
-                        View Report
-                      </Button>
-                    </div>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead className="text-right">Amount</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {personalExpenses.map((expense) => (
+                          <TableRow key={expense.id}>
+                            <TableCell>{expense.date}</TableCell>
+                            <TableCell>{expense.category}</TableCell>
+                            <TableCell>{expense.description}</TableCell>
+                            <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleDeleteExpense(expense.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        {personalExpenses.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-4">
+                              No personal expenses recorded
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
                   </div>
                 </CardContent>
               </Card>
               
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Balance Sheet</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
-                  </Button>
+                <CardHeader>
+                  <CardTitle>Expense Summary</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="p-6 flex items-center justify-center border-2 border-dashed rounded-md">
-                    <div className="text-center">
-                      <FileText className="mx-auto h-10 w-10 text-muted-foreground" />
-                      <h3 className="mt-2 text-sm font-semibold">Balance Sheet</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        As of Apr 30, 2023
-                      </p>
-                      <Button variant="link" size="sm">
-                        View Report
-                      </Button>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm font-medium">
+                      <span>Total Expenses</span>
+                      <span>${totalExpenses.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="text-sm text-muted-foreground">
+                      <p className="font-medium mb-2">By Category:</p>
+                      <ul className="space-y-1">
+                        {Object.entries(expensesByCategory).map(([category, amount]) => (
+                          <li key={category} className="flex justify-between">
+                            <span>{category}</span>
+                            <span>${amount.toFixed(2)}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </CardContent>
@@ -213,66 +247,158 @@ const Accounting = () => {
             </div>
           </TabsContent>
           
-          <TabsContent value="invoices">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Recent Invoices</CardTitle>
-                <Button size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Invoice
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>INV-001</TableCell>
-                      <TableCell>John Doe</TableCell>
-                      <TableCell>2023-04-28</TableCell>
-                      <TableCell>2023-05-12</TableCell>
-                      <TableCell className="text-right">$789.95</TableCell>
-                      <TableCell>
-                        <Badge className="bg-green-100 text-green-800" variant="outline">
-                          Paid
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">View</Button>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>INV-002</TableCell>
-                      <TableCell>Jane Smith</TableCell>
-                      <TableCell>2023-04-25</TableCell>
-                      <TableCell>2023-05-09</TableCell>
-                      <TableCell className="text-right">$329.99</TableCell>
-                      <TableCell>
-                        <Badge className="bg-yellow-100 text-yellow-800" variant="outline">
-                          Pending
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">View</Button>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+          <TabsContent value="reports">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Generate Reports</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Report Type</Label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select report type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="profit-loss">Profit & Loss</SelectItem>
+                        <SelectItem value="sales-tax">Sales & Tax</SelectItem>
+                        <SelectItem value="inventory">Inventory Valuation</SelectItem>
+                        <SelectItem value="customer">Customer Report</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Start Date</Label>
+                      <Input type="date" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>End Date</Label>
+                      <Input type="date" />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="w-full">Generate Report</Button>
+                </CardFooter>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Reports</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b pb-2">
+                      <div>
+                        <p className="font-medium">Profit & Loss</p>
+                        <p className="text-sm text-muted-foreground">April 2023</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <FileText className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between border-b pb-2">
+                      <div>
+                        <p className="font-medium">Sales & Tax</p>
+                        <p className="text-sm text-muted-foreground">Q1 2023</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <FileText className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pb-2">
+                      <div>
+                        <p className="font-medium">Inventory Valuation</p>
+                        <p className="text-sm text-muted-foreground">March 2023</p>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <FileText className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
-      </div>
+        
+        {/* Add Personal Expense Dialog */}
+        <Dialog open={showAddExpenseDialog} onOpenChange={setShowAddExpenseDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Personal Expense</DialogTitle>
+              <DialogDescription>
+                Record a new personal expense for tracking purposes.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="expense-date">Date</Label>
+                <Input
+                  id="expense-date"
+                  type="date"
+                  value={expenseDate}
+                  onChange={(e) => setExpenseDate(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="expense-category">Category</Label>
+                <Select value={expenseCategory} onValueChange={setExpenseCategory}>
+                  <SelectTrigger id="expense-category">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Office Supplies">Office Supplies</SelectItem>
+                    <SelectItem value="Travel">Travel</SelectItem>
+                    <SelectItem value="Meals">Meals</SelectItem>
+                    <SelectItem value="Utilities">Utilities</SelectItem>
+                    <SelectItem value="Rent">Rent</SelectItem>
+                    <SelectItem value="Salaries">Salaries</SelectItem>
+                    <SelectItem value="Miscellaneous">Miscellaneous</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="expense-amount">Amount</Label>
+                <Input
+                  id="expense-amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={expenseAmount}
+                  onChange={(e) => setExpenseAmount(e.target.value)}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="expense-description">Description</Label>
+                <Input
+                  id="expense-description"
+                  value={expenseDescription}
+                  onChange={(e) => setExpenseDescription(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowAddExpenseDialog(false)}>Cancel</Button>
+              <Button onClick={handleAddExpense}>Add Expense</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </motion.div>
     </MainLayout>
   );
 };

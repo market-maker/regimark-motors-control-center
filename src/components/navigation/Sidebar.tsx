@@ -1,110 +1,161 @@
 
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
 import { 
-  BarChart, 
+  DollarSign, 
+  LayoutDashboard, 
   Package, 
-  ShoppingCart, 
-  Users, 
   FileText, 
-  Settings, 
-  Database,
-  Receipt,
-  X
-} from 'lucide-react';
-import { useTheme } from '@/providers/ThemeProvider';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
+  Users, 
+  Truck, 
+  PieChart, 
+  FileCog, 
+  Upload, 
+  Settings,
+  Store,
+  CreditCard,
+  Building,
+} from "lucide-react";
+import logoImage from "/placeholder.svg";
+import { Button } from "../ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sidebar as SidebarComponent, SidebarItem, SidebarSection } from "@/components/ui/sidebar";
 
 interface SidebarProps {
-  onClose?: () => void;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const menuItems = [
-  { path: '/', label: 'Dashboard', icon: BarChart },
-  { path: '/inventory', label: 'Inventory', icon: Package },
-  { path: '/sales', label: 'Sales', icon: ShoppingCart },
-  { path: '/customers', label: 'Customers', icon: Users },
-  { path: '/suppliers', label: 'Suppliers', icon: Database },
-  { path: '/reports', label: 'Reports', icon: FileText },
-  { path: '/accounting', label: 'Accounting', icon: Database },
-  { path: '/receipt-templates', label: 'Receipt Templates', icon: Receipt },
-  { path: '/settings', label: 'Settings', icon: Settings },
-];
-
-const Sidebar = ({ onClose }: SidebarProps) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
-  const { theme } = useTheme();
-  const isMobile = useIsMobile();
+  // This function determines if the current path is active
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  // Upload logo from user
+  const [logoUrl, setLogoUrl] = useState<string>("/placeholder.svg");
+
+  // Check if custom logo exists
+  useEffect(() => {
+    const img = new Image();
+    img.src = "/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png";
+    img.onload = () => {
+      setLogoUrl("/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png");
+    };
+  }, []);
 
   return (
-    <div className={cn(
-      "w-64 border-r h-full flex flex-col",
-      theme === 'dark' 
-        ? "bg-black border-gray-800" 
-        : "bg-white border-gray-200"
-    )}>
-      {isMobile && (
-        <div className="flex justify-end p-2">
-          <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-500">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-      <div className={cn(
-        "p-4 border-b",
-        theme === 'dark' ? "border-gray-800" : "border-gray-200"
-      )}>
-        <motion.div 
-          whileHover={{ scale: 1.05 }}
-          className="flex items-center justify-center"
-        >
-          <img 
-            src="/lovable-uploads/153ce379-8cc5-4fd7-ae3b-0d0434c5e23c.png" 
-            alt="Logo" 
-            className="h-12"
+    <SidebarComponent 
+      isOpen={isOpen} 
+      onClose={() => setIsOpen(false)}
+      className="shadow-lg transition-all duration-300 border-r border-border"
+    >
+      <div className="p-4 flex justify-center mb-4">
+        <Link to="/" className="flex items-center">
+          <img
+            src={logoUrl}
+            alt="Logo"
+            className="h-12 w-auto"
           />
-        </motion.div>
+        </Link>
       </div>
-      <nav className="flex-1 pt-4 pb-4 overflow-y-auto">
-        <ul className="space-y-1 px-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <motion.li 
-                key={item.path}
-                whileHover={{ scale: 1.03, x: 5 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Link
-                  to={item.path}
-                  className={cn(
-                    "flex items-center px-4 py-3 text-sm font-medium rounded-md transition-all duration-300",
-                    isActive 
-                      ? "bg-regimark-primary text-white shadow-lg" 
-                      : theme === "dark"
-                        ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                        : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary",
-                    "sidebar-menu-item"
-                  )}
-                >
-                  <motion.div
-                    whileHover={{ rotate: isActive ? 0 : 10 }}
-                    className="mr-3"
-                  >
-                    <Icon className="h-5 w-5" />
-                  </motion.div>
-                  {item.label}
-                </Link>
-              </motion.li>
-            );
-          })}
-        </ul>
-      </nav>
-    </div>
+      
+      <ScrollArea className="flex flex-col flex-1">
+        <SidebarSection>
+          <SidebarItem
+            href="/"
+            icon={<LayoutDashboard />}
+            label="Dashboard"
+            isActive={isActive('/')}
+          />
+          <SidebarItem
+            href="/inventory"
+            icon={<Package />}
+            label="Inventory"
+            isActive={isActive('/inventory')}
+          />
+          <SidebarItem
+            href="/sales"
+            icon={<DollarSign />}
+            label="Sales"
+            isActive={isActive('/sales')}
+          />
+          <SidebarItem
+            href="/customers"
+            icon={<Users />}
+            label="Customers"
+            isActive={isActive('/customers')}
+          />
+        </SidebarSection>
+
+        <SidebarSection title="Business">
+          <SidebarItem
+            href="/stores"
+            icon={<Store />}
+            label="Stores"
+            isActive={isActive('/stores')}
+          />
+          <SidebarItem
+            href="/suppliers"
+            icon={<Truck />}
+            label="Suppliers"
+            isActive={isActive('/suppliers')}
+          />
+          <SidebarItem
+            href="/accounting"
+            icon={<CreditCard />}
+            label="Accounting"
+            isActive={isActive('/accounting')}
+          />
+          <SidebarItem
+            href="/reports"
+            icon={<PieChart />}
+            label="Reports"
+            isActive={isActive('/reports')}
+          />
+        </SidebarSection>
+
+        <SidebarSection title="System">
+          <SidebarItem
+            href="/receipt-templates"
+            icon={<FileCog />}
+            label="Receipt Templates"
+            isActive={isActive('/receipt-templates')}
+          />
+          <SidebarItem
+            href="/import"
+            icon={<Upload />}
+            label="Import Data"
+            isActive={isActive('/import')}
+          />
+          <SidebarItem
+            href="/settings"
+            icon={<Settings />}
+            label="Settings"
+            isActive={isActive('/settings')}
+          />
+        </SidebarSection>
+      </ScrollArea>
+
+      <div className="p-4 border-t">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="relative">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+            </span>
+          </div>
+          <div className="text-sm font-medium">Auto Parts System</div>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          v1.2.0
+        </div>
+      </div>
+    </SidebarComponent>
   );
 };
 

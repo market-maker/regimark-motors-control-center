@@ -1,120 +1,104 @@
 
-import { useState } from 'react';
-import { Bell, Search, User, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { toast } from '@/components/ui/sonner';
-import { motion } from 'framer-motion';
-import { useTheme } from '@/providers/ThemeProvider';
+import React, { useState } from "react";
+import { ThemeToggle } from "../theme/ThemeToggle";
+import { Menu, Search } from "lucide-react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import NotificationBell from "./NotificationBell";
 
-const Header = () => {
-  const [notifications] = useState(3);
-  const [searchTerm, setSearchTerm] = useState('');
-  const { theme } = useTheme();
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchTerm) {
-      toast.info(`Searching for: ${searchTerm}`);
-      // In a real app, we would handle the search functionality here
-      setSearchTerm('');
-    }
-  };
+interface HeaderProps {
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const iconVariants = {
-    hover: {
-      scale: 1.2,
-      rotate: 5,
-      transition: { type: "spring", stiffness: 400 }
-    },
-    tap: {
-      scale: 0.9
-    }
-  };
+const Header: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
-    <motion.header 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={`py-4 px-6 flex items-center justify-between border-b ${theme === 'dark' ? 'bg-black/40 backdrop-blur-lg border-gray-800' : 'bg-white/80 backdrop-blur-lg border-gray-200'}`}
-    >
-      <div className="flex items-center">
-        <form onSubmit={handleSearch} className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-          <Input 
-            placeholder="Search..." 
-            className={`pl-10 w-64 transition-all focus:shadow-lg ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : ''}`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </form>
-      </div>
-      <div className="flex items-center space-x-4">
-        <motion.div 
-          whileHover="hover" 
-          whileTap="tap"
-          variants={iconVariants}
-        >
-          <ThemeToggle />
-        </motion.div>
-        
-        <motion.div 
-          className="relative"
-          whileHover="hover" 
-          whileTap="tap"
-          variants={iconVariants}
-        >
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell size={20} />
-            {notifications > 0 && (
-              <motion.span 
-                className="absolute top-0 right-0 h-4 w-4 bg-regimark-primary text-white text-xs flex items-center justify-center rounded-full"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 500 }}
-              >
-                {notifications}
-              </motion.span>
-            )}
-          </Button>
-        </motion.div>
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 backdrop-blur-sm transition-all">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Toggle Menu</span>
+      </Button>
 
+      <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <SheetTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 md:hidden"
+          >
+            <Search className="h-4 w-4" />
+            <span className="sr-only">Search</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="top" className="px-4 sm:px-6">
+          <div className="relative py-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-8"
+              placeholder="Search inventory, customers, and more..."
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <div className="hidden md:flex-1 md:flex md:gap-2">
+        <Button variant="outline" className="hidden lg:flex">
+          Dashboard
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-2 md:gap-4">
+        <div className="hidden md:flex md:flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="w-64 pl-8"
+              placeholder="Search inventory, customers, and more..."
+            />
+          </div>
+        </div>
+        <NotificationBell />
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8 shadow-md">
-                  <AvatarFallback className="bg-regimark-primary text-white">
-                    RM
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">Admin User</span>
-              </Button>
-            </motion.div>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="" />
+                <AvatarFallback>AU</AvatarFallback>
+              </Avatar>
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <motion.div whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-              <DropdownMenuItem onClick={() => toast.info("Profile view not implemented yet")}>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-            </motion.div>
-            <motion.div whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-              <DropdownMenuItem onClick={() => toast.info("Settings view not implemented yet")}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-            </motion.div>
+            <DropdownMenuItem onClick={() => navigate("/settings")}>
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </motion.header>
+    </header>
   );
 };
 

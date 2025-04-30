@@ -1,59 +1,46 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Sales from "./pages/Sales";
+import ImportData from "./pages/ImportData";
 import Customers from "./pages/Customers";
+import Suppliers from "./pages/Suppliers";
 import Reports from "./pages/Reports";
 import Accounting from "./pages/Accounting";
 import NotFound from "./pages/NotFound";
+import ReceiptTemplates from "./pages/ReceiptTemplates";
+import Settings from "./pages/Settings";
+import Stores from "./pages/Stores";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import ImportData from "./pages/ImportData";
-import Suppliers from "./pages/Suppliers"; // Add Suppliers page
-import ReceiptTemplates from "./pages/ReceiptTemplates"; // Add Receipt Templates page
-import { useEffect } from "react";
+import { NotificationsProvider } from "./providers/NotificationsProvider";
+import "./App.css";
+import { Toaster } from "@/components/ui/sonner";
 
-const queryClient = new QueryClient();
-
-// Auto-authenticate user
-const AutoAuth = () => {
-  useEffect(() => {
-    // Set a default user
-    localStorage.setItem('user', JSON.stringify({ email: 'default@example.com', isLoggedIn: true }));
-  }, []);
-
-  return null;
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+function App() {
+  return (
     <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AutoAuth />
+      <NotificationsProvider>
+        <Toaster richColors position="top-right" />
+        <Router>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/sales" element={<Sales />} />
+            <Route path="/import" element={<ImportData />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/accounting" element={<Accounting />} />
-            <Route path="/import" element={<ImportData />} />
-            <Route path="/suppliers" element={<Suppliers />} /> {/* New route */}
-            <Route path="/receipt-templates" element={<ReceiptTemplates />} /> {/* New route */}
-            {/* Redirect any other paths to home */}
+            <Route path="/receipt-templates" element={<ReceiptTemplates />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/stores" element={<Stores />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+        </Router>
+      </NotificationsProvider>
     </ThemeProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;
