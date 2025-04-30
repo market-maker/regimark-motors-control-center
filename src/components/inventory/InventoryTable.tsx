@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Table, 
@@ -24,6 +23,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { useForm } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
+import { InventoryItem, determineStatus } from "@/utils/inventoryUtils";
+import { mapImportedStatus, transformImportedInventory } from "../inventory/FixInventoryTypes";
 
 interface InventoryItem {
   id: string;
@@ -148,6 +149,9 @@ const InventoryTable = () => {
   });
 
   const handleAddItem = (data: any) => {
+    const stock = parseInt(data.stock);
+    const status = determineStatus(stock);
+    
     const newItem: InventoryItem = {
       id: `${items.length + 1}`,
       sku: data.sku,
@@ -155,8 +159,8 @@ const InventoryTable = () => {
       category: data.category,
       price: parseFloat(data.price),
       cost: parseFloat(data.cost),
-      stock: parseInt(data.stock),
-      status: parseInt(data.stock) > 5 ? "In Stock" : parseInt(data.stock) > 0 ? "Low Stock" : "Out of Stock",
+      stock,
+      status,
     };
 
     setItems([...items, newItem]);
@@ -181,9 +185,11 @@ const InventoryTable = () => {
   const handleEditItem = (data: any) => {
     if (!currentItem) return;
     
+    const stock = parseInt(data.stock);
+    const status = determineStatus(stock);
+    
     const updatedItems = items.map(item => {
       if (item.id === currentItem.id) {
-        const stock = parseInt(data.stock);
         return {
           ...item,
           name: data.name,
@@ -192,7 +198,7 @@ const InventoryTable = () => {
           price: parseFloat(data.price),
           cost: parseFloat(data.cost),
           stock,
-          status: stock > 5 ? "In Stock" : stock > 0 ? "Low Stock" : "Out of Stock",
+          status,
         };
       }
       return item;
