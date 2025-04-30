@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, CompositeChart, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Line, ComposedChart, Legend } from 'recharts';
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -98,7 +98,7 @@ const SalesChart = () => {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               {timeRange === 'monthly' || timeRange === 'weekly' ? (
-                <CompositeChart
+                <ComposedChart
                   data={activeData}
                   margin={{
                     top: 5,
@@ -163,7 +163,7 @@ const SalesChart = () => {
                       <stop offset="95%" stopColor="#FF5A5A" stopOpacity={0.8}/>
                     </linearGradient>
                   </defs>
-                </CompositeChart>
+                </ComposedChart>
               ) : (
                 <BarChart
                   data={activeData}
