@@ -63,16 +63,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Regimark Motors custom colors
+				// Regimark Autoelectrics custom colors (updated to match the logo)
 				regimark: {
-					primary: '#1A365D',    // Deep blue
-					secondary: '#E53E3E',  // Accent red
-					light: '#EDF2F7',      // Light gray for backgrounds
-					dark: '#2D3748',       // Dark gray for text
-					accent: '#4299E1',     // Light blue for highlights
+					primary: '#E30613',    // Red from logo
+					secondary: '#111111',  // Black from logo
+					light: '#F8F8F8',      // Light gray for backgrounds
+					dark: '#333333',       // Dark gray for text
+					accent: '#FF5A5A',     // Light red for highlights
 					success: '#38A169',    // Green for success states
 					warning: '#F6AD55',    // Orange for warnings
-					error: '#F56565',      // Red for errors
+					error: '#E30613',      // Red for errors
 				},
 			},
 			fontFamily: {

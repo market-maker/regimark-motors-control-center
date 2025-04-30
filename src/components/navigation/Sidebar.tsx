@@ -8,7 +8,9 @@ import {
   Users, 
   FileText, 
   Settings, 
-  Database
+  Database,
+  Receipt,
+  User
 } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 
@@ -17,8 +19,10 @@ const menuItems = [
   { path: '/inventory', label: 'Inventory', icon: Package },
   { path: '/sales', label: 'Sales', icon: ShoppingCart },
   { path: '/customers', label: 'Customers', icon: Users },
+  { path: '/suppliers', label: 'Suppliers', icon: Database }, // Added suppliers menu item
   { path: '/reports', label: 'Reports', icon: FileText },
   { path: '/accounting', label: 'Accounting', icon: Database },
+  { path: '/receipt-templates', label: 'Receipt Templates', icon: Receipt }, // Added receipt templates
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -38,15 +42,8 @@ const Sidebar = () => {
         theme === 'dark' ? "border-gray-800" : "border-gray-200"
       )}>
         <h1 className="text-xl font-bold text-regimark-primary flex items-center">
-          <span className="mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-regimark-secondary">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-              <line x1="9" y1="9" x2="9.01" y2="9"/>
-              <line x1="15" y1="9" x2="15.01" y2="9"/>
-            </svg>
-          </span>
-          Regimark Motors
+          <img src="/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png" alt="Regimark Autoelectrics" className="h-8 mr-2" />
+          <span className="hidden lg:inline">Regimark Autoelectrics</span>
         </h1>
       </div>
       <nav className="flex-1 pt-4 pb-4 overflow-y-auto">

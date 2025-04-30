@@ -13,6 +13,8 @@ import Accounting from "./pages/Accounting";
 import NotFound from "./pages/NotFound";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import ImportData from "./pages/ImportData";
+import Suppliers from "./pages/Suppliers"; // Add Suppliers page
+import ReceiptTemplates from "./pages/ReceiptTemplates"; // Add Receipt Templates page
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -43,6 +45,8 @@ const App = () => (
             <Route path="/reports" element={<Reports />} />
             <Route path="/accounting" element={<Accounting />} />
             <Route path="/import" element={<ImportData />} />
+            <Route path="/suppliers" element={<Suppliers />} /> {/* New route */}
+            <Route path="/receipt-templates" element={<ReceiptTemplates />} /> {/* New route */}
             {/* Redirect any other paths to home */}
             <Route path="*" element={<NotFound />} />
           </Routes>
