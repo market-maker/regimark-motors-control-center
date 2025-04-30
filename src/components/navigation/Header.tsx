@@ -1,36 +1,17 @@
 
-import { useState, useEffect } from 'react';
-import { Bell, Search, User, Settings, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { Bell, Search, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 
 const Header = () => {
   const [notifications] = useState(3);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
   
-  // Check if user is logged in on component mount
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      const userData = JSON.parse(user);
-      setIsLoggedIn(userData.isLoggedIn);
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setIsLoggedIn(false);
-    toast.success("Logged out successfully");
-    navigate('/login');
-  };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm) {
@@ -72,10 +53,10 @@ const Header = () => {
             <Button variant="ghost" className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-regimark-primary text-white">
-                  {isLoggedIn ? 'RM' : 'G'}
+                  RM
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">{isLoggedIn ? 'Admin User' : 'Guest'}</span>
+              <span className="text-sm font-medium">Admin User</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
@@ -88,11 +69,6 @@ const Header = () => {
             <DropdownMenuItem onClick={() => toast.info("Settings view not implemented yet")}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Settings</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
