@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Table, 
@@ -7,29 +8,30 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Plus, Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+  Dialog, 
+  DialogContent,
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Edit, Trash2, Eye, Plus, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
-import { InventoryItem, determineStatus } from "@/utils/inventoryUtils";
+import { determineStatus } from "@/utils/inventoryUtils";
 import { mapImportedStatus, transformImportedInventory } from "../inventory/FixInventoryTypes";
 
+// Define our own interface to avoid conflict with imported one
 interface InventoryItem {
   id: string;
-  sku: string;
   name: string;
+  sku: string;
   category: string;
   price: number;
   cost: number;
@@ -37,7 +39,8 @@ interface InventoryItem {
   status: "In Stock" | "Low Stock" | "Out of Stock";
 }
 
-const mockInventoryItems: InventoryItem[] = [
+// Mock inventory data
+const mockInventoryData: InventoryItem[] = [
   {
     id: "1",
     sku: "BP-T19-001",
@@ -45,8 +48,8 @@ const mockInventoryItems: InventoryItem[] = [
     category: "Brakes",
     price: 89.99,
     cost: 45.00,
-    stock: 15,
-    status: "In Stock",
+    stock: 12,
+    status: "In Stock"
   },
   {
     id: "2",
@@ -56,7 +59,7 @@ const mockInventoryItems: InventoryItem[] = [
     price: 12.99,
     cost: 5.50,
     stock: 8,
-    status: "In Stock",
+    status: "In Stock"
   },
   {
     id: "3",
@@ -65,8 +68,8 @@ const mockInventoryItems: InventoryItem[] = [
     category: "Ignition",
     price: 7.99,
     cost: 3.25,
-    stock: 24,
-    status: "In Stock",
+    stock: 5,
+    status: "Low Stock"
   },
   {
     id: "4",
@@ -74,9 +77,9 @@ const mockInventoryItems: InventoryItem[] = [
     name: "Air Filter - Honda Accord 2019",
     category: "Filters",
     price: 15.99,
-    cost: 6.75,
-    stock: 3,
-    status: "Low Stock",
+    cost: 7.25,
+    stock: 0,
+    status: "Out of Stock"
   },
   {
     id: "5",
@@ -85,68 +88,72 @@ const mockInventoryItems: InventoryItem[] = [
     category: "Engine",
     price: 45.99,
     cost: 22.50,
-    stock: 0,
-    status: "Out of Stock",
-  },
+    stock: 3,
+    status: "Low Stock"
+  }
 ];
 
-const statusColor = {
-  "In Stock": "bg-green-100 text-green-800",
-  "Low Stock": "bg-yellow-100 text-yellow-800",
-  "Out of Stock": "bg-red-100 text-red-800",
-};
-
-const categories = ["All Categories", "Brakes", "Filters", "Engine", "Ignition"];
-const statusOptions = ["All Items", "In Stock", "Low Stock", "Out of Stock"];
+// Categories for the dropdown
+const categories = ["Brakes", "Filters", "Ignition", "Engine", "Electrical", "Suspension", "Exhaust", "Other"];
 
 const InventoryTable = () => {
+  const [items, setItems] = useState<InventoryItem[]>(mockInventoryData);
   const [searchTerm, setSearchTerm] = useState("");
-  const [items, setItems] = useState(mockInventoryItems);
-  const [filterCategory, setFilterCategory] = useState("All Categories");
-  const [filterStatus, setFilterStatus] = useState("All Items");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<InventoryItem | null>(null);
 
-  // Create a form with react-hook-form
-  const form = useForm({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     defaultValues: {
-      name: "",
       sku: "",
+      name: "",
       category: "",
-      price: 0,
-      cost: 0,
-      stock: 0,
-    },
+      price: "",
+      cost: "",
+      stock: ""
+    }
   });
 
-  const editForm = useForm({
-    defaultValues: {
-      name: "",
-      sku: "",
-      category: "",
-      price: 0,
-      cost: 0,
-      stock: 0,
-    },
-  });
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Filter functionality is handled in the render
+  };
 
-  // Apply all filters
-  const filteredItems = items.filter(item => {
-    // Text search
-    const matchesSearch = 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Category filter
-    const matchesCategory = filterCategory === "All Categories" || item.category === filterCategory;
-    
-    // Status filter
-    const matchesStatus = filterStatus === "All Items" || item.status === filterStatus;
-    
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const handleView = (item: InventoryItem) => {
+    setCurrentItem(item);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleEdit = (item: InventoryItem) => {
+    setCurrentItem(item);
+    setValue("sku", item.sku);
+    setValue("name", item.name);
+    setValue("category", item.category);
+    setValue("price", item.price.toString());
+    setValue("cost", item.cost.toString());
+    setValue("stock", item.stock.toString());
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = (item: InventoryItem) => {
+    setCurrentItem(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (currentItem) {
+      setItems(items.filter(item => item.id !== currentItem.id));
+      setIsDeleteDialogOpen(false);
+      toast.success("Item deleted successfully");
+    }
+  };
+
+  const handleAddDialog = () => {
+    reset();
+    setIsAddDialogOpen(true);
+  };
 
   const handleAddItem = (data: any) => {
     const stock = parseInt(data.stock);
@@ -165,21 +172,28 @@ const InventoryTable = () => {
 
     setItems([...items, newItem]);
     setIsAddDialogOpen(false);
-    form.reset();
+    reset();
     toast.success("Item added successfully");
   };
 
-  const handleEditClick = (item: InventoryItem) => {
-    setCurrentItem(item);
-    editForm.reset({
-      name: item.name,
-      sku: item.sku,
-      category: item.category,
-      price: item.price,
-      cost: item.cost,
-      stock: item.stock,
-    });
-    setIsEditDialogOpen(true);
+  const filteredItems = items.filter(
+    item =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "In Stock":
+        return "bg-green-100 text-green-800";
+      case "Low Stock":
+        return "bg-yellow-100 text-yellow-800";
+      case "Out of Stock":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   const handleEditItem = (data: any) => {
@@ -206,291 +220,40 @@ const InventoryTable = () => {
 
     setItems(updatedItems);
     setIsEditDialogOpen(false);
-    setCurrentItem(null);
     toast.success("Item updated successfully");
   };
 
-  const applyFilter = (type: string, value: string) => {
-    if (type === 'category') {
-      setFilterCategory(value);
-    } else if (type === 'status') {
-      setFilterStatus(value);
-    }
+  const handleImportData = (importedData: any[]) => {
+    // Transform the imported data to match our schema
+    const transformedData = transformImportedInventory(importedData);
+    
+    // Add the imported data to our existing items
+    setItems([...items, ...transformedData]);
+    
+    toast.success(`Imported ${transformedData.length} inventory items`);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-        <div className="relative">
+      <div className="flex flex-col sm:flex-row justify-between space-y-2 sm:space-y-0">
+        <form onSubmit={handleSearch} className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <Input
-            placeholder="Search products..."
-            className="pl-10 w-full sm:w-80"
+            type="text"
+            placeholder="Search inventory..."
+            className="pl-10"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
-        </div>
-        <div className="flex space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={() => applyFilter('status', 'All Items')}>
-                All Items
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => applyFilter('status', 'In Stock')}>
-                In Stock
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => applyFilter('status', 'Low Stock')}>
-                Low Stock
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => applyFilter('status', 'Out of Stock')}>
-                Out of Stock
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {categories.filter(c => c !== 'All Categories').map((category) => (
-                <DropdownMenuItem 
-                  key={category} 
-                  onClick={() => applyFilter('category', category)}
-                >
-                  {category}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        </form>
 
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Inventory Item</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="name">Product Name</FormLabel>
-                    <Input
-                      id="name"
-                      placeholder="Enter product name"
-                      {...form.register("name", { required: true })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="sku">SKU</FormLabel>
-                    <Input
-                      id="sku"
-                      placeholder="Enter SKU"
-                      {...form.register("sku", { required: true })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="category">Category</FormLabel>
-                    <Select
-                      onValueChange={(value) => form.setValue("category", value)}
-                      defaultValue={form.getValues("category")}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.filter(c => c !== 'All Categories').map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="stock">Stock Quantity</FormLabel>
-                    <Input
-                      id="stock"
-                      type="number"
-                      min="0"
-                      placeholder="Enter quantity"
-                      {...form.register("stock", { required: true, min: 0 })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="price">Selling Price ($)</FormLabel>
-                    <Input
-                      id="price"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...form.register("price", { required: true, min: 0 })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="cost">Cost Price ($)</FormLabel>
-                    <Input
-                      id="cost"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...form.register("cost", { required: true, min: 0 })}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsAddDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">Add Item</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Inventory Item</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={editForm.handleSubmit(handleEditItem)} className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-name">Product Name</FormLabel>
-                    <Input
-                      id="edit-name"
-                      placeholder="Enter product name"
-                      {...editForm.register("name", { required: true })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-sku">SKU</FormLabel>
-                    <Input
-                      id="edit-sku"
-                      placeholder="Enter SKU"
-                      {...editForm.register("sku", { required: true })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-category">Category</FormLabel>
-                    <Select
-                      onValueChange={(value) => editForm.setValue("category", value)}
-                      defaultValue={currentItem?.category || ""}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.filter(c => c !== 'All Categories').map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-stock">Stock Quantity</FormLabel>
-                    <Input
-                      id="edit-stock"
-                      type="number"
-                      min="0"
-                      placeholder="Enter quantity"
-                      {...editForm.register("stock", { required: true, min: 0 })}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-price">Selling Price ($)</FormLabel>
-                    <Input
-                      id="edit-price"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...editForm.register("price", { required: true, min: 0 })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <FormLabel htmlFor="edit-cost">Cost Price ($)</FormLabel>
-                    <Input
-                      id="edit-cost"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...editForm.register("cost", { required: true, min: 0 })}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setIsEditDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">Update Item</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <Button onClick={handleAddDialog}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Item
+        </Button>
       </div>
-
-      {/* Applied filters display */}
-      {(filterCategory !== "All Categories" || filterStatus !== "All Items") && (
-        <div className="flex flex-wrap gap-2 pb-2">
-          {filterCategory !== "All Categories" && (
-            <Badge variant="secondary" className="px-3 py-1">
-              Category: {filterCategory}
-              <button 
-                className="ml-2 text-xs"
-                onClick={() => setFilterCategory("All Categories")}
-              >
-                ×
-              </button>
-            </Badge>
-          )}
-          {filterStatus !== "All Items" && (
-            <Badge variant="secondary" className="px-3 py-1">
-              Status: {filterStatus}
-              <button 
-                className="ml-2 text-xs"
-                onClick={() => setFilterStatus("All Items")}
-              >
-                ×
-              </button>
-            </Badge>
-          )}
-        </div>
-      )}
-
-      <div className="border rounded-md">
+      
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -501,45 +264,255 @@ const InventoryTable = () => {
               <TableHead className="text-right">Cost</TableHead>
               <TableHead className="text-right">Stock</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
+              filteredItems.map(item => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.sku}</TableCell>
+                  <TableCell>{item.sku}</TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.category}</TableCell>
                   <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
                   <TableCell className="text-right">${item.cost.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{item.stock}</TableCell>
                   <TableCell>
-                    <Badge className={statusColor[item.status]} variant="outline">
+                    <Badge className={getStatusColor(item.status)}>
                       {item.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleEditClick(item)}
-                    >
-                      Edit
-                    </Button>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleView(item)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                  No items found. Try adjusting your filters.
+                <TableCell colSpan={8} className="text-center py-4">
+                  No items match your search
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* View Item Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>View Item Details</DialogTitle>
+          </DialogHeader>
+          {currentItem && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">SKU</p>
+                  <p>{currentItem.sku}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Category</p>
+                  <p>{currentItem.category}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Name</p>
+                <p>{currentItem.name}</p>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Price</p>
+                  <p>${currentItem.price.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Cost</p>
+                  <p>${currentItem.cost.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Profit</p>
+                  <p>${(currentItem.price - currentItem.cost).toFixed(2)}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Stock</p>
+                  <p>{currentItem.stock}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <Badge className={getStatusColor(currentItem.status)}>
+                    {currentItem.status}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Item Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Inventory Item</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(handleAddItem)} className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sku">SKU</Label>
+                <Input id="sku" {...register("sku", { required: "SKU is required" })} />
+                {errors.sku && <p className="text-xs text-red-500">{errors.sku.message?.toString()}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select onValueChange={value => setValue("category", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category && <p className="text-xs text-red-500">{errors.category.message?.toString()}</p>}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" {...register("name", { required: "Name is required" })} />
+              {errors.name && <p className="text-xs text-red-500">{errors.name.message?.toString()}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="price">Price</Label>
+                <Input id="price" type="number" step="0.01" {...register("price", { required: "Price is required" })} />
+                {errors.price && <p className="text-xs text-red-500">{errors.price.message?.toString()}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cost">Cost</Label>
+                <Input id="cost" type="number" step="0.01" {...register("cost", { required: "Cost is required" })} />
+                {errors.cost && <p className="text-xs text-red-500">{errors.cost.message?.toString()}</p>}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input id="stock" type="number" {...register("stock", { required: "Stock is required" })} />
+              {errors.stock && <p className="text-xs text-red-500">{errors.stock.message?.toString()}</p>}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Item</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Item Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Inventory Item</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(handleEditItem)} className="space-y-4 py-4">
+            {/* Similar form fields as Add Item Dialog */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-sku">SKU</Label>
+                <Input id="edit-sku" {...register("sku", { required: "SKU is required" })} />
+                {errors.sku && <p className="text-xs text-red-500">{errors.sku.message?.toString()}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-category">Category</Label>
+                <Select onValueChange={value => setValue("category", value)} defaultValue={currentItem?.category}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category && <p className="text-xs text-red-500">{errors.category.message?.toString()}</p>}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Name</Label>
+              <Input id="edit-name" {...register("name", { required: "Name is required" })} />
+              {errors.name && <p className="text-xs text-red-500">{errors.name.message?.toString()}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-price">Price</Label>
+                <Input id="edit-price" type="number" step="0.01" {...register("price", { required: "Price is required" })} />
+                {errors.price && <p className="text-xs text-red-500">{errors.price.message?.toString()}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-cost">Cost</Label>
+                <Input id="edit-cost" type="number" step="0.01" {...register("cost", { required: "Cost is required" })} />
+                {errors.cost && <p className="text-xs text-red-500">{errors.cost.message?.toString()}</p>}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-stock">Stock</Label>
+              <Input id="edit-stock" type="number" {...register("stock", { required: "Stock is required" })} />
+              {errors.stock && <p className="text-xs text-red-500">{errors.stock.message?.toString()}</p>}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Update Item</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Item Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this item? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {currentItem && (
+              <p>
+                <strong>{currentItem.name}</strong> (SKU: {currentItem.sku})
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

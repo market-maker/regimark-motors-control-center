@@ -12,11 +12,15 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Search, Trash2, Plus, CreditCard, Banknote } from "lucide-react";
+import { Search, Trash2, Plus, CreditCard, Banknote, User } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import Receipt from "./Receipt";
+import { Switch } from "@/components/ui/switch";
+import { Customer } from "@/types/customer";
+import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CartItem {
   id: string;
@@ -95,8 +99,44 @@ const availableProducts: Product[] = [
   },
 ];
 
+// Mock customers for customer selection
+const mockCustomers: Customer[] = [
+  {
+    id: "1",
+    name: "John Smith",
+    email: "john@example.com",
+    phone: "555-123-4567",
+    address: "123 Main St, City",
+    totalSpent: 1250.50,
+    lastVisit: "2023-04-15",
+    status: "Active"
+  },
+  {
+    id: "2",
+    name: "Jane Doe",
+    email: "jane@example.com",
+    phone: "555-987-6543",
+    address: "456 Oak St, Town",
+    totalSpent: 875.25,
+    lastVisit: "2023-04-20",
+    status: "Active"
+  },
+  {
+    id: "3",
+    name: "Mike Johnson",
+    email: "mike@example.com",
+    phone: "555-456-7890",
+    address: "789 Pine St, Village",
+    totalSpent: 2350.00,
+    lastVisit: "2023-04-18",
+    status: "Active"
+  }
+];
+
 const CheckoutForm = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  
   const [cartItems, setCartItems] = useState<CartItem[]>([
     {
       id: "1",
@@ -126,6 +166,13 @@ const CheckoutForm = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [completedSaleData, setCompletedSaleData] = useState<any>(null);
+  
+  // New states for credit sales
+  const [isCredit, setIsCredit] = useState(false);
+  const [dueDate, setDueDate] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [showCustomerDialog, setShowCustomerDialog] = useState(false);
+  const [customerSearchTerm, setCustomerSearchTerm] = useState("");
 
   const handleRemoveItem = (id: string) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
@@ -163,6 +210,15 @@ const CheckoutForm = () => {
     setIsAddProductDialogOpen(false);
   };
 
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setCustomerName(customer.name);
+    setCustomerPhone(customer.phone);
+    setCustomerEmail(customer.email);
+    setShowCustomerDialog(false);
+    toast.success(`Selected customer: ${customer.name}`);
+  };
+
   const handleCompleteSale = () => {
     if (cartItems.length === 0) {
       toast.error("Cannot complete sale with empty cart");
@@ -174,14 +230,26 @@ const CheckoutForm = () => {
       return;
     }
 
-    if (paymentMethod === "cash" && (!cashReceived || cashReceived < total)) {
-      toast.error("Cash received must be equal to or greater than the total amount");
-      return;
-    }
+    if (isCredit) {
+      if (!dueDate) {
+        toast.error("Please enter due date for credit sale");
+        return;
+      }
+      
+      if (!selectedCustomer) {
+        toast.error("Please select a registered customer for credit sale");
+        return;
+      }
+    } else {
+      if (paymentMethod === "cash" && (!cashReceived || cashReceived < total)) {
+        toast.error("Cash received must be equal to or greater than the total amount");
+        return;
+      }
 
-    if (paymentMethod === "card" && !cardNumber) {
-      toast.error("Please enter card number");
-      return;
+      if (paymentMethod === "card" && !cardNumber) {
+        toast.error("Please enter card number");
+        return;
+      }
     }
 
     // Show processing state
@@ -205,14 +273,24 @@ const CheckoutForm = () => {
       date: currentDate,
       customerName: customerName,
       customerEmail: customerEmail,
-      paymentMethod: paymentMethod,
+      paymentMethod: isCredit ? "credit" : paymentMethod,
       items: cartItems,
       subtotal: subtotal,
       tax: tax,
       total: total,
-      cashReceived: paymentMethod === "cash" ? cashReceived : undefined,
-      change: paymentMethod === "cash" ? cashReceived - total : undefined
+      cashReceived: paymentMethod === "cash" && !isCredit ? cashReceived : undefined,
+      change: paymentMethod === "cash" && !isCredit ? cashReceived - total : undefined,
+      isCredit: isCredit,
+      dueDate: isCredit ? dueDate : undefined
     };
+
+    // If this is a credit sale, add it to the customer's debt records
+    if (isCredit && selectedCustomer) {
+      // This would normally update a database
+      toast.info(`Added ${total.toFixed(2)} to ${selectedCustomer.name}'s account as credit`);
+      
+      // In a real app, we would update the customer's debt records here
+    }
 
     // Simulate processing delay
     setTimeout(() => {
@@ -232,6 +310,9 @@ const CheckoutForm = () => {
     setCustomerEmail("");
     setCashReceived(0);
     setCardNumber("");
+    setIsCredit(false);
+    setDueDate("");
+    setSelectedCustomer(null);
     
     toast.success("Sale completed successfully!");
   };
@@ -248,10 +329,41 @@ const CheckoutForm = () => {
     product.sku.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(productSearchTerm.toLowerCase())
   );
+  
+  const filteredCustomers = mockCustomers.filter(customer =>
+    customer.name.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(customerSearchTerm.toLowerCase()) ||
+    customer.phone.toLowerCase().includes(customerSearchTerm.toLowerCase())
+  );
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+    >
+      <motion.div 
+        variants={itemVariants}
+        className="lg:col-span-2 space-y-6"
+      >
         <Card>
           <CardHeader>
             <CardTitle>Customer Information</CardTitle>
@@ -260,12 +372,23 @@ const CheckoutForm = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="customerName">Customer Name</Label>
-                <Input
-                  id="customerName"
-                  placeholder="Enter customer name"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                />
+                <div className="flex space-x-2">
+                  <Input
+                    id="customerName"
+                    placeholder="Enter customer name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => setShowCustomerDialog(true)}
+                    title="Select Customer"
+                  >
+                    <User size={16} />
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="customerPhone">Phone Number</Label>
@@ -287,6 +410,36 @@ const CheckoutForm = () => {
                 onChange={(e) => setCustomerEmail(e.target.value)}
               />
             </div>
+            
+            {/* Credit sale toggle */}
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={isCredit}
+                onCheckedChange={setIsCredit}
+                id="credit-sale"
+              />
+              <Label htmlFor="credit-sale" className="cursor-pointer">
+                Credit Sale (Add to Customer's Account)
+              </Label>
+            </div>
+            
+            {/* Due date field for credit sales */}
+            {isCredit && (
+              <div className="space-y-2">
+                <Label htmlFor="dueDate">Payment Due Date</Label>
+                <Input 
+                  id="dueDate" 
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
+                {!selectedCustomer && (
+                  <p className="text-sm text-amber-600 mt-2">
+                    Please select a registered customer for credit sales.
+                  </p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -431,9 +584,12 @@ const CheckoutForm = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className="lg:col-span-1">
+      <motion.div 
+        variants={itemVariants}
+        className="lg:col-span-1"
+      >
         <Card>
           <CardHeader>
             <CardTitle>Payment Summary</CardTitle>
@@ -455,33 +611,35 @@ const CheckoutForm = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Payment Method</Label>
-              <Select 
-                defaultValue={paymentMethod} 
-                onValueChange={setPaymentMethod}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment method" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cash">
-                    <div className="flex items-center">
-                      <Banknote className="mr-2 h-4 w-4" />
-                      Cash
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="card">
-                    <div className="flex items-center">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Credit Card
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {!isCredit && (
+              <div className="space-y-2">
+                <Label>Payment Method</Label>
+                <Select 
+                  defaultValue={paymentMethod} 
+                  onValueChange={setPaymentMethod}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">
+                      <div className="flex items-center">
+                        <Banknote className="mr-2 h-4 w-4" />
+                        Cash
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="card">
+                      <div className="flex items-center">
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Credit Card
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            {paymentMethod === "cash" && (
+            {!isCredit && paymentMethod === "cash" && (
               <div className="space-y-2">
                 <Label htmlFor="cashReceived">Cash Received</Label>
                 <Input 
@@ -500,7 +658,7 @@ const CheckoutForm = () => {
               </div>
             )}
 
-            {paymentMethod === "card" && (
+            {!isCredit && paymentMethod === "card" && (
               <div className="space-y-2">
                 <Label htmlFor="cardNumber">Card Number</Label>
                 <Input 
@@ -528,18 +686,69 @@ const CheckoutForm = () => {
                   Processing...
                 </span>
               ) : (
-                "Complete Sale"
+                `Complete ${isCredit ? "Credit " : ""}Sale`
               )}
             </Button>
           </CardFooter>
         </Card>
-      </div>
+      </motion.div>
+
+      {/* Customer Selection Dialog */}
+      <Dialog open={showCustomerDialog} onOpenChange={setShowCustomerDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Customer</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                placeholder="Search customers..."
+                className="pl-10"
+                value={customerSearchTerm}
+                onChange={(e) => setCustomerSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <div className="border rounded-md overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">Name</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">Email</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground">Phone</th>
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCustomers.map((customer) => (
+                    <tr key={customer.id} className="border-t">
+                      <td className="px-4 py-2 text-sm">{customer.name}</td>
+                      <td className="px-4 py-2 text-sm">{customer.email}</td>
+                      <td className="px-4 py-2 text-sm">{customer.phone}</td>
+                      <td className="px-4 py-2 text-right">
+                        <Button 
+                          size="sm"
+                          onClick={() => handleSelectCustomer(customer)}
+                        >
+                          Select
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Receipt Modal */}
       {showReceipt && completedSaleData && (
         <Receipt saleData={completedSaleData} onClose={handleCloseReceipt} />
       )}
-    </div>
+    </motion.div>
   );
 };
 

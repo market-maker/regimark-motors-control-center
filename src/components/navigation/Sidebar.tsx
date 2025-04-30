@@ -10,9 +10,16 @@ import {
   Settings, 
   Database,
   Receipt,
+  X
 } from 'lucide-react';
 import { useTheme } from '@/providers/ThemeProvider';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+interface SidebarProps {
+  onClose?: () => void;
+}
 
 const menuItems = [
   { path: '/', label: 'Dashboard', icon: BarChart },
@@ -26,9 +33,10 @@ const menuItems = [
   { path: '/settings', label: 'Settings', icon: Settings },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onClose }: SidebarProps) => {
   const location = useLocation();
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   return (
     <div className={cn(
@@ -37,32 +45,26 @@ const Sidebar = () => {
         ? "bg-black border-gray-800" 
         : "bg-white border-gray-200"
     )}>
+      {isMobile && (
+        <div className="flex justify-end p-2">
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-500">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
       <div className={cn(
         "p-4 border-b",
         theme === 'dark' ? "border-gray-800" : "border-gray-200"
       )}>
         <motion.div 
           whileHover={{ scale: 1.05 }}
-          className="flex items-center"
+          className="flex items-center justify-center"
         >
           <img 
-            src="/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png" 
+            src="/lovable-uploads/153ce379-8cc5-4fd7-ae3b-0d0434c5e23c.png" 
             alt="Logo" 
-            className={cn(
-              "h-8 mr-2",
-              theme === 'dark' ? "mix-blend-screen" : ""
-            )}
+            className="h-12"
           />
-          {/* Only show name in light mode */}
-          {theme === 'light' && (
-            <motion.span 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xl font-bold text-regimark-primary hidden lg:inline"
-            >
-              Regimark Autoelectrics
-            </motion.span>
-          )}
         </motion.div>
       </div>
       <nav className="flex-1 pt-4 pb-4 overflow-y-auto">
@@ -85,7 +87,8 @@ const Sidebar = () => {
                       ? "bg-regimark-primary text-white shadow-lg" 
                       : theme === "dark"
                         ? "text-gray-300 hover:bg-gray-800 hover:text-white"
-                        : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary"
+                        : "text-regimark-dark hover:bg-regimark-light hover:text-regimark-primary",
+                    "sidebar-menu-item"
                   )}
                 >
                   <motion.div
