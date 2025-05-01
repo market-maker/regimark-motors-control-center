@@ -14,7 +14,8 @@ import {
   Store,
   Wrench,
   Store as StoreManageIcon,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ChevronLeft
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -64,9 +65,12 @@ const Sidebar = ({ onClose }: SidebarProps) => {
       className="fixed inset-y-0 left-0 z-20 h-full w-64 bg-background shadow-lg border-r lg:static overflow-hidden"
     >
       <div className="flex h-full flex-col">
-        <div className="p-4">
-          <h2 className="text-2xl font-bold text-center text-regimark-primary">RegiMark</h2>
-          <p className="text-center text-xs text-muted-foreground">Auto Parts Management</p>
+        <div className="p-4 flex justify-center items-center">
+          <img 
+            src="/lovable-uploads/b5b79438-1e8e-447e-9c8f-c886b1ed204a.png" 
+            alt="RegiMark Logo" 
+            className="h-16 object-contain" 
+          />
         </div>
         
         <ScrollArea className="flex-1 px-2">
@@ -76,9 +80,9 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors sidebar-menu-item relative",
                   isActive(item.path)
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-primary/20 text-primary glow-primary"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 )}
                 onClick={() => {
@@ -87,7 +91,12 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                   }
                 }}
               >
-                <div className="mr-3">{item.icon}</div>
+                <div className={cn(
+                  "mr-3 transition-all",
+                  isActive(item.path) && "text-primary"
+                )}>
+                  {item.icon}
+                </div>
                 <span>{item.label}</span>
                 {item.label === "Inventory" && (
                   <Badge variant="outline" className="ml-auto bg-amber-500 text-white">7</Badge>
@@ -97,9 +106,15 @@ const Sidebar = ({ onClose }: SidebarProps) => {
           </nav>
         </ScrollArea>
         
-        <div className="p-4 border-t">
-          <Button variant="outline" className="w-full" onClick={onClose}>
-            Collapse Sidebar
+        <div className="p-4 border-t flex justify-end">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="sr-only">Collapse Sidebar</span>
           </Button>
         </div>
       </div>

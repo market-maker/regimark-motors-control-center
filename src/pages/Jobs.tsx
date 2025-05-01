@@ -1,292 +1,303 @@
 
 import { useState } from "react";
-import MainLayout from "../layouts/MainLayout";
-import { JobCard as JobCardType } from "@/types/job";
-import JobCard from "../components/jobs/JobCard";
-import JobCardForm from "../components/jobs/JobCardForm";
-import JobDetails from "../components/jobs/JobDetails";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MainLayout from "@/layouts/MainLayout";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import JobCardForm from "@/components/jobs/JobCardForm";
+import JobCard from "@/components/jobs/JobCard";
+import JobDetails from "@/components/jobs/JobDetails";
+import VehicleAdviceForm from "@/components/jobs/VehicleAdviceForm";
+import { Plus, Calendar, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
+import { JobCard as JobCardType } from "@/types/job";
 import { motion } from "framer-motion";
-import { Plus, Search } from "lucide-react";
 
-// Sample job cards for demonstration
-const sampleJobCards: JobCardType[] = [
+// Sample job data
+const initialJobs: JobCardType[] = [
   {
-    id: "1",
-    createdAt: "2025-04-20T10:30:00Z",
-    updatedAt: "2025-04-20T14:45:00Z",
-    jobNumber: "JOB-12345",
-    status: "In Progress",
-    vehicle: {
-      id: "v1",
-      make: "Toyota",
-      model: "Corolla",
-      year: "2019",
-      licensePlate: "ABC-123",
-      color: "Silver",
-      mileage: 45000,
-      fuelType: "Petrol",
-      transmission: "Automatic"
-    },
-    customerId: "c1",
+    id: "job1",
+    customerId: "cust123",
     customerName: "John Smith",
-    technicianId: "t1",
-    technicianName: "Mike Technician",
-    description: "Regular maintenance, oil change and brake check",
-    diagnosis: "Oil was very dirty, brakes at 30% remaining",
-    estimatedCost: 180.50,
-    estimatedCompletionDate: "2025-04-21T17:00:00Z",
-    laborHours: 1.5,
-    laborCost: 75.00,
+    customerPhone: "0412-345-678",
+    vehicleMake: "Toyota",
+    vehicleModel: "Corolla",
+    vehicleYear: 2019,
+    vehicleRegistration: "ABC123",
+    jobDescription: "Battery replacement and electrical system check",
+    status: "completed",
+    createdAt: "2023-04-15T09:30:00Z",
+    completedAt: "2023-04-15T14:45:00Z",
+    technicianNotes: "Replaced battery, checked alternator and charging system. All working well.",
+    parts: [
+      { id: "part1", name: "NS60L Battery", quantity: 1, price: 210.50 },
+      { id: "part2", name: "Battery Terminal Cleaner", quantity: 1, price: 15.25 }
+    ],
+    labor: { hours: 1.5, rate: 95 },
+    totalCost: 368.25,
     vehicleAdvice: [
-      {
-        type: "maintenance",
-        description: "Air filter needs replacement in next service",
-        priority: "Low",
-        estimatedCost: 25.00
-      },
-      {
-        type: "repair",
-        description: "Front brake pads should be replaced soon",
-        priority: "Medium",
-        estimatedCost: 120.00
-      }
+      { id: "adv1", item: "Alternator", condition: "Good", notes: "No issues found", priority: "none" },
+      { id: "adv2", item: "Battery Terminals", condition: "Good", notes: "Cleaned and protected", priority: "none" },
+      { id: "adv3", item: "Starter Motor", condition: "Fair", notes: "Working but showing age", priority: "low" }
     ]
   },
   {
-    id: "2",
-    createdAt: "2025-04-19T09:15:00Z",
-    updatedAt: "2025-04-19T16:30:00Z",
-    jobNumber: "JOB-12344",
-    status: "Completed",
-    vehicle: {
-      id: "v2",
-      make: "Honda",
-      model: "Civic",
-      year: "2020",
-      licensePlate: "XYZ-789",
-      color: "Blue",
-      mileage: 28000,
-      fuelType: "Petrol",
-      transmission: "CVT"
-    },
-    customerId: "c2",
-    customerName: "Jane Doe",
-    technicianId: "t2",
-    technicianName: "Alex Mechanic",
-    description: "Check engine light on, strange noise from engine",
-    diagnosis: "Found loose timing belt and damaged water pump",
-    estimatedCost: 350.75,
-    estimatedCompletionDate: "2025-04-19T16:00:00Z",
-    completedDate: "2025-04-19T16:30:00Z",
-    laborHours: 3.0,
-    laborCost: 150.00,
-    vehicleAdvice: [
-      {
-        type: "upgrade",
-        description: "Consider upgrading to high-performance spark plugs",
-        priority: "Low",
-        estimatedCost: 60.00
-      }
-    ]
+    id: "job2",
+    customerId: "cust456",
+    customerName: "Sarah Johnson",
+    customerPhone: "0423-456-789",
+    vehicleMake: "Mazda",
+    vehicleModel: "CX-5",
+    vehicleYear: 2021,
+    vehicleRegistration: "XYZ789",
+    jobDescription: "Check engine light diagnosis and repair",
+    status: "in-progress",
+    createdAt: "2023-04-18T10:15:00Z",
+    technicianNotes: "Initial diagnostic shows potential issue with oxygen sensor. Further testing required.",
+    parts: [],
+    labor: { hours: 0, rate: 95 },
+    totalCost: 0,
+    vehicleAdvice: []
   },
   {
-    id: "3",
-    createdAt: "2025-04-21T11:00:00Z",
-    updatedAt: "2025-04-21T11:00:00Z",
-    jobNumber: "JOB-12346",
-    status: "Pending",
-    vehicle: {
-      id: "v3",
-      make: "Ford",
-      model: "F-150",
-      year: "2018",
-      licensePlate: "TRK-456",
-      color: "Red",
-      mileage: 65000,
-      fuelType: "Petrol",
-      transmission: "Automatic"
-    },
-    customerId: "c3",
-    customerName: "Robert Johnson",
-    description: "Annual inspection and maintenance",
-    estimatedCompletionDate: "2025-04-22T17:00:00Z"
+    id: "job3",
+    customerId: "cust789",
+    customerName: "Michael Wong",
+    customerPhone: "0434-567-890",
+    vehicleMake: "Ford",
+    vehicleModel: "Ranger",
+    vehicleYear: 2020,
+    vehicleRegistration: "DEF456",
+    jobDescription: "Full electrical system audit and repair",
+    status: "scheduled",
+    createdAt: "2023-04-20T08:00:00Z",
+    scheduledDate: "2023-04-25T09:00:00Z",
+    technicianNotes: "Customer reports intermittent electrical issues. Schedule comprehensive diagnostic.",
+    parts: [],
+    labor: { hours: 0, rate: 95 },
+    totalCost: 0,
+    vehicleAdvice: []
   }
 ];
 
 const Jobs = () => {
-  const [activeTab, setActiveTab] = useState("active");
-  const [isCreatingJob, setIsCreatingJob] = useState(false);
-  const [jobCards, setJobCards] = useState<JobCardType[]>(sampleJobCards);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [jobs, setJobs] = useState<JobCardType[]>(initialJobs);
+  const [activeTab, setActiveTab] = useState("all");
+  const [isNewJobDialogOpen, setIsNewJobDialogOpen] = useState(false);
+  const [isAdviceDialogOpen, setIsAdviceDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobCardType | null>(null);
+  const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
 
-  const handleCreateJob = (jobData: Partial<JobCardType>) => {
-    const newJob: JobCardType = {
-      id: Math.random().toString(36).substring(2, 9),
-      ...jobData,
-    } as JobCardType;
-    
-    setJobCards([newJob, ...jobCards]);
-    setIsCreatingJob(false);
-    toast.success("Job card created successfully");
+  const handleAddJob = (newJob: JobCardType) => {
+    setJobs([newJob, ...jobs]);
+    setIsNewJobDialogOpen(false);
+  };
+
+  const handleViewDetails = (job: JobCardType) => {
+    setSelectedJob(job);
+    setIsJobDetailsOpen(true);
   };
 
   const handleUpdateJob = (updatedJob: JobCardType) => {
-    setJobCards(jobCards.map(job => job.id === updatedJob.id ? updatedJob : job));
-    setSelectedJob(updatedJob);
+    setJobs(jobs.map((job) => job.id === updatedJob.id ? updatedJob : job));
+    setSelectedJob(null);
+    setIsJobDetailsOpen(false);
   };
 
-  const filteredJobs = jobCards.filter(job => {
-    const matchesSearch = 
-      job.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.jobNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesStatus = 
-      statusFilter === "all" || 
-      job.status.toLowerCase() === statusFilter.toLowerCase();
-      
-    const matchesTab = 
-      (activeTab === "active" && job.status !== "Completed" && job.status !== "Canceled") ||
-      (activeTab === "completed" && job.status === "Completed") ||
-      (activeTab === "all");
-      
-    return matchesSearch && matchesStatus && matchesTab;
+  const handleAddAdvice = (job: JobCardType, advice: any) => {
+    const updatedJob = {
+      ...job,
+      vehicleAdvice: [...job.vehicleAdvice, advice]
+    };
+    handleUpdateJob(updatedJob);
+    setIsAdviceDialogOpen(false);
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    if (activeTab === "all") return true;
+    if (activeTab === "scheduled") return job.status === "scheduled";
+    if (activeTab === "in-progress") return job.status === "in-progress";
+    if (activeTab === "completed") return job.status === "completed";
+    return true;
   });
+
+  const containerAnimation = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemAnimation = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
 
   return (
     <MainLayout>
-      <motion.div
-        className="page-container"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+      <motion.div 
+        className="page-container" 
+        initial="hidden"
+        animate="show"
+        variants={containerAnimation}
       >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <h1 className="text-3xl font-bold text-regimark-primary">Job Cards</h1>
-          <Button 
-            onClick={() => setIsCreatingJob(true)} 
-            className="mt-4 md:mt-0"
-          >
-            <Plus className="mr-2 h-4 w-4" /> New Job Card
-          </Button>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <motion.div variants={itemAnimation}>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent">
+              Job Cards
+            </h1>
+            <p className="text-muted-foreground">
+              Manage vehicle service and repair jobs
+            </p>
+          </motion.div>
+          <motion.div variants={itemAnimation} className="mt-4 md:mt-0">
+            <Button 
+              onClick={() => setIsNewJobDialogOpen(true)}
+              className="btn-3d"
+            >
+              <Plus className="mr-2 h-4 w-4" /> New Job Card
+            </Button>
+          </motion.div>
         </div>
 
-        <Tabs defaultValue="active" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <TabsList className="mb-4 md:mb-0">
-              <TabsTrigger value="active">Active Jobs</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
+        <motion.div variants={itemAnimation}>
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList>
               <TabsTrigger value="all">All Jobs</TabsTrigger>
+              <TabsTrigger value="scheduled" className="flex items-center">
+                <Calendar className="mr-2 h-4 w-4" /> Scheduled
+              </TabsTrigger>
+              <TabsTrigger value="in-progress" className="flex items-center">
+                <Clock className="mr-2 h-4 w-4" /> In Progress
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="flex items-center">
+                <CheckCircle2 className="mr-2 h-4 w-4" /> Completed
+              </TabsTrigger>
             </TabsList>
-            
-            <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-              <div className="relative w-full md:w-64">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input
-                  placeholder="Search jobs..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <Select
-                value={statusFilter}
-                onValueChange={setStatusFilter}
-              >
-                <SelectTrigger className="w-full md:w-40">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in progress">In Progress</SelectItem>
-                  <SelectItem value="on hold">On Hold</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="canceled">Canceled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
-          <TabsContent value="active" className="m-0">
-            {isCreatingJob ? (
-              <JobCardForm 
-                onSubmit={handleCreateJob} 
-                onCancel={() => setIsCreatingJob(false)} 
-              />
-            ) : (
+            <TabsContent value="all" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredJobs.length > 0 ? (
-                  filteredJobs.map(job => (
+                {filteredJobs.map((job) => (
+                  <JobCard 
+                    key={job.id} 
+                    job={job} 
+                    onClick={() => handleViewDetails(job)} 
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="scheduled" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredJobs.map((job) => (
+                  <JobCard 
+                    key={job.id} 
+                    job={job} 
+                    onClick={() => handleViewDetails(job)} 
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="in-progress" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredJobs.map((job) => (
+                  <JobCard 
+                    key={job.id} 
+                    job={job} 
+                    onClick={() => handleViewDetails(job)} 
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="completed" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredJobs.length === 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>No completed jobs</CardTitle>
+                      <CardDescription>
+                        There are currently no completed jobs to display.
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                ) : (
+                  filteredJobs.map((job) => (
                     <JobCard 
                       key={job.id} 
                       job={job} 
-                      onViewDetails={(job) => setSelectedJob(job)}
+                      onClick={() => handleViewDetails(job)}
                     />
                   ))
-                ) : (
-                  <div className="col-span-full text-center py-12 text-muted-foreground">
-                    No active jobs found. Create a new job card to get started.
-                  </div>
                 )}
               </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="completed" className="m-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    onViewDetails={(job) => setSelectedJob(job)}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  No completed jobs found matching your criteria.
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="all" className="m-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map(job => (
-                  <JobCard 
-                    key={job.id} 
-                    job={job} 
-                    onViewDetails={(job) => setSelectedJob(job)}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12 text-muted-foreground">
-                  No jobs found matching your criteria.
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-        
-        {/* Job details dialog */}
+            </TabsContent>
+          </Tabs>
+        </motion.div>
+
+        {/* New Job Dialog */}
+        <Dialog open={isNewJobDialogOpen} onOpenChange={setIsNewJobDialogOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New Job Card</DialogTitle>
+            </DialogHeader>
+            <JobCardForm 
+              onSubmit={handleAddJob} 
+              onCancel={() => setIsNewJobDialogOpen(false)} 
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* Job Details Dialog */}
         {selectedJob && (
-          <JobDetails 
-            job={selectedJob} 
-            onClose={() => setSelectedJob(null)} 
-            onUpdateJob={handleUpdateJob} 
-          />
+          <Dialog open={isJobDetailsOpen} onOpenChange={setIsJobDetailsOpen}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Job Details</DialogTitle>
+              </DialogHeader>
+              <JobDetails 
+                job={selectedJob} 
+                onClose={() => setIsJobDetailsOpen(false)} 
+                onUpdate={handleUpdateJob}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Vehicle Advice Dialog */}
+        {selectedJob && (
+          <Dialog open={isAdviceDialogOpen} onOpenChange={setIsAdviceDialogOpen}>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Add Vehicle Inspection Advice</DialogTitle>
+              </DialogHeader>
+              <VehicleAdviceForm 
+                job={selectedJob}
+                onSubmit={(advice) => handleAddAdvice(selectedJob, advice)}
+                onCancel={() => setIsAdviceDialogOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         )}
       </motion.div>
     </MainLayout>

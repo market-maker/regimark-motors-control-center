@@ -198,13 +198,64 @@
   box-shadow: 0 12px 28px rgba(17, 17, 17, 0.4), 0 0 15px rgba(51, 51, 51, 0.2);
 }
 
-/* Sidebar Menu Item Glow Effect */
+/* New Modern Glowing Sidebar Effects */
 .sidebar-menu-item {
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
 }
 
+.sidebar-menu-item:before {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(to bottom, #E30613, rgba(227, 6, 19, 0));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-menu-item:hover:before, 
+.sidebar-menu-item.active:before {
+  opacity: 1;
+}
+
+.sidebar-menu-item:hover {
+  background: rgba(227, 6, 19, 0.08);
+  box-shadow: 0 0 20px rgba(227, 6, 19, 0.1);
+  transform: translateX(2px);
+}
+
+.dark .sidebar-menu-item:hover {
+  background: rgba(227, 6, 19, 0.15);
+  box-shadow: 0 0 25px rgba(227, 6, 19, 0.2);
+}
+
+.glow-primary {
+  position: relative;
+  box-shadow: 0 0 15px rgba(227, 6, 19, 0.2);
+}
+
+.dark .glow-primary {
+  box-shadow: 0 0 20px rgba(227, 6, 19, 0.3);
+}
+
+.glow-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(45deg, #E30613, rgba(227, 6, 19, 0.5));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Advanced sidebar animations */
 .sidebar-menu-item::before {
   content: '';
   position: absolute;
@@ -218,10 +269,6 @@
 
 .sidebar-menu-item:hover::before {
   animation: pulse-shine 2s infinite;
-}
-
-.dark .sidebar-menu-item:hover {
-  box-shadow: 0 0 15px rgba(227, 6, 19, 0.3);
 }
 
 @keyframes pulse-shine {

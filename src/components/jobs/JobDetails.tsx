@@ -1,325 +1,302 @@
 
 import { useState } from "react";
-import { JobCard } from "@/types/job";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { VehicleAdviceForm } from "./VehicleAdviceForm";
-import { Check, X, Calendar, Clock, Car, User, Wrench, PenLine, Settings, FileSpreadsheet } from "lucide-react"; // Replaced Tool with Wrench
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDate, formatCurrency } from "@/lib/utils";
+import { JobCard } from "@/types/job";
+import { 
+  Car, Calendar, User, Phone, FileText, 
+  Wrench, PackageCheck, AlertTriangle, Info
+} from "lucide-react";
 
 interface JobDetailsProps {
   job: JobCard;
-  onEdit?: (job: JobCard) => void;
   onClose: () => void;
+  onUpdate: (job: JobCard) => void;
 }
 
-const JobDetails = ({ job, onEdit, onClose }: JobDetailsProps) => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [showAdviceForm, setShowAdviceForm] = useState(false);
+const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
+  const [activeTab, setActiveTab] = useState("details");
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Completed":
-        return "bg-green-500 hover:bg-green-600";
-      case "In Progress":
-        return "bg-blue-500 hover:bg-blue-600";
-      case "Pending":
-        return "bg-amber-500 hover:bg-amber-600";
-      case "On Hold":
-        return "bg-purple-500 hover:bg-purple-600";
-      case "Canceled":
-        return "bg-red-500 hover:bg-red-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
+      case "completed": return "bg-green-100 text-green-800";
+      case "in-progress": return "bg-amber-100 text-amber-800";
+      case "scheduled": return "bg-blue-100 text-blue-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
-
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'Not set';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+  
+  const markAsInProgress = () => {
+    onUpdate({
+      ...job,
+      status: "in-progress"
     });
   };
   
-  const formatCurrency = (amount: number | undefined) => {
-    if (amount === undefined) return 'Not set';
-    return `$${amount.toFixed(2)}`;
+  const markAsCompleted = () => {
+    onUpdate({
+      ...job,
+      status: "completed",
+      completedAt: new Date().toISOString()
+    });
   };
   
-  const handleAddAdvice = (advice: any) => {
-    // Here we would typically update the job with the new advice
-    // For now, we'll just close the dialog
-    setShowAdviceForm(false);
-    // In a real application, you would dispatch an action or call a mutation
-  };
-
   return (
-    <>
-      <div className="space-y-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold">Job #{job.jobNumber}</h2>
-            <p className="text-muted-foreground">Created: {formatDate(job.createdAt)}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
-            {onEdit && (
-              <Button variant="outline" size="sm" onClick={() => onEdit(job)}>
-                <PenLine className="h-4 w-4 mr-2" />
-                Edit Job
-              </Button>
-            )}
-          </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">
+            {job.vehicleMake} {job.vehicleModel} ({job.vehicleYear})
+          </h2>
+          <p className="text-muted-foreground">
+            Registration: {job.vehicleRegistration}
+          </p>
         </div>
-
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="vehicle">Vehicle</TabsTrigger>
-            <TabsTrigger value="advice">Advice</TabsTrigger>
-          </TabsList>
+        <Badge className={getStatusColor(job.status)}>
+          {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+        </Badge>
+      </div>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="parts">Parts</TabsTrigger>
+          <TabsTrigger value="labor">Labor</TabsTrigger>
+          <TabsTrigger value="advice">Vehicle Advice</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="details" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Car className="mr-2 h-4 w-4" /> Vehicle Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">Make</p>
+                <p>{job.vehicleMake}</p>
+              </div>
+              <div>
+                <p className="font-medium">Model</p>
+                <p>{job.vehicleModel}</p>
+              </div>
+              <div>
+                <p className="font-medium">Year</p>
+                <p>{job.vehicleYear}</p>
+              </div>
+              <div>
+                <p className="font-medium">Registration</p>
+                <p>{job.vehicleRegistration}</p>
+              </div>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="overview" className="space-y-4 pt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Job Details</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer</h4>
-                    <p>{job.customerName}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Technician</h4>
-                    <p>{job.technicianName || 'Unassigned'}</p>
-                  </div>
-                </div>
-                
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="mr-2 h-4 w-4" /> Customer Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="font-medium">Name</p>
+                <p>{job.customerName}</p>
+              </div>
+              <div>
+                <p className="font-medium">Phone</p>
+                <p>{job.customerPhone}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="font-medium">Customer ID</p>
+                <p>{job.customerId}</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <FileText className="mr-2 h-4 w-4" /> Job Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="font-medium">Description</p>
+                <p>{job.jobDescription}</p>
+              </div>
+              <div>
+                <p className="font-medium">Technician Notes</p>
+                <p>{job.technicianNotes || "No notes added yet."}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
-                  <p>{job.description}</p>
+                  <p className="font-medium">Created</p>
+                  <p>{formatDate(new Date(job.createdAt))}</p>
                 </div>
-                
-                {job.diagnosis && (
+                {job.completedAt && (
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Diagnosis</h4>
-                    <p>{job.diagnosis}</p>
+                    <p className="font-medium">Completed</p>
+                    <p>{formatDate(new Date(job.completedAt))}</p>
                   </div>
                 )}
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {job.scheduledDate && (
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Cost</h4>
-                    <p>{formatCurrency(job.estimatedCost)}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Final Cost</h4>
-                    <p>{formatCurrency(job.finalCost)}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Labor Hours</h4>
-                    <p>{job.laborHours || 'Not set'}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Completion</h4>
-                    <p>{formatDate(job.estimatedCompletionDate)}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Completed Date</h4>
-                    <p>{formatDate(job.completedDate)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {job.partsUsed && job.partsUsed.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Parts Used</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="border rounded-md overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-muted">
-                        <tr>
-                          <th className="text-left p-2">Part Name</th>
-                          <th className="text-center p-2">Quantity</th>
-                          <th className="text-right p-2">Cost</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {job.partsUsed.map(part => (
-                          <tr key={part.id} className="border-t">
-                            <td className="p-2">{part.name}</td>
-                            <td className="text-center p-2">{part.quantity}</td>
-                            <td className="text-right p-2">${part.cost.toFixed(2)}</td>
-                          </tr>
-                        ))}
-                        <tr className="border-t bg-muted">
-                          <td colSpan={2} className="p-2 text-right font-medium">Total:</td>
-                          <td className="p-2 text-right font-medium">
-                            ${job.partsUsed.reduce((sum, part) => sum + (part.cost * part.quantity), 0).toFixed(2)}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="vehicle" className="pt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Vehicle Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Make</h4>
-                    <p>{job.vehicle.make}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Model</h4>
-                    <p>{job.vehicle.model}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Year</h4>
-                    <p>{job.vehicle.year}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">License Plate</h4>
-                    <p>{job.vehicle.licensePlate}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">VIN</h4>
-                    <p>{job.vehicle.vin || 'Not provided'}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Color</h4>
-                    <p>{job.vehicle.color || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Mileage</h4>
-                    <p>{job.vehicle.mileage ? `${job.vehicle.mileage.toLocaleString()} miles` : 'Not recorded'}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Fuel Type</h4>
-                    <p>{job.vehicle.fuelType || 'Not specified'}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Transmission</h4>
-                  <p>{job.vehicle.transmission || 'Not specified'}</p>
-                </div>
-                
-                {job.vehicle.customerNotes && (
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer Notes</h4>
-                    <p className="text-sm">{job.vehicle.customerNotes}</p>
+                    <p className="font-medium">Scheduled</p>
+                    <p>{formatDate(new Date(job.scheduledDate))}</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="advice" className="pt-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-lg">Vehicle Advice</CardTitle>
-                <Button size="sm" onClick={() => setShowAdviceForm(true)}>Add Advice</Button>
-              </CardHeader>
-              <CardContent>
-                {job.vehicleAdvice && job.vehicleAdvice.length > 0 ? (
-                  <div className="space-y-4">
-                    {job.vehicleAdvice.map((advice, index) => (
-                      <div key={index} className="border rounded-md p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium capitalize">{advice.type}</h4>
-                            <p className="text-sm text-muted-foreground">{advice.description}</p>
-                          </div>
-                          <Badge 
-                            className={
-                              advice.priority === "Critical" ? "bg-red-500" :
-                              advice.priority === "High" ? "bg-amber-500" :
-                              advice.priority === "Medium" ? "bg-blue-500" :
-                              "bg-green-500"
-                            }
-                          >
-                            {advice.priority}
-                          </Badge>
-                        </div>
-                        {advice.estimatedCost !== undefined && (
-                          <p className="text-sm mt-2">
-                            Estimated Cost: ${advice.estimatedCost.toFixed(2)}
-                          </p>
-                        )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="parts">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <PackageCheck className="mr-2 h-4 w-4" /> Parts Used
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {job.parts.length === 0 ? (
+                <p className="text-muted-foreground">No parts added to this job.</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-12 font-medium">
+                    <div className="col-span-6">Part</div>
+                    <div className="col-span-2">Quantity</div>
+                    <div className="col-span-2">Price</div>
+                    <div className="col-span-2">Total</div>
+                  </div>
+                  <div className="divide-y">
+                    {job.parts.map((part) => (
+                      <div key={part.id} className="grid grid-cols-12 py-2">
+                        <div className="col-span-6">{part.name}</div>
+                        <div className="col-span-2">{part.quantity}</div>
+                        <div className="col-span-2">${part.price.toFixed(2)}</div>
+                        <div className="col-span-2">${(part.quantity * part.price).toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-center py-6 text-muted-foreground">No advice records found. Add vehicle advice to help the customer maintain their vehicle.</p>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                  <div className="flex justify-between pt-4 font-medium">
+                    <div>Parts Subtotal</div>
+                    <div>${job.parts.reduce((sum, part) => sum + (part.quantity * part.price), 0).toFixed(2)}</div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
         
-        <div className="flex justify-between items-center">
-          <Button variant="outline" onClick={onClose}>
-            Close
-          </Button>
-          <div className="flex gap-2">
-            {job.status !== "Completed" && (
-              <Button className="bg-green-500 hover:bg-green-600">
-                <Check className="mr-2 h-4 w-4" />
-                Mark as Completed
-              </Button>
-            )}
-            {job.status !== "Canceled" && job.status !== "Completed" && (
-              <Button variant="destructive">
-                <X className="mr-2 h-4 w-4" />
-                Cancel Job
-              </Button>
-            )}
-          </div>
+        <TabsContent value="labor">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Wrench className="mr-2 h-4 w-4" /> Labor
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2">
+                  <div>
+                    <p className="font-medium">Hours</p>
+                    <p>{job.labor.hours}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium">Rate</p>
+                    <p>${job.labor.rate.toFixed(2)}/hr</p>
+                  </div>
+                </div>
+                <div className="flex justify-between pt-4 font-medium">
+                  <div>Labor Subtotal</div>
+                  <div>${(job.labor.hours * job.labor.rate).toFixed(2)}</div>
+                </div>
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between font-bold">
+                    <div>Job Total</div>
+                    <div>${job.totalCost.toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="advice">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Info className="mr-2 h-4 w-4" /> Vehicle Inspection & Advice
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {job.vehicleAdvice.length === 0 ? (
+                <p className="text-muted-foreground">No inspection data or advice recorded for this vehicle.</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-12 font-medium">
+                    <div className="col-span-3">Item</div>
+                    <div className="col-span-3">Condition</div>
+                    <div className="col-span-4">Notes</div>
+                    <div className="col-span-2">Priority</div>
+                  </div>
+                  <div className="divide-y">
+                    {job.vehicleAdvice.map((advice) => (
+                      <div key={advice.id} className="grid grid-cols-12 py-2">
+                        <div className="col-span-3">{advice.item}</div>
+                        <div className="col-span-3">
+                          <Badge variant={
+                            advice.condition === "Good" ? "outline" :
+                            advice.condition === "Fair" ? "secondary" :
+                            "destructive"
+                          } className="font-normal">
+                            {advice.condition}
+                          </Badge>
+                        </div>
+                        <div className="col-span-4">{advice.notes}</div>
+                        <div className="col-span-2">
+                          {advice.priority !== "none" && (
+                            <Badge variant={
+                              advice.priority === "low" ? "outline" :
+                              advice.priority === "medium" ? "secondary" :
+                              "destructive"
+                            }>
+                              {advice.priority}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+        <div className="space-x-2">
+          {job.status === "scheduled" && (
+            <Button onClick={markAsInProgress}>
+              Mark as In Progress
+            </Button>
+          )}
+          {job.status === "in-progress" && (
+            <Button onClick={markAsCompleted}>
+              Mark as Completed
+            </Button>
+          )}
         </div>
       </div>
-
-      {/* Vehicle Advice Form Dialog */}
-      <Dialog open={showAdviceForm} onOpenChange={setShowAdviceForm}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Vehicle Advice</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <VehicleAdviceForm 
-              onSubmit={handleAddAdvice} 
-              onCancel={() => setShowAdviceForm(false)} 
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    </div>
   );
 };
 

@@ -10,14 +10,6 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-interface HeaderProps {
-  setSidebarOpen: (open: boolean) => void;
-}
-
-interface SidebarProps {
-  onClose: () => void;
-}
-
 // Creating a complete layout component with integrated sidebar and header
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -47,7 +39,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         title: "Overdue Debts Alert",
         message: `There are ${mockOverdueDebtors.length} customers with overdue payments`,
         type: "debtor",
-        date: new Date().toISOString(),
         linkTo: "/sales?tab=debtors"
       });
       

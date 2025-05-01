@@ -1,83 +1,88 @@
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Car, Wrench } from "lucide-react"; // Replaced Tool with Wrench
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
 import { JobCard as JobCardType } from "@/types/job";
+import { Car, Calendar, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 
 interface JobCardProps {
   job: JobCardType;
-  onView: (job: JobCardType) => void;
+  onClick?: () => void;
 }
 
-const JobCard = ({ job, onView }: JobCardProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Completed":
-        return "bg-green-500 hover:bg-green-600";
-      case "In Progress":
-        return "bg-blue-500 hover:bg-blue-600";
-      case "Pending":
-        return "bg-amber-500 hover:bg-amber-600";
-      case "On Hold":
-        return "bg-purple-500 hover:bg-purple-600";
-      case "Canceled":
-        return "bg-red-500 hover:bg-red-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
+const JobCard = ({ job, onClick }: JobCardProps) => {
+  const statusMap = {
+    scheduled: { icon: Calendar, label: "Scheduled", color: "bg-blue-100 text-blue-800" },
+    "in-progress": { icon: Clock, label: "In Progress", color: "bg-amber-100 text-amber-800" },
+    completed: { icon: CheckCircle, label: "Completed", color: "bg-green-100 text-green-800" },
+    attention: { icon: AlertTriangle, label: "Needs Attention", color: "bg-red-100 text-red-800" }
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Not set';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const StatusIcon = job.status && statusMap[job.status as keyof typeof statusMap] 
+    ? statusMap[job.status as keyof typeof statusMap].icon 
+    : Clock;
+
+  const statusLabel = job.status && statusMap[job.status as keyof typeof statusMap]
+    ? statusMap[job.status as keyof typeof statusMap].label
+    : "Unknown";
+
+  const statusColor = job.status && statusMap[job.status as keyof typeof statusMap]
+    ? statusMap[job.status as keyof typeof statusMap].color
+    : "bg-gray-100 text-gray-800";
 
   return (
-    <Card className="h-full">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">Job #{job.jobNumber}</CardTitle>
-          <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-lg truncate">{job.vehicleMake} {job.vehicleModel}</h3>
+          <Badge className={statusColor}>
+            <StatusIcon className="h-3 w-3 mr-1" />
+            {statusLabel}
+          </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">{job.description}</p>
+        <p className="text-sm text-muted-foreground">
+          {job.vehicleRegistration} ({job.vehicleYear})
+        </p>
       </CardHeader>
-      <CardContent className="pt-2 pb-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Car size={16} className="text-muted-foreground" />
-            <span className="text-sm">
-              {job.vehicle.year} {job.vehicle.make} {job.vehicle.model}
-            </span>
+      <CardContent className="pb-2">
+        <div className="space-y-2">
+          <div>
+            <p className="text-sm font-medium">Customer</p>
+            <p className="text-sm">{job.customerName}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <User size={16} className="text-muted-foreground" />
-            <span className="text-sm">{job.customerName}</span>
+          <div>
+            <p className="text-sm font-medium">Description</p>
+            <p className="text-sm line-clamp-2">{job.jobDescription}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Wrench size={16} className="text-muted-foreground" />
-            <span className="text-sm">{job.technicianName || 'Unassigned'}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar size={16} className="text-muted-foreground" />
-            <span className="text-sm">Due: {formatDate(job.estimatedCompletionDate || '')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock size={16} className="text-muted-foreground" />
-            <span className="text-sm">Created: {formatDate(job.createdAt)}</span>
+          <div className="flex justify-between text-sm">
+            <div>
+              <p className="font-medium">Created</p>
+              <p>{formatDate(new Date(job.createdAt))}</p>
+            </div>
+            {job.completedAt && (
+              <div>
+                <p className="font-medium">Completed</p>
+                <p>{formatDate(new Date(job.completedAt))}</p>
+              </div>
+            )}
+            {job.scheduledDate && !job.completedAt && (
+              <div>
+                <p className="font-medium">Scheduled</p>
+                <p>{formatDate(new Date(job.scheduledDate))}</p>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full" onClick={() => onView(job)}>
-          View Details
-        </Button>
+      <CardFooter className="border-t pt-2 flex justify-between">
+        <div className="flex items-center text-sm text-muted-foreground">
+          <Car className="h-3 w-3 mr-1" />
+          {job.parts.length} parts | ${job.totalCost.toFixed(2)}
+        </div>
+        {job.status !== "completed" && (
+          <Button variant="secondary" size="sm">View Details</Button>
+        )}
       </CardFooter>
     </Card>
   );

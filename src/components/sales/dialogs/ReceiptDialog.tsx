@@ -24,21 +24,21 @@ const ReceiptDialog = ({ open, onOpenChange, saleData, onClose }: ReceiptDialogP
           title: "Pending Sale",
           message: `Sale #${saleData.saleId} has been marked as pending.`,
           type: "sale",
-          date: new Date().toISOString()
+          linkTo: `/sales?invoice=${saleData.saleId}`
         });
       } else if (saleData.status === "Completed") {
         addNotification({
           title: "Sale Completed",
           message: `Sale #${saleData.saleId} has been completed successfully.`,
           type: "sale",
-          date: new Date().toISOString()
+          linkTo: `/sales?invoice=${saleData.saleId}`
         });
       } else if (saleData.status === "Revoked") {
         addNotification({
           title: "Sale Revoked",
           message: `Sale #${saleData.saleId} has been revoked.`,
           type: "sale",
-          date: new Date().toISOString()
+          linkTo: `/sales?invoice=${saleData.saleId}`
         });
         toast.error(`Sale #${saleData.saleId} has been revoked.`);
       }
