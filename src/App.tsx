@@ -13,6 +13,8 @@ import ReceiptTemplates from "./pages/ReceiptTemplates";
 import Settings from "./pages/Settings";
 import Stores from "./pages/Stores";
 import Jobs from "./pages/Jobs";
+import PersonalExpenses from "./pages/PersonalExpenses";
+import StoreManagement from "./pages/StoreManagement";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { NotificationsProvider } from "./providers/NotificationsProvider";
 import "./App.css";
@@ -37,6 +39,8 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/stores" element={<Stores />} />
             <Route path="/jobs" element={<Jobs />} />
+            <Route path="/expenses" element={<PersonalExpenses />} />
+            <Route path="/store-management" element={<StoreManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

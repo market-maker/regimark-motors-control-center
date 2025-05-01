@@ -12,7 +12,9 @@ import {
   Settings,
   Receipt,
   Store,
-  Wrench
+  Wrench,
+  Store as StoreManageIcon,
+  FileSpreadsheet
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -41,13 +43,15 @@ const Sidebar = ({ onClose }: SidebarProps) => {
     { path: "/", icon: <Home size={20} />, label: "Dashboard" },
     { path: "/inventory", icon: <Package size={20} />, label: "Inventory" },
     { path: "/sales", icon: <ShoppingCart size={20} />, label: "Sales" },
+    { path: "/jobs", icon: <Wrench size={20} />, label: "Jobs" },
     { path: "/customers", icon: <Users size={20} />, label: "Customers" },
     { path: "/suppliers", icon: <TruckIcon size={20} />, label: "Suppliers" },
     { path: "/reports", icon: <BarChart2 size={20} />, label: "Reports" },
     { path: "/accounting", icon: <FileText size={20} />, label: "Accounting" },
+    { path: "/expenses", icon: <FileSpreadsheet size={20} />, label: "Personal Expenses" },
     { path: "/receipt-templates", icon: <Receipt size={20} />, label: "Receipt Templates" },
     { path: "/stores", icon: <Store size={20} />, label: "Stores" },
-    { path: "/jobs", icon: <Wrench size={20} />, label: "Jobs" },
+    { path: "/store-management", icon: <StoreManageIcon size={20} />, label: "Store Management" },
     { path: "/settings", icon: <Settings size={20} />, label: "Settings" },
   ];
 

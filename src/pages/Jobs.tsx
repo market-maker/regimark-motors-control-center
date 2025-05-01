@@ -2,9 +2,9 @@
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { JobCard as JobCardType } from "@/types/job";
-import { JobCard } from "../components/jobs/JobCard";
-import { JobCardForm } from "../components/jobs/JobCardForm";
-import { JobDetails } from "../components/jobs/JobDetails";
+import JobCard from "../components/jobs/JobCard";
+import JobCardForm from "../components/jobs/JobCardForm";
+import JobDetails from "../components/jobs/JobDetails";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
