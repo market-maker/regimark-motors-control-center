@@ -4,6 +4,7 @@ import Receipt from "../Receipt";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useNotifications } from "@/providers/NotificationsProvider";
+import { motion } from "framer-motion";
 
 interface ReceiptDialogProps {
   open: boolean;
@@ -47,20 +48,26 @@ const ReceiptDialog = ({ open, onOpenChange, saleData, onClose }: ReceiptDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl backdrop-blur-sm bg-background/95 shadow-lg border border-border/50 dashboard-card-glow">
         <DialogHeader>
-          <DialogTitle>
-            Sale Receipt 
-            {saleData?.status && (
-              <span className={`ml-2 text-sm px-2 py-0.5 rounded ${
-                saleData.status === "Completed" ? "bg-green-100 text-green-800" :
-                saleData.status === "Pending" ? "bg-amber-100 text-amber-800" :
-                "bg-red-100 text-red-800"
-              }`}>
-                {saleData.status}
-              </span>
-            )}
-          </DialogTitle>
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <DialogTitle className="text-xl flex items-center">
+              Sale Receipt 
+              {saleData?.status && (
+                <span className={`ml-2 text-sm px-2 py-0.5 rounded ${
+                  saleData.status === "Completed" ? "bg-green-100 text-green-800" :
+                  saleData.status === "Pending" ? "bg-amber-100 text-amber-800" :
+                  "bg-red-100 text-red-800"
+                } shadow-sm`}>
+                  {saleData.status}
+                </span>
+              )}
+            </DialogTitle>
+          </motion.div>
         </DialogHeader>
         <Receipt saleData={saleData} onClose={onClose} />
       </DialogContent>

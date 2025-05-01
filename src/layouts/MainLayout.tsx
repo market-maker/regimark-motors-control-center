@@ -1,10 +1,14 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/navigation/Header";
 import Sidebar from "../components/navigation/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotifications } from "@/providers/NotificationsProvider";
+import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
+import { Wifi, WifiOff } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -13,8 +17,18 @@ interface MainLayoutProps {
 // Creating a complete layout component with integrated sidebar and header
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const isMobile = useIsMobile();
   const { addNotification } = useNotifications();
+  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
   
   // Close sidebar by default on mobile
   useEffect(() => {
@@ -24,6 +38,27 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       setSidebarOpen(true);
     }
   }, [isMobile]);
+  
+  // Handle online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success("You're back online");
+    };
+    
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.warning("You're offline. Some features may be limited.");
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   
   // Check for overdue debtors on component mount and send notifications
   useEffect(() => {
@@ -65,24 +100,60 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     }
   };
 
+  // If not authenticated, return nothing (will redirect in useEffect)
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Offline indicator */}
+      <AnimatePresence>
+        {!isOnline && (
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white p-2 flex items-center justify-center"
+          >
+            <WifiOff size={16} className="mr-2" />
+            <span>You are currently offline. Some features may be limited.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
       {/* Sidebar - conditionally shown based on sidebarOpen state */}
-      {sidebarOpen && (
-        <Sidebar onClose={() => setSidebarOpen(false)} />
-      )}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <Sidebar onClose={() => setSidebarOpen(false)} />
+        )}
+      </AnimatePresence>
       
       {/* Main content area */}
       <div className="flex flex-col flex-1">
-        <Header setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 p-6">
-          {children}
+        <Header 
+          setSidebarOpen={setSidebarOpen} 
+          isOnline={isOnline}
+          userRole={user?.role || "user"}
+        />
+        <main className={`flex-1 p-6 ${!isOnline ? 'mt-10' : ''}`}>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {children}
+          </motion.div>
         </main>
       </div>
       
       {/* Mobile overlay to close sidebar when clicked outside */}
       {sidebarOpen && isMobile && (
-        <div 
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 bg-black/50 z-10" 
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"

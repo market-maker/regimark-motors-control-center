@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { ThemeToggle } from "../theme/ThemeToggle";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, LogOut, Settings as SettingsIcon, User, Wifi, WifiOff } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -16,17 +16,36 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import NotificationBell from "./NotificationBell";
+import { useAuth } from "@/providers/AuthProvider";
+import { Badge } from "../ui/badge";
+import { motion } from "framer-motion";
 
 interface HeaderProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isOnline?: boolean;
+  userRole?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  setSidebarOpen, 
+  isOnline = true,
+  userRole = "user"
+}) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const userInitials = user?.email
+    ? user.email.slice(0, 2).toUpperCase()
+    : "GU";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 backdrop-blur-sm transition-all">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 px-4 md:px-6 backdrop-blur-sm transition-all shadow-sm">
       <Button
         variant="ghost"
         size="icon"
@@ -70,31 +89,82 @@ const Header: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="w-64 pl-8"
+              className="w-64 pl-8 shadow-sm hover:shadow-md transition-all duration-300"
               placeholder="Search inventory, customers, and more..."
             />
           </div>
         </div>
+        
+        {/* Connectivity status indicator */}
+        {isOnline ? (
+          <motion.div 
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            className="hidden md:flex items-center text-green-500"
+            title="Online"
+          >
+            <Wifi size={16} />
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            className="hidden md:flex items-center text-amber-500"
+            title="Offline"
+          >
+            <WifiOff size={16} />
+          </motion.div>
+        )}
+        
+        {/* Admin badge */}
+        {userRole === "admin" && (
+          <Badge variant="secondary" className="hidden md:flex bg-regimark-primary text-white">
+            Admin
+          </Badge>
+        )}
+        
         <NotificationBell />
         <ThemeToggle />
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button variant="ghost" size="icon" className="rounded-full shadow-glow">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" />
-                <AvatarFallback>AU</AvatarFallback>
+                <AvatarFallback className="bg-regimark-primary text-white">
+                  {userInitials}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-56 sidebar-menu-item">
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span>{user?.email}</span>
+                <span className="text-xs text-muted-foreground">
+                  {userRole === "admin" ? "Administrator" : "Standard User"}
+                </span>
+              </div>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/settings")}>
-              Settings
+            <DropdownMenuItem 
+              onClick={() => navigate("/settings")}
+              className="sidebar-menu-item cursor-pointer"
+            >
+              <SettingsIcon className="h-4 w-4 mr-2" /> Settings
             </DropdownMenuItem>
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem 
+              className="sidebar-menu-item cursor-pointer"
+            >
+              <User className="h-4 w-4 mr-2" /> Profile
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              className="text-regimark-primary hover:text-regimark-primary/80 cursor-pointer"
+            >
+              <LogOut className="h-4 w-4 mr-2" /> Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
