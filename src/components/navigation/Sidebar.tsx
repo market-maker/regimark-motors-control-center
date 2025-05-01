@@ -1,167 +1,105 @@
 
-import React, { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { 
-  DollarSign, 
-  LayoutDashboard, 
-  Package, 
-  FileText, 
-  Users, 
-  Truck, 
-  PieChart, 
-  FileCog, 
-  Upload, 
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Home,
+  Package,
+  ShoppingCart,
+  Users,
+  TruckIcon,
+  BarChart2,
+  FileText,
   Settings,
+  Receipt,
   Store,
-  CreditCard,
-  Car,
+  Wrench
 } from "lucide-react";
-import logoImage from "/placeholder.svg";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sidebar as SidebarComponent, SidebarItem, SidebarSection } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+const Sidebar = ({ onClose }: SidebarProps) => {
   const location = useLocation();
-  // This function determines if the current path is active
+  const [expanded, setExpanded] = useState<string | null>(null);
+
   const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
+    return location.pathname === path;
   };
 
-  // Upload logo from user
-  const [logoUrl, setLogoUrl] = useState<string>("/placeholder.svg");
+  const handleExpand = (section: string) => {
+    setExpanded(expanded === section ? null : section);
+  };
 
-  // Check if custom logo exists
-  useEffect(() => {
-    const img = new Image();
-    img.src = "/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png";
-    img.onload = () => {
-      setLogoUrl("/lovable-uploads/916eabaf-754d-4b79-9245-7f184af91ccb.png");
-    };
-  }, []);
+  // Define sidebar navigation items
+  const navItems = [
+    { path: "/", icon: <Home size={20} />, label: "Dashboard" },
+    { path: "/inventory", icon: <Package size={20} />, label: "Inventory" },
+    { path: "/sales", icon: <ShoppingCart size={20} />, label: "Sales" },
+    { path: "/customers", icon: <Users size={20} />, label: "Customers" },
+    { path: "/suppliers", icon: <TruckIcon size={20} />, label: "Suppliers" },
+    { path: "/reports", icon: <BarChart2 size={20} />, label: "Reports" },
+    { path: "/accounting", icon: <FileText size={20} />, label: "Accounting" },
+    { path: "/receipt-templates", icon: <Receipt size={20} />, label: "Receipt Templates" },
+    { path: "/stores", icon: <Store size={20} />, label: "Stores" },
+    { path: "/jobs", icon: <Wrench size={20} />, label: "Jobs" },
+    { path: "/settings", icon: <Settings size={20} />, label: "Settings" },
+  ];
 
   return (
-    <SidebarComponent 
-      isOpen={isOpen} 
-      onClose={() => setIsOpen(false)}
-      className="shadow-lg transition-all duration-300 border-r border-border"
+    <motion.aside
+      initial={{ x: -280 }}
+      animate={{ x: 0 }}
+      exit={{ x: -280 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-y-0 left-0 z-20 h-full w-64 bg-background shadow-lg border-r lg:static overflow-hidden"
     >
-      <div className="p-4 flex justify-center mb-4">
-        <Link to="/" className="flex items-center">
-          <img
-            src={logoUrl}
-            alt="Logo"
-            className="h-12 w-auto"
-          />
-        </Link>
-      </div>
-      
-      <ScrollArea className="flex flex-col flex-1">
-        <SidebarSection>
-          <SidebarItem
-            href="/"
-            icon={<LayoutDashboard />}
-            label="Dashboard"
-            isActive={isActive('/')}
-          />
-          <SidebarItem
-            href="/inventory"
-            icon={<Package />}
-            label="Inventory"
-            isActive={isActive('/inventory')}
-          />
-          <SidebarItem
-            href="/sales"
-            icon={<DollarSign />}
-            label="Sales"
-            isActive={isActive('/sales')}
-          />
-          <SidebarItem
-            href="/customers"
-            icon={<Users />}
-            label="Customers"
-            isActive={isActive('/customers')}
-          />
-        </SidebarSection>
-
-        <SidebarSection title="Business">
-          <SidebarItem
-            href="/jobs"
-            icon={<Car />}
-            label="Jobs"
-            isActive={isActive('/jobs')}
-          />
-          <SidebarItem
-            href="/stores"
-            icon={<Store />}
-            label="Stores"
-            isActive={isActive('/stores')}
-          />
-          <SidebarItem
-            href="/suppliers"
-            icon={<Truck />}
-            label="Suppliers"
-            isActive={isActive('/suppliers')}
-          />
-          <SidebarItem
-            href="/accounting"
-            icon={<CreditCard />}
-            label="Accounting"
-            isActive={isActive('/accounting')}
-          />
-          <SidebarItem
-            href="/reports"
-            icon={<PieChart />}
-            label="Reports"
-            isActive={isActive('/reports')}
-          />
-        </SidebarSection>
-
-        <SidebarSection title="System">
-          <SidebarItem
-            href="/receipt-templates"
-            icon={<FileCog />}
-            label="Receipt Templates"
-            isActive={isActive('/receipt-templates')}
-          />
-          <SidebarItem
-            href="/import"
-            icon={<Upload />}
-            label="Import Data"
-            isActive={isActive('/import')}
-          />
-          <SidebarItem
-            href="/settings"
-            icon={<Settings />}
-            label="Settings"
-            isActive={isActive('/settings')}
-          />
-        </SidebarSection>
-      </ScrollArea>
-
-      <div className="p-4 border-t">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="relative">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-          </div>
-          <div className="text-sm font-medium">Auto Parts System</div>
+      <div className="flex h-full flex-col">
+        <div className="p-4">
+          <h2 className="text-2xl font-bold text-center text-regimark-primary">RegiMark</h2>
+          <p className="text-center text-xs text-muted-foreground">Auto Parts Management</p>
         </div>
-        <div className="text-xs text-muted-foreground">
-          v1.2.0
+        
+        <ScrollArea className="flex-1 px-2">
+          <nav className="space-y-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  isActive(item.path)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                )}
+                onClick={() => {
+                  if (window.innerWidth < 1024) {
+                    onClose();
+                  }
+                }}
+              >
+                <div className="mr-3">{item.icon}</div>
+                <span>{item.label}</span>
+                {item.label === "Inventory" && (
+                  <Badge variant="outline" className="ml-auto bg-amber-500 text-white">7</Badge>
+                )}
+              </Link>
+            ))}
+          </nav>
+        </ScrollArea>
+        
+        <div className="p-4 border-t">
+          <Button variant="outline" className="w-full" onClick={onClose}>
+            Collapse Sidebar
+          </Button>
         </div>
       </div>
-    </SidebarComponent>
+    </motion.aside>
   );
 };
 

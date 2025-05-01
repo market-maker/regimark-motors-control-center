@@ -1,292 +1,326 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { JobCard } from "@/types/job";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { JobCard as JobCardType } from "@/types/job";
-import { AlertCircle, Car, Clock, Tool, User, Calendar, Wrench } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VehicleAdviceForm } from "./VehicleAdviceForm";
-import { toast } from "sonner";
+import { Check, X, Calendar, Clock, Car, User, Wrench, PenLine, Settings, FileSpreadsheet } from "lucide-react"; // Replaced Tool with Wrench
 
 interface JobDetailsProps {
-  job: JobCardType;
+  job: JobCard;
+  onEdit?: (job: JobCard) => void;
   onClose: () => void;
-  onUpdateJob: (updatedJob: JobCardType) => void;
 }
 
-export const JobDetails = ({ job, onClose, onUpdateJob }: JobDetailsProps) => {
-  const [activeTab, setActiveTab] = useState("details");
+const JobDetails = ({ job, onEdit, onClose }: JobDetailsProps) => {
+  const [activeTab, setActiveTab] = useState("overview");
   const [showAdviceForm, setShowAdviceForm] = useState(false);
-  const [notes, setNotes] = useState(job.diagnosis || "");
-  const [estimatedCost, setEstimatedCost] = useState(job.estimatedCost?.toString() || "");
-
-  const handleUpdateNotes = () => {
-    const updatedJob = {
-      ...job,
-      diagnosis: notes,
-      estimatedCost: estimatedCost ? parseFloat(estimatedCost) : undefined
-    };
-    onUpdateJob(updatedJob);
-    toast.success("Job details updated successfully");
-  };
-
-  const handleAdviceSubmit = (advice: any) => {
-    const updatedAdvice = [...(job.vehicleAdvice || []), advice];
-    const updatedJob = {
-      ...job,
-      vehicleAdvice: updatedAdvice
-    };
-    onUpdateJob(updatedJob);
-    setShowAdviceForm(false);
-    toast.success("Vehicle advice added successfully");
-  };
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "Not specified";
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }).format(date);
-  };
-
+  
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pending": return "bg-yellow-500";
-      case "In Progress": return "bg-blue-500";
-      case "Completed": return "bg-green-500";
-      case "On Hold": return "bg-orange-500";
-      case "Canceled": return "bg-red-500";
-      default: return "bg-gray-500";
+      case "Completed":
+        return "bg-green-500 hover:bg-green-600";
+      case "In Progress":
+        return "bg-blue-500 hover:bg-blue-600";
+      case "Pending":
+        return "bg-amber-500 hover:bg-amber-600";
+      case "On Hold":
+        return "bg-purple-500 hover:bg-purple-600";
+      case "Canceled":
+        return "bg-red-500 hover:bg-red-600";
+      default:
+        return "bg-gray-500 hover:bg-gray-600";
     }
   };
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Not set';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+  
+  const formatCurrency = (amount: number | undefined) => {
+    if (amount === undefined) return 'Not set';
+    return `$${amount.toFixed(2)}`;
+  };
+  
+  const handleAddAdvice = (advice: any) => {
+    // Here we would typically update the job with the new advice
+    // For now, we'll just close the dialog
+    setShowAdviceForm(false);
+    // In a real application, you would dispatch an action or call a mutation
+  };
+
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] md:max-w-[800px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Job Card #{job.jobNumber}</span>
+    <>
+      <div className="space-y-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-2xl font-bold">Job #{job.jobNumber}</h2>
+            <p className="text-muted-foreground">Created: {formatDate(job.createdAt)}</p>
+          </div>
+          <div className="flex items-center gap-2">
             <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
-          </DialogTitle>
-        </DialogHeader>
-        
-        <Tabs defaultValue="details" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
+            {onEdit && (
+              <Button variant="outline" size="sm" onClick={() => onEdit(job)}>
+                <PenLine className="h-4 w-4 mr-2" />
+                Edit Job
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="vehicle">Vehicle</TabsTrigger>
             <TabsTrigger value="advice">Advice</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="details" className="space-y-4">
+          <TabsContent value="overview" className="space-y-4 pt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Job Information</CardTitle>
+                <CardTitle className="text-lg">Job Details</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer</h4>
+                    <p>{job.customerName}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Technician</h4>
+                    <p>{job.technicianName || 'Unassigned'}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
+                  <p>{job.description}</p>
+                </div>
+                
+                {job.diagnosis && (
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Diagnosis</h4>
+                    <p>{job.diagnosis}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Cost</h4>
+                    <p>{formatCurrency(job.estimatedCost)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Final Cost</h4>
+                    <p>{formatCurrency(job.finalCost)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Labor Hours</h4>
+                    <p>{job.laborHours || 'Not set'}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Completion</h4>
+                    <p>{formatDate(job.estimatedCompletionDate)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Completed Date</h4>
+                    <p>{formatDate(job.completedDate)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {job.partsUsed && job.partsUsed.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Parts Used</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="border rounded-md overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left p-2">Part Name</th>
+                          <th className="text-center p-2">Quantity</th>
+                          <th className="text-right p-2">Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {job.partsUsed.map(part => (
+                          <tr key={part.id} className="border-t">
+                            <td className="p-2">{part.name}</td>
+                            <td className="text-center p-2">{part.quantity}</td>
+                            <td className="text-right p-2">${part.cost.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t bg-muted">
+                          <td colSpan={2} className="p-2 text-right font-medium">Total:</td>
+                          <td className="p-2 text-right font-medium">
+                            ${job.partsUsed.reduce((sum, part) => sum + (part.cost * part.quantity), 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="vehicle" className="pt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Vehicle Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label className="text-sm text-muted-foreground">Created On</Label>
-                    <p className="font-medium">{formatDate(job.createdAt)}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Make</h4>
+                    <p>{job.vehicle.make}</p>
                   </div>
                   <div>
-                    <Label className="text-sm text-muted-foreground">Status</Label>
-                    <p><Badge className={getStatusColor(job.status)}>{job.status}</Badge></p>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Model</h4>
+                    <p>{job.vehicle.model}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Year</h4>
+                    <p>{job.vehicle.year}</p>
                   </div>
                 </div>
                 
-                <Separator />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">License Plate</h4>
+                    <p>{job.vehicle.licensePlate}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">VIN</h4>
+                    <p>{job.vehicle.vin || 'Not provided'}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Color</h4>
+                    <p>{job.vehicle.color || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Mileage</h4>
+                    <p>{job.vehicle.mileage ? `${job.vehicle.mileage.toLocaleString()} miles` : 'Not recorded'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Fuel Type</h4>
+                    <p>{job.vehicle.fuelType || 'Not specified'}</p>
+                  </div>
+                </div>
                 
                 <div>
-                  <Label className="text-sm text-muted-foreground">Customer</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <User size={16} />
-                    <p className="font-medium">{job.customerName}</p>
-                  </div>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Transmission</h4>
+                  <p>{job.vehicle.transmission || 'Not specified'}</p>
                 </div>
                 
-                <div>
-                  <Label className="text-sm text-muted-foreground">Technician</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Tool size={16} />
-                    <p className="font-medium">{job.technicianName || "Not assigned"}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label className="text-sm text-muted-foreground">Description</Label>
-                  <p className="mt-1 text-sm">{job.description}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+                {job.vehicle.customerNotes && (
                   <div>
-                    <Label className="text-sm text-muted-foreground">Estimated Completion</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Calendar size={16} />
-                      <p>{job.estimatedCompletionDate ? formatDate(job.estimatedCompletionDate) : "Not specified"}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm text-muted-foreground">Completed On</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Clock size={16} />
-                      <p>{job.completedDate ? formatDate(job.completedDate) : "Not completed"}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Diagnosis Notes</Label>
-                  <Textarea 
-                    id="notes" 
-                    value={notes} 
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add diagnosis notes here..."
-                    rows={4}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="estimatedCost">Estimated Cost</Label>
-                  <Input 
-                    id="estimatedCost" 
-                    type="number"
-                    min="0"
-                    step="0.01" 
-                    value={estimatedCost} 
-                    onChange={(e) => setEstimatedCost(e.target.value)}
-                    placeholder="0.00"
-                  />
-                </div>
-                
-                <Button onClick={handleUpdateNotes} className="w-full">
-                  Update Job Details
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="vehicle">
-            <Card>
-              <CardHeader>
-                <CardTitle>Vehicle Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Car size={18} />
-                    <h3 className="text-lg font-medium">
-                      {job.vehicle.make} {job.vehicle.model} ({job.vehicle.year})
-                    </h3>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">License Plate</Label>
-                      <p className="font-medium">{job.vehicle.licensePlate}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">VIN</Label>
-                      <p>{job.vehicle.vin || "Not specified"}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Color</Label>
-                      <p>{job.vehicle.color || "Not specified"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Mileage</Label>
-                      <p>{job.vehicle.mileage ? `${job.vehicle.mileage} km` : "Not specified"}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Fuel Type</Label>
-                      <p>{job.vehicle.fuelType || "Not specified"}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Transmission</Label>
-                      <p>{job.vehicle.transmission || "Not specified"}</p>
-                    </div>
-                  </div>
-                  
-                  {job.vehicle.customerNotes && (
-                    <div>
-                      <Label className="text-sm text-muted-foreground">Customer Notes</Label>
-                      <p className="text-sm mt-1">{job.vehicle.customerNotes}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="advice">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Vehicle Advice</CardTitle>
-                <Button onClick={() => setShowAdviceForm(true)}>
-                  Add Advice
-                </Button>
-              </CardHeader>
-              <CardContent>
-                {showAdviceForm ? (
-                  <VehicleAdviceForm 
-                    onSubmit={handleAdviceSubmit}
-                    onCancel={() => setShowAdviceForm(false)}
-                  />
-                ) : (
-                  <div className="space-y-4">
-                    {job.vehicleAdvice && job.vehicleAdvice.length > 0 ? (
-                      job.vehicleAdvice.map((advice, index) => (
-                        <div key={index} className="border rounded-md p-4 space-y-2">
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              <Wrench size={16} />
-                              <h4 className="font-medium capitalize">{advice.type}</h4>
-                            </div>
-                            <Badge variant={
-                              advice.priority === "Low" ? "outline" : 
-                              advice.priority === "Medium" ? "secondary" :
-                              advice.priority === "High" ? "destructive" : "outline"
-                            }>
-                              {advice.priority}
-                            </Badge>
-                          </div>
-                          <p className="text-sm">{advice.description}</p>
-                          {advice.estimatedCost !== undefined && (
-                            <p className="text-sm font-medium">Est. Cost: ${advice.estimatedCost.toFixed(2)}</p>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <Alert>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription>
-                          No advice has been added for this vehicle yet.
-                        </AlertDescription>
-                      </Alert>
-                    )}
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Customer Notes</h4>
+                    <p className="text-sm">{job.vehicle.customerNotes}</p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </TabsContent>
+          
+          <TabsContent value="advice" className="pt-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg">Vehicle Advice</CardTitle>
+                <Button size="sm" onClick={() => setShowAdviceForm(true)}>Add Advice</Button>
+              </CardHeader>
+              <CardContent>
+                {job.vehicleAdvice && job.vehicleAdvice.length > 0 ? (
+                  <div className="space-y-4">
+                    {job.vehicleAdvice.map((advice, index) => (
+                      <div key={index} className="border rounded-md p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h4 className="font-medium capitalize">{advice.type}</h4>
+                            <p className="text-sm text-muted-foreground">{advice.description}</p>
+                          </div>
+                          <Badge 
+                            className={
+                              advice.priority === "Critical" ? "bg-red-500" :
+                              advice.priority === "High" ? "bg-amber-500" :
+                              advice.priority === "Medium" ? "bg-blue-500" :
+                              "bg-green-500"
+                            }
+                          >
+                            {advice.priority}
+                          </Badge>
+                        </div>
+                        {advice.estimatedCost !== undefined && (
+                          <p className="text-sm mt-2">
+                            Estimated Cost: ${advice.estimatedCost.toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center py-6 text-muted-foreground">No advice records found. Add vehicle advice to help the customer maintain their vehicle.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+        
+        <div className="flex justify-between items-center">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+          <div className="flex gap-2">
+            {job.status !== "Completed" && (
+              <Button className="bg-green-500 hover:bg-green-600">
+                <Check className="mr-2 h-4 w-4" />
+                Mark as Completed
+              </Button>
+            )}
+            {job.status !== "Canceled" && job.status !== "Completed" && (
+              <Button variant="destructive">
+                <X className="mr-2 h-4 w-4" />
+                Cancel Job
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Vehicle Advice Form Dialog */}
+      <Dialog open={showAdviceForm} onOpenChange={setShowAdviceForm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Vehicle Advice</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <VehicleAdviceForm 
+              onSubmit={handleAddAdvice} 
+              onCancel={() => setShowAdviceForm(false)} 
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
+
+export default JobDetails;

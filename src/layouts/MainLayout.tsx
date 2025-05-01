@@ -1,73 +1,62 @@
 
-import { ReactNode, useState, useEffect } from 'react';
-import Sidebar from '../components/navigation/Sidebar';
-import Header from '../components/navigation/Header';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/providers/ThemeProvider';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import Header from "../components/navigation/Header";
+import Sidebar from "../components/navigation/Sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MainLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
+interface HeaderProps {
+  setSidebarOpen: (open: boolean) => void;
+}
+
+interface SidebarProps {
+  onClose: () => void;
+}
+
+// Creating a complete layout component with integrated sidebar and header
 const MainLayout = ({ children }: MainLayoutProps) => {
-  const { theme } = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   
-  // Handle sidebar state when screen size changes
+  // Close sidebar by default on mobile
   useEffect(() => {
-    setSidebarOpen(!isMobile);
+    if (isMobile) {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
+    }
   }, [isMobile]);
 
+  const closeSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
-    <div className={`flex h-screen ${theme === 'dark' ? 'bg-black' : 'bg-gradient-to-br from-regimark-light to-white'}`}>
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ x: isMobile ? -280 : 0 }}
-            animate={{ x: 0 }}
-            exit={{ x: -280 }}
-            transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 30 }}
-            className={`${isMobile ? 'fixed z-40' : ''} h-full`}
-          >
-            <Sidebar onClose={() => setSidebarOpen(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar - conditionally shown based on sidebarOpen state */}
+      {sidebarOpen && (
+        <Sidebar onClose={() => setSidebarOpen(false)} />
+      )}
       
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <Header />
-        <motion.main 
-          className="flex-1 overflow-y-auto p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {!sidebarOpen && (
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setSidebarOpen(true)}
-              className="mb-4 shadow-glow hover:shadow-lg transition-all duration-300"
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
-          )}
+      {/* Main content area */}
+      <div className="flex flex-col flex-1">
+        <Header setSidebarOpen={setSidebarOpen} />
+        <main className="flex-1 p-6">
           {children}
-        </motion.main>
+        </main>
       </div>
       
+      {/* Mobile overlay to close sidebar when clicked outside */}
       {sidebarOpen && isMobile && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30"
+        <div 
+          className="fixed inset-0 bg-black/50 z-10" 
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
     </div>
