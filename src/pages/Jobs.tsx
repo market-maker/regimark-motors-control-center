@@ -142,6 +142,14 @@ const Jobs = () => {
   });
 
   const selectedJob = selectedJobId ? jobCards.find(job => job.id === selectedJobId) : null;
+  
+  // Handle job update
+  const handleJobUpdate = (updatedJob: JobCardType) => {
+    // In a real app this would update the job in the database
+    console.log("Job updated:", updatedJob);
+    // For now we'll just close the details view
+    setSelectedJobId(null);
+  };
 
   return (
     <MainLayout>
@@ -216,7 +224,11 @@ const Jobs = () => {
           {/* Right column - Job details or vehicle advice */}
           <div className="lg:col-span-2">
             {selectedJob ? (
-              <JobDetails job={selectedJob} />
+              <JobDetails 
+                job={selectedJob} 
+                onClose={() => setSelectedJobId(null)} 
+                onUpdate={handleJobUpdate} 
+              />
             ) : (
               <Card className="dashboard-card-glow h-full">
                 <CardHeader>

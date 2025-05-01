@@ -10,6 +10,56 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 
+// BoxGrid component for animated background
+const BoxGrid = () => {
+  const boxes = Array(20).fill(0).map((_, i) => i);
+  
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="relative h-full w-full">
+        {boxes.map((i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-md bg-red-500/10 hover:bg-black/10 transition-colors duration-300"
+            initial={{ 
+              opacity: Math.random() * 0.2 + 0.1,
+              scale: Math.random() * 0.4 + 0.8
+            }}
+            animate={{ 
+              x: [
+                `${Math.random() * 90 + 5}%`,
+                `${Math.random() * 90 + 5}%`,
+                `${Math.random() * 90 + 5}%`,
+              ],
+              y: [
+                `${Math.random() * 90 + 5}%`,
+                `${Math.random() * 90 + 5}%`,
+                `${Math.random() * 90 + 5}%`,
+              ],
+              opacity: [0.1, 0.2, 0.1],
+              scale: [0.8, 1, 0.9]
+            }}
+            transition={{ 
+              duration: Math.random() * 20 + 20,
+              repeat: Infinity,
+              repeatType: "mirror"
+            }}
+            style={{ 
+              width: `${Math.random() * 10 + 5}rem`,
+              height: `${Math.random() * 10 + 5}rem`,
+              filter: `blur(${Math.random() * 40 + 20}px)`,
+            }}
+            whileHover={{
+              backgroundColor: "rgba(0,0,0,0.2)",
+              transition: { duration: 0.2 }
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -54,15 +104,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -inset-[10px] bg-red-500/10 animate-pulse blur-3xl rounded-full opacity-20" 
-            style={{ animation: "pulse-glow 8s infinite alternate", filter: "blur(120px)" }} />
-        <div className="absolute bottom-0 left-1/4 bg-red-600/20 w-[40vw] h-[40vw] rounded-full animate-pulse blur-3xl" 
-            style={{ animation: "pulse-glow 12s infinite alternate-reverse", filter: "blur(100px)" }} />
-        <div className="absolute top-1/4 right-1/4 bg-red-400/10 w-[30vw] h-[30vw] rounded-full animate-pulse blur-3xl" 
-            style={{ animation: "pulse-glow 10s infinite alternate", filter: "blur(80px)" }} />
-      </div>
+      {/* Animated background boxes */}
+      <BoxGrid />
       
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -207,8 +250,9 @@ const Login = () => {
         Market.Maker.Software©2025
       </div>
       
-      {/* Adding style for the glow animation */}
-      <style jsx>{`
+      {/* Adding styles for animations without JSX attribute */}
+      <style>
+        {`
         @keyframes pulse-glow {
           0% {
             opacity: 0.1;
@@ -223,7 +267,8 @@ const Login = () => {
             transform: scale(1.05);
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

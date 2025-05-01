@@ -26,6 +26,23 @@ export interface VehicleAdvice {
   estimatedCost?: number;
 }
 
+export interface Vehicle {
+  id?: string;
+  make: string;
+  model: string;
+  year: string;
+  licensePlate: string;
+  registration?: string;
+  vin?: string;
+  color?: string;
+  mileage?: number;
+  fuelType?: "Petrol" | "Diesel" | "Electric" | "Hybrid" | "Gas" | "Other";
+  transmission?: "Automatic" | "Manual" | "Semi-automatic" | "CVT" | "Other";
+  customerNotes?: string;
+  engineType?: string;
+  transmissionType?: string;
+}
+
 export interface JobCard {
   id: string;
   customerName: string;
@@ -61,15 +78,6 @@ export interface JobCard {
   vehicleAdvice: VehicleAdvice[];
   partsUsed?: Part[];
   recommendations?: string[];
-  vehicle?: {
-    make: string;
-    model: string;
-    year: string;
-    registration: string;
-    vin?: string;
-    color?: string;
-    mileage?: number;
-    engineType?: string;
-    transmissionType?: string;
-  };
+  vehicle?: Vehicle;
+  updatedAt?: string;
 }

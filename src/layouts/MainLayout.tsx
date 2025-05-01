@@ -150,9 +150,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </motion.div>
         </main>
         
-        {/* Copyright footer */}
-        <footer className="p-4 text-center border-t text-sm text-muted-foreground">
-          Market.Maker.Software©2025
+        {/* Copyright footer with enhanced styling */}
+        <footer className="p-4 text-center border-t text-sm text-muted-foreground backdrop-blur-sm bg-background/80">
+          <div className="flex items-center justify-center">
+            <span className="opacity-80 hover:opacity-100 transition-opacity">
+              Market.Maker.Software©2025
+            </span>
+          </div>
         </footer>
       </div>
       
