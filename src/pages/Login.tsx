@@ -16,6 +16,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
   const { isAuthenticated, login } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
@@ -52,7 +53,17 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
+      {/* Animated background gradient */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -inset-[10px] bg-red-500/10 animate-pulse blur-3xl rounded-full opacity-20" 
+            style={{ animation: "pulse-glow 8s infinite alternate", filter: "blur(120px)" }} />
+        <div className="absolute bottom-0 left-1/4 bg-red-600/20 w-[40vw] h-[40vw] rounded-full animate-pulse blur-3xl" 
+            style={{ animation: "pulse-glow 12s infinite alternate-reverse", filter: "blur(100px)" }} />
+        <div className="absolute top-1/4 right-1/4 bg-red-400/10 w-[30vw] h-[30vw] rounded-full animate-pulse blur-3xl" 
+            style={{ animation: "pulse-glow 10s infinite alternate", filter: "blur(80px)" }} />
+      </div>
+      
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -61,7 +72,7 @@ const Login = () => {
           type: "spring", 
           stiffness: 100 
         }}
-        className="relative"
+        className="relative z-10"
       >
         {/* 3D Card with glassmorphism effect */}
         <div 
@@ -114,10 +125,13 @@ const Login = () => {
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
                     required
-                    className="h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm"
+                    className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm text-black dark:text-white
+                      ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)] text-red-600 dark:text-red-400" : ""}`}
                   />
-                  <div className="absolute inset-0 rounded-md pointer-events-none shadow-[0_0_15px_rgba(227,6,19,0.1)]" />
+                  <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
                 </div>
               </motion.div>
 
@@ -132,8 +146,11 @@ const Login = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
                     required
-                    className="h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm"
+                    className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm text-black dark:text-white
+                      ${focusedField === "password" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)] text-red-600 dark:text-red-400" : ""}`}
                   />
                   <button
                     type="button"
@@ -146,7 +163,7 @@ const Login = () => {
                       <Eye size={18} />
                     )}
                   </button>
-                  <div className="absolute inset-0 rounded-md pointer-events-none shadow-[0_0_15px_rgba(227,6,19,0.1)]" />
+                  <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "password" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
                 </div>
               </motion.div>
 
@@ -184,6 +201,29 @@ const Login = () => {
           }}
         />
       </motion.div>
+      
+      {/* Copyright footer */}
+      <div className="absolute bottom-4 text-center text-sm text-slate-500 dark:text-slate-400">
+        Market.Maker.Software©2025
+      </div>
+      
+      {/* Adding style for the glow animation */}
+      <style jsx>{`
+        @keyframes pulse-glow {
+          0% {
+            opacity: 0.1;
+            transform: scale(0.95);
+          }
+          50% {
+            opacity: 0.2;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0.1;
+            transform: scale(1.05);
+          }
+        }
+      `}</style>
     </div>
   );
 };

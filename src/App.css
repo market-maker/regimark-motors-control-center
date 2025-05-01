@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +40,62 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Added glow animations */
+@keyframes pulse-glow {
+  0% {
+    opacity: 0.1;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow-red {
+  0% {
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(220, 38, 38, 0.2);
+  }
+}
+
+.glow-hover:hover {
+  animation: glow-red 2s infinite;
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+  color: rgb(220, 38, 38);
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: #000;
+  --foreground: #fff;
+  --accent: #f00;
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
+.high-contrast .card,
+.high-contrast .input,
+.high-contrast .button {
+  border: 2px solid var(--foreground);
+}
+
+/* Reduced motion */
+.reduced-motion * {
+  animation: none !important;
+  transition: none !important;
 }

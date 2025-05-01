@@ -1,11 +1,13 @@
 
-export type JobStatus = "Pending" | "Completed" | "In Progress" | "On Hold" | "Canceled";
-export type JobPriority = "Low" | "Medium" | "High" | "Critical";
+export type JobStatus = "Pending" | "Completed" | "In Progress" | "On Hold" | "Canceled" | "scheduled" | "in-progress" | "completed";
+export type JobPriority = "Low" | "Medium" | "High" | "Critical" | "none" | "low" | "medium";
 
 export interface Part {
+  id?: string;
   name: string;
   quantity: number;
   cost: number;
+  price?: number;
 }
 
 export interface Labor {
@@ -29,22 +31,45 @@ export interface JobCard {
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
+  customerId?: string;
   status: JobStatus;
   priority: JobPriority;
   technicianName: string;
+  technicianId?: string;
   createdDate: string;
+  createdAt?: string;
   completedDate: string | null;
+  completedAt?: string | null;
   description: string;
   estimatedCost: number;
+  finalCost?: number;
   vehicleMake: string;
   vehicleModel: string;
   vehicleYear: string;
   vehicleRegistration: string;
   jobDescription: string;
+  jobNumber?: string;
+  diagnosis?: string;
   technicianNotes: string;
   scheduledDate: string;
+  estimatedCompletionDate?: string;
   parts: Part[];
   labor: Labor;
+  laborHours?: number;
+  laborCost?: number;
   totalCost: number;
   vehicleAdvice: VehicleAdvice[];
+  partsUsed?: Part[];
+  recommendations?: string[];
+  vehicle?: {
+    make: string;
+    model: string;
+    year: string;
+    registration: string;
+    vin?: string;
+    color?: string;
+    mileage?: number;
+    engineType?: string;
+    transmissionType?: string;
+  };
 }

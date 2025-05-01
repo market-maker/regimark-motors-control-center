@@ -134,7 +134,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </AnimatePresence>
       
       {/* Main content area */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 relative">
         <Header 
           setSidebarOpen={setSidebarOpen} 
           isOnline={isOnline}
@@ -149,6 +149,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {children}
           </motion.div>
         </main>
+        
+        {/* Copyright footer */}
+        <footer className="p-4 text-center border-t text-sm text-muted-foreground">
+          Market.Maker.Software©2025
+        </footer>
       </div>
       
       {/* Mobile overlay to close sidebar when clicked outside */}
