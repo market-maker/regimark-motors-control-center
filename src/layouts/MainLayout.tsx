@@ -43,12 +43,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      toast.success("You're back online");
+      toast.success("You're back online", {
+        description: "All features are now available"
+      });
     };
     
     const handleOffline = () => {
       setIsOnline(false);
-      toast.warning("You're offline. Some features may be limited.");
+      toast.warning("You're offline", {
+        description: "Limited functionality available. Changes will sync when you reconnect."
+      });
     };
     
     window.addEventListener('online', handleOnline);

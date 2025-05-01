@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { getAuthFromLocalStorage, saveAuthToLocalStorage, clearAuth, isAuthExpired } from "@/lib/utils";
+import { toast } from "sonner";
 
 type User = {
   email: string;
@@ -60,6 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: authData.role,
           token: authData.token
         });
+        
+        // Show notification when reconnecting while authenticated
+        if (navigator.onLine) {
+          toast.success(`Welcome back, ${authData.email}`, {
+            description: "You are now connected and authenticated",
+          });
+        }
       }
       setIsLoading(false);
     };
@@ -71,11 +79,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleOnline = () => {
       console.log("Application is online");
-      // Here you would normally sync any offline changes with the server
+      if (user) {
+        toast.success("You're back online", {
+          description: "All features are now available"
+        });
+      }
     };
 
     const handleOffline = () => {
       console.log("Application is offline");
+      if (user) {
+        toast.warning("You're offline", {
+          description: "Limited functionality available. Changes will sync when you reconnect."
+        });
+      }
     };
 
     window.addEventListener('online', handleOnline);
@@ -85,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [user]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
@@ -107,6 +124,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setUser(userData);
       saveAuthToLocalStorage(userData);
+      
+      toast.success(`Welcome, ${user.email}`, {
+        description: `Logged in as ${user.role}`,
+      });
+      
       setIsLoading(false);
       return true;
     }
@@ -116,8 +138,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    const email = user?.email;
     setUser(null);
     clearAuth();
+    toast.info(`Goodbye, ${email || 'user'}`, {
+      description: "You have been logged out",
+    });
   };
 
   return (
