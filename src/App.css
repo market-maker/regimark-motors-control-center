@@ -154,10 +154,12 @@
   background: rgba(220, 38, 38, 0.1);
   filter: blur(20px);
   transition: all 0.5s ease;
+  animation: pulse-glow 8s infinite;
 }
 
 .animated-box:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  animation-play-state: paused;
 }
 
 /* Focus styles for form elements */

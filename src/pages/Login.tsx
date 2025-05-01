@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 
-// BoxGrid component for animated background
+// BoxGrid component for animated background with hover effects
 const BoxGrid = () => {
   const boxes = Array(20).fill(0).map((_, i) => i);
   
@@ -20,7 +20,7 @@ const BoxGrid = () => {
         {boxes.map((i) => (
           <motion.div
             key={i}
-            className="absolute rounded-md bg-red-500/10 hover:bg-black/10 transition-colors duration-300"
+            className="animated-box"
             initial={{ 
               opacity: Math.random() * 0.2 + 0.1,
               scale: Math.random() * 0.4 + 0.8
@@ -123,7 +123,7 @@ const Login = () => {
             w-96 rounded-3xl ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-white/80'} 
             backdrop-blur-xl shadow-2xl overflow-hidden
             transform perspective-1000 rotate-x-1 hover:rotate-x-0
-            transition-all duration-500
+            transition-all duration-500 float-card
           `}
           style={{ 
             boxShadow: theme === 'dark' 
@@ -171,8 +171,9 @@ const Login = () => {
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
                     required
-                    className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm text-black dark:text-white
-                      ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)] text-red-600 dark:text-red-400" : ""}`}
+                    className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
+                      text-black dark:text-white
+                      ${focusedField === "email" ? "text-glow-red" : ""}`}
                   />
                   <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
                 </div>
@@ -192,8 +193,9 @@ const Login = () => {
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     required
-                    className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm text-black dark:text-white
-                      ${focusedField === "password" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)] text-red-600 dark:text-red-400" : ""}`}
+                    className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
+                      text-black dark:text-white
+                      ${focusedField === "password" ? "text-glow-red" : ""}`}
                   />
                   <button
                     type="button"
@@ -249,26 +251,6 @@ const Login = () => {
       <div className="absolute bottom-4 text-center text-sm text-slate-500 dark:text-slate-400">
         Market.Maker.Software©2025
       </div>
-      
-      {/* Adding styles for animations without JSX attribute */}
-      <style>
-        {`
-        @keyframes pulse-glow {
-          0% {
-            opacity: 0.1;
-            transform: scale(0.95);
-          }
-          50% {
-            opacity: 0.2;
-            transform: scale(1);
-          }
-          100% {
-            opacity: 0.1;
-            transform: scale(1.05);
-          }
-        }
-        `}
-      </style>
     </div>
   );
 };

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { JobCard, Vehicle } from "@/types/job"; // Import Vehicle type
+import { JobCard, Vehicle, JobStatus, JobPriority } from "@/types/job"; // Import JobStatus and JobPriority
 
 interface JobCardFormProps {
   onSubmit?: (jobCard: JobCard) => void;
@@ -26,9 +26,9 @@ const technicians = [
 
 // Mock customers
 const customers = [
-  { id: "1", name: "Alice Brown" },
-  { id: "2", name: "Bob Wilson" },
-  { id: "3", name: "Carol White" }
+  { id: "1", name: "Alice Brown", email: "alice@example.com", phone: "555-1234" },
+  { id: "2", name: "Bob Wilson", email: "bob@example.com", phone: "555-5678" },
+  { id: "3", name: "Carol White", email: "carol@example.com", phone: "555-9012" }
 ];
 
 const JobCardForm = ({ onSubmit, onCancel, initialData }: JobCardFormProps) => {
@@ -37,27 +37,30 @@ const JobCardForm = ({ onSubmit, onCancel, initialData }: JobCardFormProps) => {
   
   // Form state
   const [jobNumber, setJobNumber] = useState(initialData?.jobNumber || `JOB-${Date.now().toString().slice(-6)}`);
-  const [status, setStatus] = useState<"Pending" | "In Progress" | "Completed" | "On Hold" | "Canceled">(initialData?.status || "Pending");
+  const [status, setStatus] = useState<JobStatus>(initialData?.status as JobStatus || "Pending");
   const [customerId, setCustomerId] = useState(initialData?.customerId || "");
   const [customerName, setCustomerName] = useState(initialData?.customerName || "");
+  const [customerEmail, setCustomerEmail] = useState(initialData?.customerEmail || "");
+  const [customerPhone, setCustomerPhone] = useState(initialData?.customerPhone || "");
   const [technicianId, setTechnicianId] = useState(initialData?.technicianId || "");
   const [technicianName, setTechnicianName] = useState(initialData?.technicianName || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [diagnosis, setDiagnosis] = useState(initialData?.diagnosis || "");
+  const [priority, setPriority] = useState<JobPriority>(initialData?.priority as JobPriority || "Medium");
   const [estimatedCost, setEstimatedCost] = useState<number | undefined>(initialData?.estimatedCost);
   const [estimatedCompletionDate, setEstimatedCompletionDate] = useState(initialData?.estimatedCompletionDate || "");
   
   // Vehicle information
-  const [make, setMake] = useState(initialData?.vehicle.make || "");
-  const [model, setModel] = useState(initialData?.vehicle.model || "");
-  const [year, setYear] = useState(initialData?.vehicle.year || "");
-  const [licensePlate, setLicensePlate] = useState(initialData?.vehicle.licensePlate || "");
-  const [vin, setVin] = useState(initialData?.vehicle.vin || "");
-  const [color, setColor] = useState(initialData?.vehicle.color || "");
-  const [mileage, setMileage] = useState<number | undefined>(initialData?.vehicle.mileage);
-  const [fuelType, setFuelType] = useState<"Petrol" | "Diesel" | "Electric" | "Hybrid" | "Gas" | "Other" | undefined>(initialData?.vehicle.fuelType);
-  const [transmission, setTransmission] = useState<"Automatic" | "Manual" | "Semi-automatic" | "CVT" | "Other" | undefined>(initialData?.vehicle.transmission);
-  const [customerNotes, setCustomerNotes] = useState(initialData?.vehicle.customerNotes || "");
+  const [make, setMake] = useState(initialData?.vehicleMake || initialData?.vehicle?.make || "");
+  const [model, setModel] = useState(initialData?.vehicleModel || initialData?.vehicle?.model || "");
+  const [year, setYear] = useState(initialData?.vehicleYear || initialData?.vehicle?.year || "");
+  const [licensePlate, setLicensePlate] = useState(initialData?.vehicleRegistration || initialData?.vehicle?.licensePlate || "");
+  const [vin, setVin] = useState(initialData?.vehicle?.vin || "");
+  const [color, setColor] = useState(initialData?.vehicle?.color || "");
+  const [mileage, setMileage] = useState<number | undefined>(initialData?.vehicle?.mileage);
+  const [fuelType, setFuelType] = useState<"Petrol" | "Diesel" | "Electric" | "Hybrid" | "Gas" | "Other" | undefined>(initialData?.vehicle?.fuelType);
+  const [transmission, setTransmission] = useState<"Automatic" | "Manual" | "Semi-automatic" | "CVT" | "Other" | undefined>(initialData?.vehicle?.transmission);
+  const [customerNotes, setCustomerNotes] = useState(initialData?.vehicle?.customerNotes || "");
   
   // Additional options
   const [createInvoice, setCreateInvoice] = useState(false);
@@ -68,6 +71,8 @@ const JobCardForm = ({ onSubmit, onCancel, initialData }: JobCardFormProps) => {
     if (customer) {
       setCustomerId(customer.id);
       setCustomerName(customer.name);
+      setCustomerEmail(customer.email);
+      setCustomerPhone(customer.phone || "");
     }
   };
   
@@ -90,11 +95,11 @@ const JobCardForm = ({ onSubmit, onCancel, initialData }: JobCardFormProps) => {
     
     // Create vehicle object
     const vehicle: Vehicle = {
-      id: initialData?.vehicle.id || `VEH-${Date.now().toString().slice(-6)}`,
-      make, // This is required by the Vehicle interface
-      model, // This is required by the Vehicle interface
-      year, // This is required by the Vehicle interface
-      licensePlate, // This is required by the Vehicle interface
+      id: initialData?.vehicle?.id || `VEH-${Date.now().toString().slice(-6)}`,
+      make, 
+      model, 
+      year, 
+      licensePlate, 
       vin,
       color,
       mileage,
@@ -103,30 +108,43 @@ const JobCardForm = ({ onSubmit, onCancel, initialData }: JobCardFormProps) => {
       customerNotes
     };
     
-    // Create job card object
+    // Create job card object with all required fields
     const jobCard: JobCard = {
       id: initialData?.id || `ID-${Date.now().toString().slice(-6)}`,
-      createdAt: initialData?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
       jobNumber,
       status,
-      vehicle,
-      customerId,
       customerName,
+      customerEmail,
+      customerPhone,
+      customerId,
       technicianId,
       technicianName,
       description,
-      diagnosis: diagnosis || undefined,
-      estimatedCost,
+      diagnosis: diagnosis || "",
+      createdDate: initialData?.createdDate || new Date().toISOString(),
+      completedDate: initialData?.completedDate || null,
+      priority,
+      estimatedCost: estimatedCost || 0,
+      finalCost: initialData?.finalCost || 0,
+      vehicleMake: make,
+      vehicleModel: model,
+      vehicleYear: year,
+      vehicleRegistration: licensePlate,
+      jobDescription: description,
+      technicianNotes: initialData?.technicianNotes || "",
+      scheduledDate: initialData?.scheduledDate || new Date().toISOString(),
       estimatedCompletionDate: estimatedCompletionDate || undefined,
-      // We're not modifying the other fields from initialData if they exist
-      finalCost: initialData?.finalCost,
-      completedDate: initialData?.completedDate,
+      parts: initialData?.parts || [],
+      labor: initialData?.labor || { hours: 0, rate: 0 },
+      totalCost: initialData?.totalCost || 0,
+      vehicleAdvice: initialData?.vehicleAdvice || [],
+      vehicle: vehicle,
+      createdAt: initialData?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       partsUsed: initialData?.partsUsed || [],
       laborHours: initialData?.laborHours,
       laborCost: initialData?.laborCost,
-      recommendations: initialData?.recommendations || [],
-      vehicleAdvice: initialData?.vehicleAdvice || []
+      recommendations: initialData?.recommendations || []
     };
     
     if (onSubmit) {
