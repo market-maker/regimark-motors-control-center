@@ -14,7 +14,7 @@ import {
   Settings,
   Store,
   CreditCard,
-  Building,
+  Car,
 } from "lucide-react";
 import logoImage from "/placeholder.svg";
 import { Button } from "../ui/button";
@@ -93,6 +93,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </SidebarSection>
 
         <SidebarSection title="Business">
+          <SidebarItem
+            href="/jobs"
+            icon={<Car />}
+            label="Jobs"
+            isActive={isActive('/jobs')}
+          />
           <SidebarItem
             href="/stores"
             icon={<Store />}

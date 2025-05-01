@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import ReceiptTemplates from "./pages/ReceiptTemplates";
 import Settings from "./pages/Settings";
 import Stores from "./pages/Stores";
+import Jobs from "./pages/Jobs";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { NotificationsProvider } from "./providers/NotificationsProvider";
 import "./App.css";
@@ -35,6 +36,7 @@ function App() {
             <Route path="/receipt-templates" element={<ReceiptTemplates />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/stores" element={<Stores />} />
+            <Route path="/jobs" element={<Jobs />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
