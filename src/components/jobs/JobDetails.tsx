@@ -21,8 +21,9 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
   const [activeTab, setActiveTab] = useState("details");
   
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "completed": return "bg-green-100 text-green-800";
+      case "in progress": 
       case "in-progress": return "bg-amber-100 text-amber-800";
       case "scheduled": return "bg-blue-100 text-blue-800";
       default: return "bg-gray-100 text-gray-800";
@@ -108,11 +109,11 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               </div>
               <div>
                 <p className="font-medium">Phone</p>
-                <p>{job.customerPhone}</p>
+                <p>{job.customerPhone || 'N/A'}</p>
               </div>
               <div className="col-span-2">
                 <p className="font-medium">Customer ID</p>
-                <p>{job.customerId}</p>
+                <p>{job.customerId || 'N/A'}</p>
               </div>
             </CardContent>
           </Card>
@@ -135,12 +136,12 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="font-medium">Created</p>
-                  <p>{formatDate(new Date(job.createdAt))}</p>
+                  <p>{formatDate(new Date(job.createdAt || job.createdDate))}</p>
                 </div>
-                {job.completedAt && (
+                {(job.completedAt || job.completedDate) && (
                   <div>
                     <p className="font-medium">Completed</p>
-                    <p>{formatDate(new Date(job.completedAt))}</p>
+                    <p>{formatDate(new Date(job.completedAt || job.completedDate))}</p>
                   </div>
                 )}
                 {job.scheduledDate && (
@@ -173,18 +174,18 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
                     <div className="col-span-2">Total</div>
                   </div>
                   <div className="divide-y">
-                    {job.parts.map((part) => (
-                      <div key={part.id} className="grid grid-cols-12 py-2">
+                    {job.parts.map((part, index) => (
+                      <div key={part.id || `part-${index}`} className="grid grid-cols-12 py-2">
                         <div className="col-span-6">{part.name}</div>
                         <div className="col-span-2">{part.quantity}</div>
-                        <div className="col-span-2">${part.price.toFixed(2)}</div>
-                        <div className="col-span-2">${(part.quantity * part.price).toFixed(2)}</div>
+                        <div className="col-span-2">${part.cost.toFixed(2)}</div>
+                        <div className="col-span-2">${(part.quantity * part.cost).toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-between pt-4 font-medium">
                     <div>Parts Subtotal</div>
-                    <div>${job.parts.reduce((sum, part) => sum + (part.quantity * part.price), 0).toFixed(2)}</div>
+                    <div>${job.parts.reduce((sum, part) => sum + (part.quantity * part.cost), 0).toFixed(2)}</div>
                   </div>
                 </div>
               )}
@@ -261,8 +262,8 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
                         <div className="col-span-2">
                           {advice.priority !== "none" && (
                             <Badge variant={
-                              advice.priority === "low" ? "outline" :
-                              advice.priority === "medium" ? "secondary" :
+                              advice.priority === "low" || advice.priority === "Low" ? "outline" :
+                              advice.priority === "medium" || advice.priority === "Medium" ? "secondary" :
                               "destructive"
                             }>
                               {advice.priority}
@@ -284,12 +285,12 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
           Close
         </Button>
         <div className="space-x-2">
-          {job.status === "scheduled" && (
+          {job.status.toLowerCase() === "scheduled" && (
             <Button onClick={markAsInProgress}>
               Mark as In Progress
             </Button>
           )}
-          {job.status === "in-progress" && (
+          {job.status.toLowerCase() === "in progress" || job.status.toLowerCase() === "in-progress" && (
             <Button onClick={markAsCompleted}>
               Mark as Completed
             </Button>

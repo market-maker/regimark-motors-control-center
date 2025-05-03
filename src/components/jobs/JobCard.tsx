@@ -9,9 +9,10 @@ import { Car, Calendar, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 interface JobCardProps {
   job: JobCardType;
   onClick?: () => void;
+  isSelected?: boolean;
 }
 
-const JobCard = ({ job, onClick }: JobCardProps) => {
+const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
   const statusMap = {
     scheduled: { icon: Calendar, label: "Scheduled", color: "bg-blue-100 text-blue-800" },
     "in-progress": { icon: Clock, label: "In Progress", color: "bg-amber-100 text-amber-800" },
@@ -32,7 +33,10 @@ const JobCard = ({ job, onClick }: JobCardProps) => {
     : "bg-gray-100 text-gray-800";
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+    <Card 
+      className={`overflow-hidden hover:shadow-lg transition-shadow cursor-pointer ${isSelected ? 'ring-2 ring-primary' : ''}`} 
+      onClick={onClick}
+    >
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-lg truncate">{job.vehicleMake} {job.vehicleModel}</h3>
@@ -58,15 +62,15 @@ const JobCard = ({ job, onClick }: JobCardProps) => {
           <div className="flex justify-between text-sm">
             <div>
               <p className="font-medium">Created</p>
-              <p>{formatDate(new Date(job.createdAt))}</p>
+              <p>{formatDate(new Date(job.createdAt || job.createdDate))}</p>
             </div>
-            {job.completedAt && (
+            {(job.completedAt || job.completedDate) && (
               <div>
                 <p className="font-medium">Completed</p>
-                <p>{formatDate(new Date(job.completedAt))}</p>
+                <p>{formatDate(new Date(job.completedAt || job.completedDate))}</p>
               </div>
             )}
-            {job.scheduledDate && !job.completedAt && (
+            {job.scheduledDate && !(job.completedAt || job.completedDate) && (
               <div>
                 <p className="font-medium">Scheduled</p>
                 <p>{formatDate(new Date(job.scheduledDate))}</p>

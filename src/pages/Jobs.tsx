@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -206,7 +205,7 @@ const Jobs = () => {
                         className="cursor-pointer"
                       >
                         <JobCard 
-                          {...job} 
+                          job={job} 
                           isSelected={job.id === selectedJobId}
                         />
                       </div>
