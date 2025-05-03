@@ -15,6 +15,7 @@ const Jobs = () => {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAdviceForm, setShowAdviceForm] = useState(false);
 
   // Sample job cards for demonstration
   const jobCards: JobCardType[] = [
@@ -157,14 +158,23 @@ const Jobs = () => {
       <div className="page-container">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-regimark-primary">Job Management</h1>
-          <Button className="btn-3d">
-            <Plus className="mr-2 h-4 w-4" /> Create New Job
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              className="btn-3d"
+              onClick={() => setShowAdviceForm(!showAdviceForm)}
+              variant={showAdviceForm ? "default" : "outline"}
+            >
+              {showAdviceForm ? "Hide Advice Form" : "Show Advice Form"}
+            </Button>
+            <Button className="btn-3d">
+              <Plus className="mr-2 h-4 w-4" /> Create New Job
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left column - Job cards list */}
-          <div className="lg:col-span-1 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left column - Job cards list (wider) */}
+          <div className="lg:col-span-3 space-y-4">
             <Card className="dashboard-card-glow">
               <CardHeader className="pb-2">
                 <CardTitle>Jobs</CardTitle>
@@ -198,7 +208,7 @@ const Jobs = () => {
                   </Tabs>
                 </div>
                 
-                <div className="mt-4 space-y-4 max-h-[600px] overflow-y-auto">
+                <div className="mt-4 space-y-6 max-h-[700px] overflow-y-auto px-1">
                   {filteredJobs.length > 0 ? (
                     filteredJobs.map(job => (
                       <div 
@@ -230,7 +240,7 @@ const Jobs = () => {
                 onClose={() => setSelectedJobId(null)} 
                 onUpdate={handleJobUpdate} 
               />
-            ) : (
+            ) : showAdviceForm ? (
               <Card className="dashboard-card-glow h-full">
                 <CardHeader>
                   <CardTitle>Vehicle Advice Form</CardTitle>
@@ -239,6 +249,15 @@ const Jobs = () => {
                 <CardContent>
                   <VehicleAdviceForm />
                 </CardContent>
+              </Card>
+            ) : (
+              <Card className="dashboard-card-glow h-full flex items-center justify-center p-6">
+                <div className="text-center space-y-4">
+                  <h3 className="text-xl font-medium">No Job Selected</h3>
+                  <p className="text-muted-foreground">
+                    Select a job from the list to view details or use the button above to show the vehicle advice form.
+                  </p>
+                </div>
               </Card>
             )}
           </div>
