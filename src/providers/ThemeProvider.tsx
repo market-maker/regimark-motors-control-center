@@ -1,19 +1,45 @@
-import React from "react";
+
+import React, { useState, useContext, createContext, useEffect } from "react";
+
+type Theme = "light" | "dark";
 
 type ThemeContextType = {
-  // Keep empty interface for now to avoid breaking existing imports
+  theme: Theme;
+  toggleTheme: () => void;
 };
 
-const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>("light");
+  
+  // Load theme from localStorage on initial load
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as Theme;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    }
+  }, []);
+  
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
+
   return (
-    <>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
-    </>
+    </ThemeContext.Provider>
   );
 }
 
-export const useTheme = () => {
-  return {}; // Return empty object to avoid breaking existing code that uses this hook
-};
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+}

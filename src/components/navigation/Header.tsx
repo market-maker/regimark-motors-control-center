@@ -18,6 +18,7 @@ import NotificationBell from "./NotificationBell";
 import { useAuth } from "@/providers/AuthProvider";
 import { Badge } from "../ui/badge";
 import { motion } from "framer-motion";
+import { ThemeToggle } from "../theme/ThemeToggle";
 
 interface HeaderProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -121,6 +122,8 @@ const Header: React.FC<HeaderProps> = ({
             Admin
           </Badge>
         )}
+        
+        <ThemeToggle />
         
         <NotificationBell />
         
