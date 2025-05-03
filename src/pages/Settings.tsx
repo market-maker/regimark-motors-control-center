@@ -9,7 +9,6 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/providers/ThemeProvider";
 import { toast } from "sonner";
 import { 
   MonitorCheck, Eye, Gauge, TextCursorInput, Volume2, MonitorSmartphone,
@@ -26,7 +25,6 @@ const Settings = () => {
   const [textSpacing, setTextSpacing] = useState(1);
   
   // Display settings
-  const { theme, setTheme } = useTheme();
   const [zoomLevel, setZoomLevel] = useState(100);
   const [cursorSize, setCursorSize] = useState("medium");
   const [volumeLevel, setVolumeLevel] = useState(80);
@@ -84,12 +82,9 @@ const Settings = () => {
         </div>
         
         <Tabs defaultValue="accessibility" className="w-full">
-          <TabsList className="grid grid-cols-4 mb-6">
+          <TabsList className="grid grid-cols-3 mb-6">
             <TabsTrigger value="accessibility" className="flex items-center gap-2">
               <Eye className="h-4 w-4" /> Accessibility
-            </TabsTrigger>
-            <TabsTrigger value="display" className="flex items-center gap-2">
-              <MonitorCheck className="h-4 w-4" /> Display
             </TabsTrigger>
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="h-4 w-4" /> Notifications
@@ -188,105 +183,6 @@ const Settings = () => {
                         Reset to Defaults
                       </Button>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          {/* Display Settings */}
-          <TabsContent value="display" className="space-y-6">
-            <Card className="dashboard-card-glow">
-              <CardHeader>
-                <CardTitle>Display Settings</CardTitle>
-                <CardDescription>Configure visual appearance and theme</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="theme">Application Theme</Label>
-                      <Select value={theme} onValueChange={setTheme}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select theme" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="light">Light</SelectItem>
-                          <SelectItem value="dark">Dark</SelectItem>
-                          <SelectItem value="system">System Default</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="cursor">Cursor Size</Label>
-                      <Select value={cursorSize} onValueChange={setCursorSize}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select cursor size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="small">Small</SelectItem>
-                          <SelectItem value="medium">Medium</SelectItem>
-                          <SelectItem value="large">Large</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="zoom">Zoom Level: {zoomLevel}%</Label>
-                      </div>
-                      <Slider 
-                        id="zoom"
-                        value={[zoomLevel]} 
-                        min={80} 
-                        max={150} 
-                        step={5}
-                        onValueChange={(value) => setZoomLevel(value[0])} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="volume">System Volume: {volumeLevel}%</Label>
-                      </div>
-                      <Slider 
-                        id="volume"
-                        value={[volumeLevel]} 
-                        min={0} 
-                        max={100} 
-                        step={5}
-                        onValueChange={(value) => setVolumeLevel(value[0])} 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="dashboard-card-glow">
-              <CardHeader>
-                <CardTitle>Device Settings</CardTitle>
-                <CardDescription>Configure device-specific preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="responsive-layout">Responsive Layout</Label>
-                      <p className="text-sm text-muted-foreground">Automatically adjust to screen size</p>
-                    </div>
-                    <Switch id="responsive-layout" defaultChecked />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="touch-optimization">Touch Optimization</Label>
-                      <p className="text-sm text-muted-foreground">Optimize for touch screen devices</p>
-                    </div>
-                    <Switch id="touch-optimization" defaultChecked />
                   </div>
                 </div>
               </CardContent>

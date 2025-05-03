@@ -1,6 +1,5 @@
 
 import React, { useState } from "react";
-import { ThemeToggle } from "../theme/ThemeToggle";
 import { Menu, Search, LogOut, Settings as SettingsIcon, User, Wifi, WifiOff } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -124,7 +123,6 @@ const Header: React.FC<HeaderProps> = ({
         )}
         
         <NotificationBell />
-        <ThemeToggle />
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

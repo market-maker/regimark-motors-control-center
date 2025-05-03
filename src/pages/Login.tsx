@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
-import { useTheme } from "@/providers/ThemeProvider";
 
 // BoxGrid component for animated background with hover effects
 const BoxGrid = () => {
@@ -69,7 +68,6 @@ const Login = () => {
   const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
   const { isAuthenticated, login } = useAuth();
   const { toast } = useToast();
-  const { theme } = useTheme();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +101,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
       {/* Animated background boxes */}
       <BoxGrid />
       
@@ -119,16 +117,9 @@ const Login = () => {
       >
         {/* 3D Card with glassmorphism effect */}
         <div 
-          className={`
-            w-96 rounded-3xl ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-white/80'} 
-            backdrop-blur-xl shadow-2xl overflow-hidden
-            transform perspective-1000 rotate-x-1 hover:rotate-x-0
-            transition-all duration-500 float-card
-          `}
+          className="w-96 rounded-3xl bg-white/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card"
           style={{ 
-            boxShadow: theme === 'dark' 
-              ? '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 25px -5px rgba(255, 90, 90, 0.25)' 
-              : '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px -5px rgba(227, 6, 19, 0.2)'
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px -5px rgba(227, 6, 19, 0.2)'
           }}
         >
           <div className="p-8">
@@ -172,7 +163,7 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      text-black dark:text-white
+                      text-black
                       ${focusedField === "email" ? "text-glow-red" : ""}`}
                   />
                   <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
@@ -194,13 +185,13 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      text-black dark:text-white
+                      text-black
                       ${focusedField === "password" ? "text-glow-red" : ""}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -240,15 +231,13 @@ const Login = () => {
         <div 
           className="absolute -bottom-6 left-0 right-0 h-12 mx-auto w-4/5 rounded-full blur-xl"
           style={{ 
-            background: theme === 'dark' 
-              ? 'linear-gradient(rgba(227, 6, 19, 0.2), transparent)' 
-              : 'linear-gradient(rgba(0, 0, 0, 0.05), transparent)' 
+            background: 'linear-gradient(rgba(0, 0, 0, 0.05), transparent)'
           }}
         />
       </motion.div>
       
       {/* Copyright footer */}
-      <div className="absolute bottom-4 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="absolute bottom-4 text-center text-sm text-slate-500">
         Market.Maker.Software©2025
       </div>
     </div>
