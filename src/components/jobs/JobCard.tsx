@@ -4,8 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { JobCard as JobCardType, VehicleAdvice } from "@/types/job";
-import { Car, Calendar, AlertTriangle, CheckCircle, Clock, Plus } from "lucide-react";
+import { Car, Calendar, AlertTriangle, CheckCircle, Clock, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface JobCardProps {
   job: JobCardType;
@@ -15,6 +20,17 @@ interface JobCardProps {
 
 const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
   const [showAdvice, setShowAdvice] = useState(false);
+  const [showAdviceForm, setShowAdviceForm] = useState(false);
+  const [currentAdvice, setCurrentAdvice] = useState<VehicleAdvice>({
+    id: '',
+    type: 'maintenance',
+    item: '',
+    condition: 'Good',
+    description: '',
+    priority: 'Low',
+    notes: '',
+    estimatedCost: undefined
+  });
   
   // Normalize status to lowercase for consistent comparison
   const normalizedStatus = job.status ? job.status.toLowerCase() : "";
@@ -51,6 +67,26 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
     }
   };
 
+  const handleInputChange = (field: keyof VehicleAdvice, value: string | number) => {
+    setCurrentAdvice({
+      ...currentAdvice,
+      [field]: value
+    });
+  };
+
+  const addAdvice = () => {
+    if (!currentAdvice.item || !currentAdvice.description) {
+      // We would show an error toast here
+      return;
+    }
+
+    // In a real app, we would send this to the server
+    console.log("New advice:", currentAdvice);
+    
+    setShowAdviceForm(false);
+    // We would refresh the job data here
+  };
+
   // Render advice items if available
   const renderVehicleAdvice = () => {
     if (!job.vehicleAdvice || job.vehicleAdvice.length === 0) {
@@ -85,6 +121,95 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
             </div>
           </div>
         ))}
+      </div>
+    );
+  };
+
+  // Vehicle advice form
+  const renderAdviceForm = () => {
+    return (
+      <div className="space-y-4 p-2 border-t mt-2">
+        <h4 className="font-medium">Add Vehicle Recommendation</h4>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="item">Component</Label>
+            <Input
+              id="item"
+              placeholder="e.g., Brakes, Engine"
+              value={currentAdvice.item}
+              onChange={(e) => handleInputChange('item', e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="type">Type</Label>
+            <Select
+              value={currentAdvice.type}
+              onValueChange={(value) => handleInputChange('type', value as any)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
+                <SelectItem value="repair">Repair</SelectItem>
+                <SelectItem value="upgrade">Upgrade</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            placeholder="Describe the recommendation"
+            value={currentAdvice.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            rows={2}
+          />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="priority">Priority</Label>
+            <Select
+              value={currentAdvice.priority}
+              onValueChange={(value) => handleInputChange('priority', value as any)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Low">Low</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="High">High</SelectItem>
+                <SelectItem value="Critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="estimatedCost">Est. Cost ($)</Label>
+            <Input
+              id="estimatedCost"
+              type="number"
+              placeholder="0.00"
+              value={currentAdvice.estimatedCost || ''}
+              onChange={(e) => handleInputChange('estimatedCost', parseFloat(e.target.value) || 0)}
+            />
+          </div>
+        </div>
+        
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" size="sm" onClick={() => setShowAdviceForm(false)}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={addAdvice}>
+            Add Recommendation
+          </Button>
+        </div>
       </div>
     );
   };
@@ -138,28 +263,46 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
           </div>
         </div>
         
-        {/* Vehicle Advice Section - Toggleable */}
-        <div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full flex items-center justify-center gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowAdvice(!showAdvice);
-            }}
-          >
-            <Plus className="h-4 w-4" />
-            {showAdvice ? "Hide" : "Show"} Vehicle Advice
-          </Button>
-          
-          {showAdvice && (
-            <div className="mt-3 border-t pt-3">
-              <p className="font-medium mb-2">Vehicle Recommendations</p>
-              {renderVehicleAdvice()}
-            </div>
-          )}
-        </div>
+        {/* Vehicle Advice Section - Collapsible */}
+        <Collapsible 
+          open={showAdvice} 
+          onOpenChange={setShowAdvice}
+          className="border rounded-md"
+        >
+          <CollapsibleTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full flex items-center justify-between"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowAdvice(!showAdvice);
+              }}
+            >
+              <span>Vehicle Recommendations</span>
+              {showAdvice ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="px-4 pb-4">
+            {showAdviceForm ? renderAdviceForm() : (
+              <>
+                {renderVehicleAdvice()}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-3"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAdviceForm(true);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Recommendation
+                </Button>
+              </>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
       <CardFooter className="border-t pt-3 flex justify-between">
         <div className="flex items-center text-base text-muted-foreground">

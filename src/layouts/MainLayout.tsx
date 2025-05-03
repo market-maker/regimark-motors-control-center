@@ -98,16 +98,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     }
   }, [addNotification]);
 
-  const closeSidebar = () => {
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   // If not authenticated, return nothing (will redirect in useEffect)
   if (!isAuthenticated) {
     return null;
   }
+
+  // Calculate content margin based on sidebar state
+  const contentMargin = sidebarOpen && !isMobile ? "lg:ml-64" : "";
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -129,14 +130,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Sidebar - conditionally shown based on sidebarOpen state */}
       <AnimatePresence>
         {sidebarOpen && (
-          <Sidebar onClose={() => setSidebarOpen(false)} />
+          <Sidebar onClose={toggleSidebar} />
         )}
       </AnimatePresence>
       
       {/* Main content area */}
-      <div className="flex flex-col flex-1 relative">
+      <div className={`flex flex-col flex-1 relative transition-all duration-300 ${contentMargin}`}>
         <Header 
-          setSidebarOpen={setSidebarOpen} 
+          setSidebarOpen={toggleSidebar} 
           isOnline={isOnline}
           userRole={user?.role || "user"}
         />
@@ -168,7 +169,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="fixed inset-0 bg-black/50 z-10" 
-          onClick={() => setSidebarOpen(false)}
+          onClick={toggleSidebar}
           aria-hidden="true"
         />
       )}

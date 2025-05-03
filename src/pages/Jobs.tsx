@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,15 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import JobCard from "@/components/jobs/JobCard";
 import JobDetails from "@/components/jobs/JobDetails";
-import { VehicleAdviceForm } from "@/components/jobs/VehicleAdviceForm";
-import { Plus, Calendar, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Plus, Calendar, Clock, CheckCircle2, AlertTriangle, Filter } from "lucide-react";
 import { JobCard as JobCardType } from "@/types/job";
 
 const Jobs = () => {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAdviceForm, setShowAdviceForm] = useState(false);
 
   // Sample job cards for demonstration
   const jobCards: JobCardType[] = [
@@ -159,109 +156,82 @@ const Jobs = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-regimark-primary">Job Management</h1>
           <div className="flex space-x-2">
-            <Button 
-              className="btn-3d"
-              onClick={() => setShowAdviceForm(!showAdviceForm)}
-              variant={showAdviceForm ? "default" : "outline"}
-            >
-              {showAdviceForm ? "Hide Advice Form" : "Show Advice Form"}
-            </Button>
             <Button className="btn-3d">
               <Plus className="mr-2 h-4 w-4" /> Create New Job
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Left column - Job cards list (wider) */}
-          <div className="lg:col-span-3 space-y-4">
-            <Card className="dashboard-card-glow">
-              <CardHeader className="pb-2">
-                <CardTitle>Jobs</CardTitle>
-                <CardDescription>View and manage all jobs</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col space-y-4">
-                  <Input 
-                    placeholder="Search jobs..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="mb-2"
-                  />
-                  
-                  <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid grid-cols-5 mb-2">
-                      <TabsTrigger value="all">All</TabsTrigger>
-                      <TabsTrigger value="pending" className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" /> Pending
-                      </TabsTrigger>
-                      <TabsTrigger value="in-progress" className="flex items-center gap-1">
-                        <AlertTriangle className="h-4 w-4" /> In Progress
-                      </TabsTrigger>
-                      <TabsTrigger value="completed" className="flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4" /> Completed
-                      </TabsTrigger>
-                      <TabsTrigger value="scheduled" className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" /> Scheduled
-                      </TabsTrigger>
-                    </TabsList>
-                  </Tabs>
-                </div>
-                
-                <div className="mt-4 space-y-6 max-h-[700px] overflow-y-auto px-1">
-                  {filteredJobs.length > 0 ? (
-                    filteredJobs.map(job => (
-                      <div 
-                        key={job.id}
-                        onClick={() => setSelectedJobId(job.id)}
-                        className="cursor-pointer"
-                      >
-                        <JobCard 
-                          job={job} 
-                          isSelected={job.id === selectedJobId}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-10 text-muted-foreground">
-                      No jobs found matching your criteria
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Right column - Job details or vehicle advice */}
-          <div className="lg:col-span-2">
-            {selectedJob ? (
-              <JobDetails 
-                job={selectedJob} 
-                onClose={() => setSelectedJobId(null)} 
-                onUpdate={handleJobUpdate} 
+        <Card className="dashboard-card-glow">
+          <CardHeader className="pb-2">
+            <CardTitle>Jobs</CardTitle>
+            <CardDescription>View and manage all jobs</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {/* Search and filters row */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <Input 
+                placeholder="Search jobs..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1"
               />
-            ) : showAdviceForm ? (
-              <Card className="dashboard-card-glow h-full">
-                <CardHeader>
-                  <CardTitle>Vehicle Advice Form</CardTitle>
-                  <CardDescription>Create recommendations for vehicle maintenance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <VehicleAdviceForm />
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="dashboard-card-glow h-full flex items-center justify-center p-6">
-                <div className="text-center space-y-4">
-                  <h3 className="text-xl font-medium">No Job Selected</h3>
-                  <p className="text-muted-foreground">
-                    Select a job from the list to view details or use the button above to show the vehicle advice form.
-                  </p>
+              
+              <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="flex-1">
+                <TabsList className="grid grid-cols-5">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="pending" className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" /> Pending
+                  </TabsTrigger>
+                  <TabsTrigger value="in-progress" className="flex items-center gap-1">
+                    <AlertTriangle className="h-4 w-4" /> In Progress
+                  </TabsTrigger>
+                  <TabsTrigger value="completed" className="flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4" /> Completed
+                  </TabsTrigger>
+                  <TabsTrigger value="scheduled" className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" /> Scheduled
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
+            {/* Jobs content area */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map(job => (
+                  <div 
+                    key={job.id}
+                    onClick={() => setSelectedJobId(job.id)}
+                    className="cursor-pointer"
+                  >
+                    <JobCard 
+                      job={job} 
+                      isSelected={job.id === selectedJobId}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10 text-muted-foreground col-span-full">
+                  No jobs found matching your criteria
                 </div>
-              </Card>
+              )}
+            </div>
+
+            {/* Selected job details modal or overlay */}
+            {selectedJob && (
+              <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-background rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
+                  <JobDetails 
+                    job={selectedJob} 
+                    onClose={() => setSelectedJobId(null)} 
+                    onUpdate={handleJobUpdate} 
+                  />
+                </div>
+              </div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

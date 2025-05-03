@@ -15,7 +15,8 @@ import {
   Wrench,
   Store as StoreManageIcon,
   FileSpreadsheet,
-  ChevronLeft
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +31,7 @@ interface SidebarProps {
 const Sidebar = ({ onClose }: SidebarProps) => {
   const location = useLocation();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -37,6 +39,13 @@ const Sidebar = ({ onClose }: SidebarProps) => {
 
   const handleExpand = (section: string) => {
     setExpanded(expanded === section ? null : section);
+  };
+
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed);
+    if (!collapsed) {
+      onClose();
+    }
   };
 
   // Define sidebar navigation items
@@ -59,21 +68,24 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   return (
     <motion.aside
       initial={{ x: -280 }}
-      animate={{ x: 0 }}
+      animate={{ x: 0, width: collapsed ? '80px' : '256px' }}
       exit={{ x: -280 }}
       transition={{ duration: 0.3 }}
-      className="fixed inset-y-0 left-0 z-20 h-full w-64 bg-background shadow-lg border-r lg:static overflow-hidden"
+      className={cn(
+        "fixed inset-y-0 left-0 z-20 h-full bg-background shadow-lg border-r lg:static overflow-hidden",
+        collapsed ? "w-20" : "w-64"
+      )}
     >
       <div className="flex h-full flex-col">
         <div className="p-4 flex justify-center items-center">
           <img 
             src="/lovable-uploads/b5b79438-1e8e-447e-9c8f-c886b1ed204a.png" 
             alt="RegiMark Logo" 
-            className="h-16 object-contain" 
+            className={collapsed ? "h-10 object-contain" : "h-16 object-contain"} 
           />
         </div>
         
-        <ScrollArea className="flex-1 px-2">
+        <ScrollArea className="flex-1 px-2 overflow-y-auto">
           <nav className="space-y-1">
             {navItems.map((item) => (
               <Link
@@ -92,13 +104,14 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                 }}
               >
                 <div className={cn(
-                  "mr-3 transition-all",
-                  isActive(item.path) && "text-primary"
+                  "transition-all",
+                  isActive(item.path) && "text-primary",
+                  collapsed ? "mx-auto" : "mr-3"
                 )}>
                   {item.icon}
                 </div>
-                <span>{item.label}</span>
-                {item.label === "Inventory" && (
+                {!collapsed && <span>{item.label}</span>}
+                {!collapsed && item.label === "Inventory" && (
                   <Badge variant="outline" className="ml-auto bg-amber-500 text-white">7</Badge>
                 )}
               </Link>
@@ -106,15 +119,21 @@ const Sidebar = ({ onClose }: SidebarProps) => {
           </nav>
         </ScrollArea>
         
-        <div className="p-4 border-t flex justify-end">
+        <div className={cn(
+          "p-4 border-t flex",
+          collapsed ? "justify-center" : "justify-end"
+        )}>
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={onClose}
+            onClick={toggleCollapse}
             className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+            aria-label={collapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="sr-only">Collapse Sidebar</span>
+            {collapsed ? 
+              <ChevronRight className="h-5 w-5" /> : 
+              <ChevronLeft className="h-5 w-5" />
+            }
           </Button>
         </div>
       </div>
