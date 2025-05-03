@@ -13,13 +13,16 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    // Check local storage or system preference
-    const savedTheme = localStorage.getItem("regimark-theme") as Theme;
-    if (savedTheme) return savedTheme;
-    
-    // Check for system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return "dark";
+    // Only access localStorage in browser environment
+    if (typeof window !== 'undefined') {
+      // Check local storage or system preference
+      const savedTheme = localStorage.getItem("regimark-theme") as Theme;
+      if (savedTheme) return savedTheme;
+      
+      // Check for system preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return "dark";
+      }
     }
     
     return "light";
