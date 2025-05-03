@@ -1,5 +1,5 @@
 
-export type JobStatus = "Pending" | "Completed" | "In Progress" | "On Hold" | "Canceled" | "scheduled" | "in-progress" | "completed";
+export type JobStatus = "Pending" | "pending" | "Completed" | "completed" | "In Progress" | "in progress" | "in-progress" | "On Hold" | "on hold" | "Canceled" | "canceled" | "Scheduled" | "scheduled";
 export type JobPriority = "Low" | "Medium" | "High" | "Critical" | "none" | "low" | "medium";
 
 export interface Part {
