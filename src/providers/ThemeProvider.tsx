@@ -37,12 +37,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("regimark-theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = React.useCallback(() => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-  };
+  }, []);
+
+  const value = React.useMemo(() => ({
+    theme,
+    toggleTheme,
+    setTheme
+  }), [theme, toggleTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Sales from "./pages/Sales";
