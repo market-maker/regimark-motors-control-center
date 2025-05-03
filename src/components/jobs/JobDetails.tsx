@@ -20,8 +20,12 @@ interface JobDetailsProps {
 const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
   const [activeTab, setActiveTab] = useState("details");
   
+  // Normalize status to lowercase for consistent comparison
+  const normalizedStatus = job.status ? job.status.toLowerCase() : "";
+  
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+    const normalizedStatus = status.toLowerCase();
+    switch (normalizedStatus) {
       case "completed": return "bg-green-100 text-green-800";
       case "in progress": 
       case "in-progress": return "bg-amber-100 text-amber-800";
@@ -44,6 +48,17 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
       completedAt: new Date().toISOString()
     });
   };
+
+  // Safely handle date formatting
+  const formatSafeDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "N/A";
+    try {
+      return formatDate(new Date(dateString));
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "Invalid Date";
+    }
+  };
   
   return (
     <div className="space-y-6">
@@ -56,7 +71,7 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
             Registration: {job.vehicleRegistration}
           </p>
         </div>
-        <Badge className={getStatusColor(job.status)}>
+        <Badge className={getStatusColor(normalizedStatus)}>
           {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
         </Badge>
       </div>
@@ -136,18 +151,18 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="font-medium">Created</p>
-                  <p>{formatDate(new Date(job.createdAt || job.createdDate))}</p>
+                  <p>{formatSafeDate(job.createdAt || job.createdDate)}</p>
                 </div>
                 {(job.completedAt || job.completedDate) && (
                   <div>
                     <p className="font-medium">Completed</p>
-                    <p>{formatDate(new Date(job.completedAt || job.completedDate))}</p>
+                    <p>{formatSafeDate(job.completedAt || job.completedDate)}</p>
                   </div>
                 )}
                 {job.scheduledDate && (
                   <div>
                     <p className="font-medium">Scheduled</p>
-                    <p>{formatDate(new Date(job.scheduledDate))}</p>
+                    <p>{formatSafeDate(job.scheduledDate)}</p>
                   </div>
                 )}
               </div>
@@ -163,7 +178,7 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {job.parts.length === 0 ? (
+              {!job.parts || job.parts.length === 0 ? (
                 <p className="text-muted-foreground">No parts added to this job.</p>
               ) : (
                 <div className="space-y-4">
@@ -201,28 +216,32 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2">
-                  <div>
-                    <p className="font-medium">Hours</p>
-                    <p>{job.labor.hours}</p>
+              {!job.labor ? (
+                <p className="text-muted-foreground">No labor information recorded for this job.</p>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2">
+                    <div>
+                      <p className="font-medium">Hours</p>
+                      <p>{job.labor.hours}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Rate</p>
+                      <p>${job.labor.rate.toFixed(2)}/hr</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Rate</p>
-                    <p>${job.labor.rate.toFixed(2)}/hr</p>
+                  <div className="flex justify-between pt-4 font-medium">
+                    <div>Labor Subtotal</div>
+                    <div>${(job.labor.hours * job.labor.rate).toFixed(2)}</div>
+                  </div>
+                  <div className="border-t pt-4 mt-4">
+                    <div className="flex justify-between font-bold">
+                      <div>Job Total</div>
+                      <div>${job.totalCost ? job.totalCost.toFixed(2) : "0.00"}</div>
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-between pt-4 font-medium">
-                  <div>Labor Subtotal</div>
-                  <div>${(job.labor.hours * job.labor.rate).toFixed(2)}</div>
-                </div>
-                <div className="border-t pt-4 mt-4">
-                  <div className="flex justify-between font-bold">
-                    <div>Job Total</div>
-                    <div>${job.totalCost.toFixed(2)}</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -235,7 +254,7 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {job.vehicleAdvice.length === 0 ? (
+              {!job.vehicleAdvice || job.vehicleAdvice.length === 0 ? (
                 <p className="text-muted-foreground">No inspection data or advice recorded for this vehicle.</p>
               ) : (
                 <div className="space-y-4">
@@ -285,12 +304,12 @@ const JobDetails = ({ job, onClose, onUpdate }: JobDetailsProps) => {
           Close
         </Button>
         <div className="space-x-2">
-          {job.status.toLowerCase() === "scheduled" && (
+          {normalizedStatus === "scheduled" && (
             <Button onClick={markAsInProgress}>
               Mark as In Progress
             </Button>
           )}
-          {job.status.toLowerCase() === "in progress" || job.status.toLowerCase() === "in-progress" && (
+          {(normalizedStatus === "in progress" || normalizedStatus === "in-progress") && (
             <Button onClick={markAsCompleted}>
               Mark as Completed
             </Button>

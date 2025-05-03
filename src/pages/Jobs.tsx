@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,7 +22,7 @@ const Jobs = () => {
       id: "1",
       customerName: "John Doe",
       customerEmail: "john@example.com",
-      status: "Pending",
+      status: "pending",
       priority: "High",
       technicianName: "Mike Smith",
       createdDate: new Date().toISOString(),
@@ -69,7 +70,7 @@ const Jobs = () => {
       id: "2",
       customerName: "Jane Smith",
       customerEmail: "jane@example.com",
-      status: "Completed",
+      status: "completed",
       priority: "Medium",
       technicianName: "Robert Johnson",
       createdDate: new Date().toISOString(),
@@ -106,7 +107,7 @@ const Jobs = () => {
       id: "3",
       customerName: "Robert Brown",
       customerEmail: "robert@example.com",
-      status: "In Progress",
+      status: "in-progress",
       priority: "Critical",
       technicianName: "Sarah Wilson",
       createdDate: new Date().toISOString(),
@@ -128,8 +129,9 @@ const Jobs = () => {
   ];
 
   const filteredJobs = jobCards.filter(job => {
+    const normalizedStatus = job.status.toLowerCase();
     // Filter by status tab
-    if (activeTab !== "all" && job.status.toLowerCase() !== activeTab) {
+    if (activeTab !== "all" && normalizedStatus !== activeTab) {
       return false;
     }
     // Filter by search term
@@ -183,7 +185,7 @@ const Jobs = () => {
                       <TabsTrigger value="pending" className="flex items-center gap-1">
                         <Clock className="h-4 w-4" /> Pending
                       </TabsTrigger>
-                      <TabsTrigger value="in progress" className="flex items-center gap-1">
+                      <TabsTrigger value="in-progress" className="flex items-center gap-1">
                         <AlertTriangle className="h-4 w-4" /> In Progress
                       </TabsTrigger>
                       <TabsTrigger value="completed" className="flex items-center gap-1">

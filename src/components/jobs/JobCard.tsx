@@ -13,24 +13,40 @@ interface JobCardProps {
 }
 
 const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
+  // Normalize status to lowercase for consistent comparison
+  const normalizedStatus = job.status ? job.status.toLowerCase() : "";
+  
   const statusMap = {
-    scheduled: { icon: Calendar, label: "Scheduled", color: "bg-blue-100 text-blue-800" },
+    "scheduled": { icon: Calendar, label: "Scheduled", color: "bg-blue-100 text-blue-800" },
     "in-progress": { icon: Clock, label: "In Progress", color: "bg-amber-100 text-amber-800" },
-    completed: { icon: CheckCircle, label: "Completed", color: "bg-green-100 text-green-800" },
-    attention: { icon: AlertTriangle, label: "Needs Attention", color: "bg-red-100 text-red-800" }
+    "in progress": { icon: Clock, label: "In Progress", color: "bg-amber-100 text-amber-800" },
+    "completed": { icon: CheckCircle, label: "Completed", color: "bg-green-100 text-green-800" },
+    "attention": { icon: AlertTriangle, label: "Needs Attention", color: "bg-red-100 text-red-800" },
+    "pending": { icon: Clock, label: "Pending", color: "bg-gray-100 text-gray-800" }
   };
 
-  const StatusIcon = job.status && statusMap[job.status as keyof typeof statusMap] 
-    ? statusMap[job.status as keyof typeof statusMap].icon 
+  const StatusIcon = normalizedStatus && statusMap[normalizedStatus as keyof typeof statusMap] 
+    ? statusMap[normalizedStatus as keyof typeof statusMap].icon 
     : Clock;
 
-  const statusLabel = job.status && statusMap[job.status as keyof typeof statusMap]
-    ? statusMap[job.status as keyof typeof statusMap].label
+  const statusLabel = normalizedStatus && statusMap[normalizedStatus as keyof typeof statusMap]
+    ? statusMap[normalizedStatus as keyof typeof statusMap].label
     : "Unknown";
 
-  const statusColor = job.status && statusMap[job.status as keyof typeof statusMap]
-    ? statusMap[job.status as keyof typeof statusMap].color
+  const statusColor = normalizedStatus && statusMap[normalizedStatus as keyof typeof statusMap]
+    ? statusMap[normalizedStatus as keyof typeof statusMap].color
     : "bg-gray-100 text-gray-800";
+
+  // Safely handle date formatting
+  const formatSafeDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "N/A";
+    try {
+      return formatDate(new Date(dateString));
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return "Invalid Date";
+    }
+  };
 
   return (
     <Card 
@@ -62,18 +78,18 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
           <div className="flex justify-between text-sm">
             <div>
               <p className="font-medium">Created</p>
-              <p>{formatDate(new Date(job.createdAt || job.createdDate))}</p>
+              <p>{formatSafeDate(job.createdAt || job.createdDate)}</p>
             </div>
             {(job.completedAt || job.completedDate) && (
               <div>
                 <p className="font-medium">Completed</p>
-                <p>{formatDate(new Date(job.completedAt || job.completedDate))}</p>
+                <p>{formatSafeDate(job.completedAt || job.completedDate)}</p>
               </div>
             )}
             {job.scheduledDate && !(job.completedAt || job.completedDate) && (
               <div>
                 <p className="font-medium">Scheduled</p>
-                <p>{formatDate(new Date(job.scheduledDate))}</p>
+                <p>{formatSafeDate(job.scheduledDate)}</p>
               </div>
             )}
           </div>
@@ -82,9 +98,9 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
       <CardFooter className="border-t pt-2 flex justify-between">
         <div className="flex items-center text-sm text-muted-foreground">
           <Car className="h-3 w-3 mr-1" />
-          {job.parts.length} parts | ${job.totalCost.toFixed(2)}
+          {job.parts && job.parts.length} parts | ${job.totalCost ? job.totalCost.toFixed(2) : "0.00"}
         </div>
-        {job.status !== "completed" && (
+        {normalizedStatus !== "completed" && (
           <Button variant="secondary" size="sm">View Details</Button>
         )}
       </CardFooter>
