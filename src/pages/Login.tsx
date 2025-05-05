@@ -50,7 +50,7 @@ const BoxGrid = () => {
               filter: `blur(${Math.random() * 40 + 20}px)`,
             }}
             whileHover={{
-              backgroundColor: "rgba(0,0,0,0.2)",
+              backgroundColor: "rgba(255,255,255,0.1)",
               transition: { duration: 0.2 }
             }}
           />
@@ -97,7 +97,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-black dark:bg-black relative overflow-hidden">
       {/* Animated background boxes */}
       <BoxGrid />
       
@@ -113,9 +113,9 @@ const Login = () => {
       >
         {/* 3D Card with glassmorphism effect */}
         <div 
-          className="w-96 rounded-3xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card"
+          className="w-96 rounded-3xl bg-black/70 dark:bg-black/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card border border-gray-800"
           style={{ 
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px -5px rgba(227, 6, 19, 0.2)'
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.55), 0 0 15px -5px rgba(227, 6, 19, 0.4)'
           }}
         >
           <div className="p-8">
@@ -131,7 +131,7 @@ const Login = () => {
               initial={{ y: -20 }}
               animate={{ y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-2xl font-bold mb-6 text-center dark:text-white"
+              className="text-2xl font-bold mb-6 text-center text-white"
             >
               Login
             </motion.h1>
@@ -158,8 +158,8 @@ const Login = () => {
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
                     required
-                    className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      dark:text-white
+                    className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
+                      bg-gray-900 text-white border-gray-700
                       ${focusedField === "email" ? "text-glow-red" : ""}`}
                   />
                   <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
@@ -180,14 +180,14 @@ const Login = () => {
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     required
-                    className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      dark:text-white
+                    className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
+                      bg-gray-900 text-white border-gray-700
                       ${focusedField === "password" ? "text-glow-red" : ""}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -215,7 +215,7 @@ const Login = () => {
               </motion.div>
             </form>
             
-            <div className="mt-6 text-center text-sm text-muted-foreground">
+            <div className="mt-6 text-center text-sm text-gray-400">
               <p>Demo credentials:</p>
               <p>Email: admin@regimark.com</p>
               <p>Password: admin123</p>
@@ -227,13 +227,13 @@ const Login = () => {
         <div 
           className="absolute -bottom-6 left-0 right-0 h-12 mx-auto w-4/5 rounded-full blur-xl"
           style={{ 
-            background: 'linear-gradient(rgba(0, 0, 0, 0.05), transparent)'
+            background: 'linear-gradient(rgba(227, 6, 19, 0.2), transparent)'
           }}
         />
       </motion.div>
       
       {/* Copyright footer */}
-      <div className="absolute bottom-4 text-center text-sm text-slate-500 dark:text-slate-400">
+      <div className="absolute bottom-4 text-center text-sm text-gray-500">
         Market.Maker.Software©2025
       </div>
     </div>
