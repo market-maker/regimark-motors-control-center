@@ -107,9 +107,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     return null;
   }
 
-  // Calculate content margin based on sidebar state
-  const contentMargin = sidebarOpen && !isMobile ? "lg:ml-64" : "";
-
   return (
     <div className="flex min-h-screen bg-background">
       {/* Offline indicator */}
@@ -135,7 +132,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </AnimatePresence>
       
       {/* Main content area */}
-      <div className={`flex flex-col flex-1 relative transition-all duration-300 ${contentMargin}`}>
+      <div className="flex flex-col flex-1 relative transition-all duration-300">
         <Header 
           setSidebarOpen={toggleSidebar} 
           isOnline={isOnline}
@@ -168,7 +165,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 bg-black/50 z-10" 
+          className="fixed inset-0 bg-black/50 z-10 backdrop-blur-sm" 
           onClick={toggleSidebar}
           aria-hidden="true"
         />
