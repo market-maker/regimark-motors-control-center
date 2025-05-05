@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 // BoxGrid component for animated background with hover effects
 const BoxGrid = () => {
@@ -67,7 +68,6 @@ const Login = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [focusedField, setFocusedField] = useState<"email" | "password" | null>(null);
   const { isAuthenticated, login } = useAuth();
-  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,17 +78,13 @@ const Login = () => {
       const success = await login(email, password);
       if (!success) {
         setLoginError("Invalid email or password");
-        toast({
-          variant: "destructive",
-          title: "Authentication Failed",
+        toast.error("Authentication Failed", {
           description: "Please check your credentials and try again.",
         });
       }
     } catch (error) {
       setLoginError("An unexpected error occurred. Please try again.");
-      toast({
-        variant: "destructive",
-        title: "Login Error",
+      toast.error("Login Error", {
         description: "An unexpected error occurred. Please try again later.",
       });
     } finally {
@@ -101,7 +97,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 relative overflow-hidden">
       {/* Animated background boxes */}
       <BoxGrid />
       
@@ -117,7 +113,7 @@ const Login = () => {
       >
         {/* 3D Card with glassmorphism effect */}
         <div 
-          className="w-96 rounded-3xl bg-white/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card"
+          className="w-96 rounded-3xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card"
           style={{ 
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 15px -5px rgba(227, 6, 19, 0.2)'
           }}
@@ -135,7 +131,7 @@ const Login = () => {
               initial={{ y: -20 }}
               animate={{ y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-2xl font-bold mb-6 text-center"
+              className="text-2xl font-bold mb-6 text-center dark:text-white"
             >
               Login
             </motion.h1>
@@ -163,7 +159,7 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      text-black
+                      dark:text-white
                       ${focusedField === "email" ? "text-glow-red" : ""}`}
                   />
                   <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
@@ -185,13 +181,13 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm 
-                      text-black
+                      dark:text-white
                       ${focusedField === "password" ? "text-glow-red" : ""}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -237,7 +233,7 @@ const Login = () => {
       </motion.div>
       
       {/* Copyright footer */}
-      <div className="absolute bottom-4 text-center text-sm text-slate-500">
+      <div className="absolute bottom-4 text-center text-sm text-slate-500 dark:text-slate-400">
         Market.Maker.Software©2025
       </div>
     </div>
