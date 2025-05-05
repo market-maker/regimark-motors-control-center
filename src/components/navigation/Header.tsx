@@ -19,9 +19,10 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Badge } from "../ui/badge";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "../theme/ThemeToggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HeaderProps {
-  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setSidebarOpen: (value: React.SetStateAction<boolean>) => void;
   isOnline?: boolean;
   userRole?: string;
 }
@@ -34,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const isMobile = useIsMobile();
   
   const handleLogout = () => {
     logout();
@@ -44,13 +46,18 @@ const Header: React.FC<HeaderProps> = ({
     ? user.email.slice(0, 2).toUpperCase()
     : "GU";
 
+  const toggleSidebar = () => {
+    setSidebarOpen(prev => !prev);
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/80 px-4 md:px-6 backdrop-blur-sm transition-all shadow-sm">
+    <header className="sticky top-0 z-30 flex h-14 md:h-16 items-center gap-2 md:gap-4 border-b bg-background/80 px-2 md:px-6 backdrop-blur-sm transition-all shadow-sm">
       <Button
         variant="ghost"
         size="icon"
-        className="md:hidden"
-        onClick={() => setSidebarOpen(true)}
+        className="flex-shrink-0"
+        onClick={toggleSidebar}
+        aria-label="Toggle sidebar"
       >
         <Menu className="h-5 w-5" />
         <span className="sr-only">Toggle Menu</span>
@@ -72,7 +79,8 @@ const Header: React.FC<HeaderProps> = ({
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-8"
-              placeholder="Search inventory, customers, and more..."
+              placeholder="Search..."
+              autoFocus
             />
           </div>
         </SheetContent>
@@ -84,12 +92,12 @@ const Header: React.FC<HeaderProps> = ({
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex flex-1 md:flex-none items-center justify-end gap-2 md:gap-4">
         <div className="hidden md:flex md:flex-1">
-          <div className="relative">
+          <div className="relative w-full max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              className="w-64 pl-8 shadow-sm hover:shadow-md transition-all duration-300"
+              className="w-full pl-8 shadow-sm hover:shadow-md transition-all duration-300"
               placeholder="Search inventory, customers, and more..."
             />
           </div>
@@ -141,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({
           <DropdownMenuContent align="end" className="w-56 sidebar-menu-item">
             <DropdownMenuLabel>
               <div className="flex flex-col">
-                <span>{user?.email}</span>
+                <span className="truncate">{user?.email}</span>
                 <span className="text-xs text-muted-foreground">
                   {userRole === "admin" ? "Administrator" : "Standard User"}
                 </span>

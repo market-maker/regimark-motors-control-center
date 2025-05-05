@@ -1,12 +1,14 @@
 
-import React from "react";  // Explicitly import React
+import React from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/ThemeProvider";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   const variants = {
     light: { rotate: 0, scale: 1 },
@@ -21,9 +23,10 @@ export function ThemeToggle() {
     >
       <Button
         variant="ghost"
-        size="icon"
+        size={isMobile ? "sm" : "icon"}
         onClick={toggleTheme}
-        className="relative rounded-full overflow-hidden"
+        className="relative rounded-full overflow-hidden touch-action-manipulation"
+        aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       >
         <motion.div
           initial={false}
@@ -34,7 +37,7 @@ export function ThemeToggle() {
           transition={{ duration: 0.3 }}
           className="absolute"
         >
-          <Sun className="h-5 w-5" />
+          <Sun className="h-4 w-4 md:h-5 md:w-5" />
         </motion.div>
         <motion.div
           initial={false}
@@ -45,7 +48,7 @@ export function ThemeToggle() {
           transition={{ duration: 0.3 }}
           className="absolute"
         >
-          <Moon className="h-5 w-5" />
+          <Moon className="h-4 w-4 md:h-5 md:w-5" />
         </motion.div>
         <span className="sr-only">Toggle theme</span>
       </Button>

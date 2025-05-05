@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Home,
@@ -17,12 +17,13 @@ import {
   FileSpreadsheet,
   ChevronDown,
   Search,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
 import { useTheme } from "@/providers/ThemeProvider";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Sidebar as UISidebar,
   SidebarContext,
@@ -34,6 +35,7 @@ import {
   SidebarDivider,
   SidebarUser
 } from "@/components/ui/sidebar";
+import { Button } from "../ui/button";
 
 interface SidebarProps {
   onClose: () => void;
@@ -44,15 +46,24 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
+  
+  useEffect(() => {
+    if (isMobile) {
+      setCollapsed(false);
+    }
+  }, [isMobile]);
   
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const toggleCollapse = () => {
-    setCollapsed(!collapsed);
-    if (!collapsed) {
-      onClose();
+    if (!isMobile) {
+      setCollapsed(!collapsed);
+      if (!collapsed) {
+        onClose();
+      }
     }
   };
 
@@ -91,72 +102,90 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   };
 
   return (
-    <UISidebar 
-      defaultCollapsed={collapsed} 
-      onCollapseChange={(state) => {
-        setCollapsed(state);
-        if (state) onClose();
-      }}
-      className={cn(
-        theme === 'dark' ? 'border-gray-800' : 'border-gray-200',
-        "fixed inset-y-0 left-0 z-20 h-full lg:static"
+    <div className="relative h-full">
+      {isMobile && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="absolute right-2 top-2 z-50"
+          aria-label="Close sidebar"
+        >
+          <X size={20} />
+        </Button>
       )}
-    >
-      <SidebarHeader
-        logo={
-          <img 
-            src="/lovable-uploads/b5b79438-1e8e-447e-9c8f-c886b1ed204a.png" 
-            alt="RegiMark Logo" 
-            className="h-8 w-auto" 
-          />
-        }
-        title="RegiMark"
-      />
       
-      <SidebarSearch
-        onSearch={handleSearch}
-        placeholder="Search menu..."
-      />
-      
-      <div className="flex-1 overflow-y-auto scrollbar-none">
-        <SidebarSection title="Navigation">
-          {filteredPrimaryItems.map((item) => (
-            <SidebarItem
-              key={item.path}
-              icon={item.icon}
-              title={item.label}
-              href={item.path}
-              isActive={isActive(item.path)}
-              badge={item.badge}
-              activeClasses="bg-primary/20 text-primary glow-primary"
+      <UISidebar 
+        defaultCollapsed={collapsed && !isMobile} 
+        onCollapseChange={(state) => {
+          if (!isMobile) {
+            setCollapsed(state);
+            if (state) onClose();
+          }
+        }}
+        className={cn(
+          theme === 'dark' ? 'border-gray-800' : 'border-gray-200',
+          "h-full"
+        )}
+      >
+        <SidebarHeader
+          logo={
+            <img 
+              src="/lovable-uploads/b5b79438-1e8e-447e-9c8f-c886b1ed204a.png" 
+              alt="RegiMark Logo" 
+              className="h-8 w-auto" 
             />
-          ))}
-        </SidebarSection>
+          }
+          title="RegiMark"
+        />
+        
+        <SidebarSearch
+          onSearch={handleSearch}
+          placeholder="Search menu..."
+        />
+        
+        <div className="flex-1 overflow-y-auto scrollbar-none">
+          <SidebarSection title="Navigation">
+            {filteredPrimaryItems.map((item) => (
+              <SidebarItem
+                key={item.path}
+                icon={item.icon}
+                title={item.label}
+                href={item.path}
+                isActive={isActive(item.path)}
+                badge={item.badge}
+                activeClasses="bg-primary/20 text-primary glow-primary"
+                onClick={isMobile ? onClose : undefined}
+              />
+            ))}
+          </SidebarSection>
+          
+          <SidebarDivider />
+          
+          <SidebarSection title="Management">
+            {filteredSecondaryItems.map((item) => (
+              <SidebarItem
+                key={item.path}
+                icon={item.icon}
+                title={item.label}
+                href={item.path}
+                isActive={isActive(item.path)}
+                activeClasses="bg-primary/20 text-primary glow-primary"
+                onClick={isMobile ? onClose : undefined}
+              />
+            ))}
+          </SidebarSection>
+        </div>
         
         <SidebarDivider />
         
-        <SidebarSection title="Management">
-          {filteredSecondaryItems.map((item) => (
-            <SidebarItem
-              key={item.path}
-              icon={item.icon}
-              title={item.label}
-              href={item.path}
-              isActive={isActive(item.path)}
-              activeClasses="bg-primary/20 text-primary glow-primary"
-            />
-          ))}
-        </SidebarSection>
-      </div>
-      
-      <SidebarDivider />
-      
-      <SidebarUser
-        name="John Doe"
-        email="john@regimark.com"
-        avatar="https://github.com/shadcn.png"
-      />
-    </UISidebar>
+        <SidebarUser
+          name="John Doe"
+          email="john@regimark.com"
+          avatar="https://github.com/shadcn.png"
+        />
+      </UISidebar>
+    </div>
   );
 };
 
