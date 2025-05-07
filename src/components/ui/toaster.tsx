@@ -1,5 +1,5 @@
 
-import React from "react";  // Add explicit React import
+import * as React from "react";
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
