@@ -5,11 +5,12 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { motion } from "framer-motion";
+import { SaleData } from "../types/salesTypes";
 
 interface ReceiptDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  saleData: any;
+  saleData: SaleData;
   onClose: () => void;
 }
 

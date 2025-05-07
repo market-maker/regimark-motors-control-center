@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -69,6 +68,7 @@ const CheckoutForm = () => {
     showAdviceDialog,
     setShowAdviceDialog,
     showReceipt,
+    setShowReceipt,
     
     // Calculated values
     subtotal,
