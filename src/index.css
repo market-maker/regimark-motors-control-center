@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;  /* Changed to a slightly off-white */
     --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
@@ -36,7 +36,7 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
+    --sidebar-background: 0 0% 98%;  /* Changed to match new background */
     --sidebar-foreground: 359 97% 45%;
     --sidebar-primary: 359 97% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
