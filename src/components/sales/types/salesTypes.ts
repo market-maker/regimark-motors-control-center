@@ -1,0 +1,40 @@
+
+import { Customer } from "@/types/customer";
+
+export interface CartItem {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  quantity: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  category: string;
+  stock: number;
+}
+
+export interface SaleData {
+  saleId: string;
+  date: string;
+  customerName: string;
+  customerEmail: string;
+  paymentMethod: string;
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  discountType?: "percentage" | "fixed";
+  discountValue?: number;
+  discountAmount?: number;
+  finalTotal?: number;
+  cashReceived?: number;
+  change?: number;
+  isCredit?: boolean;
+  dueDate?: string;
+  status: "Completed" | "Pending" | "Revoked";
+}
