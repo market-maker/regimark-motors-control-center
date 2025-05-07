@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -142,6 +143,18 @@
 }
 
 /* Reduced motion */
+@media (prefers-reduced-motion) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .float-card, .animated-box {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 .reduced-motion * {
   animation: none !important;
   transition: none !important;
@@ -205,4 +218,31 @@
 .focus-visible:focus {
   outline: 2px solid rgb(220, 38, 38);
   outline-offset: 2px;
+}
+
+/* Enhanced keyboard focus styles */
+:focus-visible {
+  outline: 3px solid rgb(220, 38, 38);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
+}
+
+/* Skip to content link - accessibility feature */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  background: #fff;
+  padding: 1rem;
+  z-index: 9999;
+}
+
+.skip-to-content:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* Ensure proper contrast */
+.text-gray-500 {
+  color: #6b7280; /* Ensure sufficient contrast */
 }

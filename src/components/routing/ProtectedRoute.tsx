@@ -20,10 +20,10 @@ export const ProtectedRoute = ({
   // Show loading state if still checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" aria-live="polite" aria-busy="true">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="w-16 h-16 bg-regimark-primary/20 rounded-full mb-4"></div>
-          <div className="h-4 w-24 bg-regimark-primary/20 rounded"></div>
+          <div className="w-16 h-16 bg-regimark-primary/20 rounded-full mb-4" role="progressbar"></div>
+          <div className="h-4 w-24 bg-regimark-primary/20 rounded">Loading...</div>
         </div>
       </div>
     );

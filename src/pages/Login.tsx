@@ -15,7 +15,7 @@ const BoxGrid = () => {
   const boxes = Array(20).fill(0).map((_, i) => i);
   
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       <div className="relative h-full w-full">
         {boxes.map((i) => (
           <motion.div
@@ -150,7 +150,9 @@ const Login = () => {
                 transition={{ delay: 0.3, duration: 0.5 }}
               >
                 <div className="relative">
+                  <label htmlFor="email" className="sr-only">Email</label>
                   <Input
+                    id="email"
                     type="email"
                     placeholder="Email"
                     value={email}
@@ -158,6 +160,7 @@ const Login = () => {
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
                     required
+                    aria-required="true"
                     className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
                       bg-white/70 dark:bg-gray-900 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700
                       ${focusedField === "email" ? "text-glow-red" : ""}`}
@@ -172,7 +175,9 @@ const Login = () => {
                 transition={{ delay: 0.4, duration: 0.5 }}
               >
                 <div className="relative">
+                  <label htmlFor="password" className="sr-only">Password</label>
                   <Input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
@@ -180,6 +185,7 @@ const Login = () => {
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
                     required
+                    aria-required="true"
                     className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
                       bg-white/70 dark:bg-gray-900 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700
                       ${focusedField === "password" ? "text-glow-red" : ""}`}
@@ -187,6 +193,7 @@ const Login = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     {showPassword ? (
@@ -208,6 +215,7 @@ const Login = () => {
                 <Button
                   type="submit"
                   disabled={isLoggingIn}
+                  aria-busy={isLoggingIn}
                   className="w-full h-12 bg-regimark-primary hover:bg-regimark-primary/90 btn-3d shadow-lg hover:shadow-xl transition-all"
                 >
                   {isLoggingIn ? "Signing in..." : "Sign In"}
@@ -229,6 +237,7 @@ const Login = () => {
           style={{ 
             background: 'linear-gradient(rgba(227, 6, 19, 0.2), transparent)'
           }}
+          aria-hidden="true"
         />
       </motion.div>
       

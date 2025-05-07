@@ -1,8 +1,8 @@
 
-import * as React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
+import * as React from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
 
 // Register service worker for offline capabilities
 if ('serviceWorker' in navigator) {
@@ -19,11 +19,8 @@ if ('serviceWorker' in navigator) {
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
-  createRoot(rootElement).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  const root = createRoot(rootElement);
+  root.render(<App />);
 } else {
   console.error("Root element not found");
 }
