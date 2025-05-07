@@ -97,7 +97,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-black dark:bg-black relative overflow-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[rgba(252,252,252,0.9)] dark:bg-black relative overflow-hidden">
       {/* Animated background boxes */}
       <BoxGrid />
       
@@ -113,9 +113,9 @@ const Login = () => {
       >
         {/* 3D Card with glassmorphism effect */}
         <div 
-          className="w-96 rounded-3xl bg-black/70 dark:bg-black/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card border border-gray-800"
+          className="w-96 rounded-3xl bg-white/90 dark:bg-black/80 backdrop-blur-xl shadow-2xl overflow-hidden transform perspective-1000 rotate-x-1 hover:rotate-x-0 transition-all duration-500 float-card border border-gray-200 dark:border-gray-800"
           style={{ 
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.55), 0 0 15px -5px rgba(227, 6, 19, 0.4)'
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 15px -5px rgba(227, 6, 19, 0.4)'
           }}
         >
           <div className="p-8">
@@ -131,7 +131,7 @@ const Login = () => {
               initial={{ y: -20 }}
               animate={{ y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-2xl font-bold mb-6 text-center text-white"
+              className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white"
             >
               Login
             </motion.h1>
@@ -159,7 +159,7 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
-                      bg-gray-900 text-white border-gray-700
+                      bg-white/70 dark:bg-gray-900 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700
                       ${focusedField === "email" ? "text-glow-red" : ""}`}
                   />
                   <div className={`absolute inset-0 rounded-md pointer-events-none ${focusedField === "email" ? "shadow-[0_0_15px_rgba(220,38,38,0.5)]" : "shadow-[0_0_15px_rgba(227,6,19,0.1)]"}`} />
@@ -181,13 +181,13 @@ const Login = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     className={`h-12 px-4 pr-10 shadow-md hover:shadow-lg transition-shadow duration-300 bg-opacity-50 backdrop-blur-sm
-                      bg-gray-900 text-white border-gray-700
+                      bg-white/70 dark:bg-gray-900 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700
                       ${focusedField === "password" ? "text-glow-red" : ""}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     {showPassword ? (
                       <EyeOff size={18} />
@@ -215,7 +215,7 @@ const Login = () => {
               </motion.div>
             </form>
             
-            <div className="mt-6 text-center text-sm text-gray-400">
+            <div className="mt-6 text-center text-sm text-gray-500">
               <p>Demo credentials:</p>
               <p>Email: admin@regimark.com</p>
               <p>Password: admin123</p>
