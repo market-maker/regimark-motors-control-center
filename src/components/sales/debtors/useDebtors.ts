@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Customer, DebtRecord } from "@/types/customer";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { DebtSummary, DebtorRecord } from "./types";
+import { toast } from "@/components/ui/sonner";
 
 // Mock customers with debts
 const mockCustomers: Customer[] = [
