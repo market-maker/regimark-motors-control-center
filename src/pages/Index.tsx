@@ -4,7 +4,7 @@ import StatCard from "../components/dashboard/StatCard";
 import RecentSales from "../components/dashboard/RecentSales";
 import LowStockAlert from "../components/dashboard/LowStockAlert";
 import SalesChart from "../components/dashboard/SalesChart";
-import { ShoppingCart, Package, Users, DollarSign } from "lucide-react";
+import { BarChart3, Package, Users, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
 
@@ -46,7 +46,7 @@ const Index = () => {
             <StatCard 
               title="Total Sales" 
               value="$12,452.75" 
-              icon={<ShoppingCart className="h-5 w-5" />} 
+              icon={<BarChart3 className="h-5 w-5" />} 
               trend={{ value: 12.5, isPositive: true }}
               className="dashboard-card-glow red-glow"
             />
