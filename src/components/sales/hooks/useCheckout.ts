@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/sonner";
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { Customer } from "@/types/customer";
