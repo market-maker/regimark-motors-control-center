@@ -130,7 +130,7 @@ const SalesChart = () => {
                   <Bar 
                     dataKey="sales" 
                     name="Sales"
-                    fill="url(#salesGradient)" 
+                    fill="#E30613" 
                     barSize={40} 
                     radius={[4, 4, 0, 0]} 
                     animationDuration={1500}
@@ -157,12 +157,6 @@ const SalesChart = () => {
                     dot={{ r: 4 }}
                     activeDot={{ r: 6, stroke: "#FF8A65", strokeWidth: 2 }}
                   />
-                  <defs>
-                    <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#E30613" stopOpacity={0.9}/>
-                      <stop offset="95%" stopColor="#FF5A5A" stopOpacity={0.8}/>
-                    </linearGradient>
-                  </defs>
                 </ComposedChart>
               ) : (
                 <BarChart
@@ -195,7 +189,7 @@ const SalesChart = () => {
                   />
                   <Bar 
                     dataKey="sales" 
-                    fill="url(#salesGradient)" 
+                    fill="#E30613" 
                     barSize={40} 
                     radius={[4, 4, 0, 0]} 
                     animationDuration={1500}
@@ -213,12 +207,6 @@ const SalesChart = () => {
                       />
                     ))}
                   </Bar>
-                  <defs>
-                    <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#E30613" stopOpacity={0.9}/>
-                      <stop offset="95%" stopColor="#FF5A5A" stopOpacity={0.8}/>
-                    </linearGradient>
-                  </defs>
                 </BarChart>
               )}
             </ResponsiveContainer>
