@@ -38,8 +38,8 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[rgba(252,252,252,0.9)] dark:bg-black relative overflow-hidden">
-      {/* Animated background boxes */}
+    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-black relative overflow-hidden">
+      {/* Simple background */}
       <BoxGrid />
       
       <LoginCard 
