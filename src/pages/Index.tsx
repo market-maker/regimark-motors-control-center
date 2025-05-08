@@ -4,12 +4,22 @@ import StatCard from "../components/dashboard/StatCard";
 import RecentSales from "../components/dashboard/RecentSales";
 import LowStockAlert from "../components/dashboard/LowStockAlert";
 import SalesChart from "../components/dashboard/SalesChart";
-import { BarChart3, Package, Users, DollarSign } from "lucide-react";
+import { BarChart3, Package, Users, DollarSign, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { theme } = useTheme();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   
   const containerAnimation = {
     hidden: { opacity: 0 },
@@ -34,12 +44,23 @@ const Index = () => {
         animate="show"
         variants={containerAnimation}
       >
-        <motion.h1 
-          className="text-3xl font-bold mb-8 bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent"
+        <motion.div 
+          className="flex justify-between items-center mb-8"
           variants={itemAnimation}
         >
-          Dashboard Overview
-        </motion.h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent">
+            Dashboard Overview
+          </h1>
+          
+          <Button 
+            onClick={handleLogout} 
+            variant="outline" 
+            className="flex items-center gap-2 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+          >
+            <LogOut size={16} />
+            Logout
+          </Button>
+        </motion.div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
