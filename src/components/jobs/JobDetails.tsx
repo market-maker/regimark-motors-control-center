@@ -10,6 +10,7 @@ import {
   Car, Calendar, User, Phone, FileText, 
   Wrench, PackageCheck, AlertTriangle, Info
 } from "lucide-react";
+import JobInvoice from "./JobInvoice";
 
 interface JobDetailsProps {
   job: JobCard;

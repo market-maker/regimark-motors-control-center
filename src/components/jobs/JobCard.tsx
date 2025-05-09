@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { JobCard as JobCardType, VehicleAdvice } from "@/types/job";
-import { Car, Calendar, AlertTriangle, CheckCircle, Clock, Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Car, Calendar, AlertTriangle, CheckCircle, Clock, Plus, ChevronDown, ChevronUp, User } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -260,6 +260,14 @@ const JobCard = ({ job, onClick, isSelected }: JobCardProps) => {
                 <p>{formatSafeDate(job.scheduledDate)}</p>
               </div>
             )}
+          </div>
+          {/* Display Assigned Mechanic */}
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <span className="font-medium">Assigned to: </span>
+              <span>{job.technicianName || "Unassigned"}</span>
+            </div>
           </div>
         </div>
         

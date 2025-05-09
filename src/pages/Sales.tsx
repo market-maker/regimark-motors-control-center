@@ -5,6 +5,7 @@ import CheckoutForm from "../components/sales/CheckoutForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DebtorsList from "../components/sales/DebtorsList";
 import { motion } from "framer-motion";
+import ReceiptList from "../components/sales/receipts/ReceiptList";
 
 const Sales = () => {
   const [activeTab, setActiveTab] = useState("checkout");
@@ -20,12 +21,15 @@ const Sales = () => {
         <h1 className="text-3xl font-bold mb-8 text-regimark-primary">Sales & Checkout</h1>
         
         <Tabs defaultValue="checkout" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-8">
+          <TabsList className="grid grid-cols-3 mb-8">
             <TabsTrigger value="checkout" className="text-lg">
               Checkout
             </TabsTrigger>
             <TabsTrigger value="debtors" className="text-lg">
               Credit Sales & Debtors
+            </TabsTrigger>
+            <TabsTrigger value="receipts" className="text-lg">
+              Receipts
             </TabsTrigger>
           </TabsList>
           <TabsContent value="checkout">
@@ -33,6 +37,9 @@ const Sales = () => {
           </TabsContent>
           <TabsContent value="debtors">
             <DebtorsList />
+          </TabsContent>
+          <TabsContent value="receipts">
+            <ReceiptList />
           </TabsContent>
         </Tabs>
       </motion.div>
