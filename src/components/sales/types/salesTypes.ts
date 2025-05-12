@@ -1,5 +1,6 @@
 
 import { Customer } from "@/types/customer";
+import { ProductComponent } from "@/types/receipt";
 
 export interface CartItem {
   id: string;
@@ -7,6 +8,9 @@ export interface CartItem {
   sku: string;
   price: number;
   quantity: number;
+  isSplit?: boolean;
+  components?: ProductComponent[];
+  notes?: string;
 }
 
 export interface Product {
@@ -16,6 +20,9 @@ export interface Product {
   price: number;
   category: string;
   stock: number;
+  isSplit?: boolean;
+  components?: ProductComponent[];
+  notes?: string;
 }
 
 export interface SaleData {

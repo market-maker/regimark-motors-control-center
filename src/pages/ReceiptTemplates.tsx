@@ -10,8 +10,9 @@ import { useState } from "react";
 import { ReceiptTemplate } from "@/types/receipt";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock data for receipt templates
+// Mock data for templates
 const mockTemplates: ReceiptTemplate[] = [
   {
     id: "1",
@@ -21,7 +22,8 @@ const mockTemplates: ReceiptTemplate[] = [
     previewUrl: "https://via.placeholder.com/300x400?text=Standard+Receipt",
     dateCreated: "2025-01-15",
     dateModified: "2025-02-20",
-    isDefault: true
+    isDefault: true,
+    type: "receipt"
   },
   {
     id: "2",
@@ -31,7 +33,8 @@ const mockTemplates: ReceiptTemplate[] = [
     previewUrl: "https://via.placeholder.com/300x400?text=Invoice+Receipt",
     dateCreated: "2025-02-10",
     dateModified: "2025-02-10",
-    isDefault: false
+    isDefault: false,
+    type: "receipt"
   },
   {
     id: "3",
@@ -41,17 +44,42 @@ const mockTemplates: ReceiptTemplate[] = [
     previewUrl: "https://via.placeholder.com/300x400?text=Compact+Receipt",
     dateCreated: "2025-03-05",
     dateModified: "2025-03-05",
-    isDefault: false
+    isDefault: false,
+    type: "receipt"
+  },
+  {
+    id: "4",
+    name: "Standard Invoice",
+    description: "Professional invoice template with detailed breakdown",
+    filename: "standard_invoice.html",
+    previewUrl: "https://via.placeholder.com/300x400?text=Standard+Invoice",
+    dateCreated: "2025-01-10",
+    dateModified: "2025-01-10",
+    isDefault: true,
+    type: "invoice"
+  },
+  {
+    id: "5",
+    name: "Detailed Invoice",
+    description: "Comprehensive invoice with tax calculations and payment terms",
+    filename: "detailed_invoice.html",
+    previewUrl: "https://via.placeholder.com/300x400?text=Detailed+Invoice",
+    dateCreated: "2025-02-15",
+    dateModified: "2025-03-01",
+    isDefault: false,
+    type: "invoice"
   }
 ];
 
-const ReceiptTemplates = () => {
+const Templates = () => {
   const [templates, setTemplates] = useState<ReceiptTemplate[]>(mockTemplates);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"receipt" | "invoice">("receipt");
   const [newTemplate, setNewTemplate] = useState({
     name: "",
     description: "",
-    file: null as File | null
+    file: null as File | null,
+    type: "receipt" as "receipt" | "invoice"
   });
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,10 +107,11 @@ const ReceiptTemplates = () => {
       name: newTemplate.name,
       description: newTemplate.description,
       filename: newTemplate.file.name,
-      previewUrl: "https://via.placeholder.com/300x400?text=New+Template",
+      previewUrl: `https://via.placeholder.com/300x400?text=${encodeURIComponent(newTemplate.name)}`,
       dateCreated: new Date().toISOString().split('T')[0],
       dateModified: new Date().toISOString().split('T')[0],
-      isDefault: false
+      isDefault: false,
+      type: newTemplate.type
     };
     
     setTemplates([...templates, newTemplateObj]);
@@ -90,25 +119,27 @@ const ReceiptTemplates = () => {
     setNewTemplate({
       name: "",
       description: "",
-      file: null
+      file: null,
+      type: "receipt"
     });
     
-    toast.success("Receipt template added successfully");
+    toast.success(`${newTemplate.type === "receipt" ? "Receipt" : "Invoice"} template added successfully`);
   };
 
-  const handleSetDefault = (id: string) => {
+  const handleSetDefault = (id: string, type: "receipt" | "invoice") => {
     const updatedTemplates = templates.map(template => ({
       ...template,
-      isDefault: template.id === id
+      isDefault: template.id === id && template.type === type ? true : 
+                (template.type === type ? false : template.isDefault)
     }));
     setTemplates(updatedTemplates);
-    toast.success("Default template updated");
+    toast.success(`Default ${type} template updated`);
   };
 
-  const handleDeleteTemplate = (id: string) => {
+  const handleDeleteTemplate = (id: string, type: "receipt" | "invoice") => {
     const templateToDelete = templates.find(t => t.id === id);
     if (templateToDelete?.isDefault) {
-      toast.error("Cannot delete the default template");
+      toast.error(`Cannot delete the default ${type} template`);
       return;
     }
     
@@ -117,11 +148,13 @@ const ReceiptTemplates = () => {
     toast.success("Template deleted successfully");
   };
 
+  const filteredTemplates = templates.filter(template => template.type === activeTab);
+
   return (
     <MainLayout>
       <div className="page-container">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-regimark-primary">Receipt Templates</h1>
+          <h1 className="text-3xl font-bold text-regimark-primary">Templates</h1>
           <Button onClick={() => setIsAddDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add Template
@@ -129,11 +162,18 @@ const ReceiptTemplates = () => {
         </div>
         
         <p className="text-muted-foreground mb-6">
-          Manage and customize receipt templates for your sales transactions. Set a default template or upload your own custom designs.
+          Manage and customize templates for your sales transactions and invoices. Set default templates or upload your own custom designs.
         </p>
         
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "receipt" | "invoice")} className="mb-6">
+          <TabsList>
+            <TabsTrigger value="receipt">Receipt Templates</TabsTrigger>
+            <TabsTrigger value="invoice">Invoice Templates</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
+          {filteredTemplates.map((template) => (
             <Card key={template.id} className={template.isDefault ? "border-2 border-regimark-primary" : ""}>
               <CardHeader className="pb-2">
                 <CardTitle className="flex justify-between items-center text-lg">
@@ -165,7 +205,7 @@ const ReceiptTemplates = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => handleSetDefault(template.id)}
+                    onClick={() => handleSetDefault(template.id, template.type)}
                   >
                     Set as Default
                   </Button>
@@ -180,7 +220,7 @@ const ReceiptTemplates = () => {
                   size="sm" 
                   className="text-regimark-error hover:text-regimark-error/80"
                   disabled={template.isDefault}
-                  onClick={() => handleDeleteTemplate(template.id)}
+                  onClick={() => handleDeleteTemplate(template.id, template.type)}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -193,10 +233,42 @@ const ReceiptTemplates = () => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle>Add New Receipt Template</DialogTitle>
+            <DialogTitle>Add New Template</DialogTitle>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="template-type" className="text-right">
+                Type <span className="text-regimark-primary">*</span>
+              </Label>
+              <div className="col-span-3">
+                <div className="flex space-x-4">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="type-receipt"
+                      name="type"
+                      checked={newTemplate.type === "receipt"}
+                      onChange={() => setNewTemplate(prev => ({ ...prev, type: "receipt" }))}
+                      className="mr-2"
+                    />
+                    <Label htmlFor="type-receipt">Receipt</Label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="type-invoice"
+                      name="type"
+                      checked={newTemplate.type === "invoice"}
+                      onChange={() => setNewTemplate(prev => ({ ...prev, type: "invoice" }))}
+                      className="mr-2"
+                    />
+                    <Label htmlFor="type-invoice">Invoice</Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
                 Name <span className="text-regimark-primary">*</span>
@@ -288,4 +360,4 @@ const Badge = ({ children, className }: { children: React.ReactNode; className?:
   );
 };
 
-export default ReceiptTemplates;
+export default Templates;

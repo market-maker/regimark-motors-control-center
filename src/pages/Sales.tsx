@@ -21,7 +21,7 @@ const Sales = () => {
         <h1 className="text-3xl font-bold mb-8 text-regimark-primary">Sales & Checkout</h1>
         
         <Tabs defaultValue="checkout" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8">
+          <TabsList className="grid grid-cols-4 mb-8">
             <TabsTrigger value="checkout" className="text-lg">
               Checkout
             </TabsTrigger>
@@ -30,6 +30,9 @@ const Sales = () => {
             </TabsTrigger>
             <TabsTrigger value="receipts" className="text-lg">
               Receipts
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="text-lg">
+              Templates
             </TabsTrigger>
           </TabsList>
           <TabsContent value="checkout">
@@ -40,6 +43,16 @@ const Sales = () => {
           </TabsContent>
           <TabsContent value="receipts">
             <ReceiptList />
+          </TabsContent>
+          <TabsContent value="templates">
+            <div className="text-center py-12">
+              <Button onClick={() => window.location.href = '/templates'}>
+                Manage Templates
+              </Button>
+              <p className="text-sm text-muted-foreground mt-2">
+                Create and manage receipt and invoice templates
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </motion.div>

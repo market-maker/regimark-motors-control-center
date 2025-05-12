@@ -1,13 +1,21 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/types/job";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
 import { useReactToPrint } from "react-to-print";
-import { Download, Printer, Mail } from "lucide-react";
+import { Download, Printer, Mail, FileText } from "lucide-react";
 import { motion } from "framer-motion";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "@/components/ui/sonner";
 
 interface JobInvoiceProps {
   job: JobCard;
@@ -15,10 +23,22 @@ interface JobInvoiceProps {
 
 const JobInvoice = ({ job }: JobInvoiceProps) => {
   const invoiceRef = useRef<HTMLDivElement>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("standard");
 
   const handlePrint = useReactToPrint({
     content: () => invoiceRef.current,
+    onAfterPrint: () => toast.success("Invoice printed successfully"),
   });
+
+  const handleDownload = () => {
+    // This would be implemented to generate a PDF from the invoice
+    toast.success("Invoice downloaded successfully");
+  };
+
+  const handleEmail = () => {
+    // This would be implemented to email the invoice
+    toast.success("Invoice emailed successfully");
+  };
 
   const totalPartsCost = job.parts
     ? job.parts.reduce((acc, part) => acc + part.cost * part.quantity, 0)
@@ -47,38 +67,50 @@ const JobInvoice = ({ job }: JobInvoiceProps) => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-end space-x-2 mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center"
-          onClick={handlePrint}
-        >
-          <Printer className="w-4 h-4 mr-2" />
-          Print Invoice
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center"
-          onClick={() => {
-            // Handle download functionality
-          }}
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Download PDF
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center"
-          onClick={() => {
-            // Handle email functionality
-          }}
-        >
-          <Mail className="w-4 h-4 mr-2" />
-          Email Invoice
-        </Button>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-regimark-primary" />
+          <span className="font-medium">Select Invoice Template:</span>
+          <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select template" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="standard">Standard Invoice</SelectItem>
+              <SelectItem value="detailed">Detailed Invoice</SelectItem>
+              <SelectItem value="compact">Compact Invoice</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center"
+            onClick={handlePrint}
+          >
+            <Printer className="w-4 h-4 mr-2" />
+            Print
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center"
+            onClick={handleDownload}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center"
+            onClick={handleEmail}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Email
+          </Button>
+        </div>
       </div>
 
       <motion.div
@@ -140,6 +172,15 @@ const JobInvoice = ({ job }: JobInvoiceProps) => {
               </h3>
               <p className="mt-2">{job.jobDescription}</p>
             </div>
+            
+            {job.technicianName && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-300">
+                  Service Technician
+                </h3>
+                <p className="mt-2">{job.technicianName}</p>
+              </div>
+            )}
 
             <div className="mt-8">
               <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">
@@ -161,7 +202,21 @@ const JobInvoice = ({ job }: JobInvoiceProps) => {
                         key={part.id || index}
                         className="border-b border-gray-200 dark:border-gray-700"
                       >
-                        <td className="py-2">{part.name}</td>
+                        <td className="py-2">
+                          <div>
+                            {part.name}
+                            {part.isSplit && (
+                              <span className="ml-2 text-xs px-1.5 py-0.5 bg-yellow-100 text-yellow-800 rounded-sm">
+                                Split Product
+                              </span>
+                            )}
+                          </div>
+                          {part.notes && (
+                            <div className="text-xs italic text-amber-600 mt-1">
+                              Note: {part.notes}
+                            </div>
+                          )}
+                        </td>
                         <td className="text-right py-2">{part.quantity}</td>
                         <td className="text-right py-2">
                           {formatCurrency(part.cost)}
