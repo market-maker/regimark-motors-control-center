@@ -1,14 +1,16 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/navigation/Header";
-import Sidebar from "../components/navigation/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
 import { Wifi, WifiOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Lazy load the Sidebar component
+const Sidebar = lazy(() => import("../components/navigation/Sidebar"));
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -81,20 +83,22 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         linkTo: "/sales?tab=debtors"
       });
       
-      // Show a toast alert for the first overdue debtor
-      if (mockOverdueDebtors[0]) {
-        const debtor = mockOverdueDebtors[0];
-        toast.warning(
-          `${debtor.customerName} has an overdue payment of $${debtor.amount} (${debtor.daysOverdue} days)`,
-          {
-            duration: 5000,
-            action: {
-              label: "View Debtors",
-              onClick: () => window.location.href = "/sales?tab=debtors"
+      // Show a toast alert for the first overdue debtor - use requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
+        if (mockOverdueDebtors[0]) {
+          const debtor = mockOverdueDebtors[0];
+          toast.warning(
+            `${debtor.customerName} has an overdue payment of $${debtor.amount} (${debtor.daysOverdue} days)`,
+            {
+              duration: 5000,
+              action: {
+                label: "View Debtors",
+                onClick: () => window.location.href = "/sales?tab=debtors"
+              }
             }
-          }
-        );
-      }
+          );
+        }
+      });
     }
   }, [addNotification]);
 
@@ -134,7 +138,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="z-40"
           >
-            <Sidebar onClose={toggleSidebar} />
+            <Suspense fallback={<div className="w-64 h-screen bg-gray-100 animate-pulse"></div>}>
+              <Sidebar onClose={toggleSidebar} />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>
