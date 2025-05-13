@@ -8,6 +8,16 @@ export interface Part {
   quantity: number;
   cost: number;
   price?: number;
+  isSplit?: boolean;
+  notes?: string;
+  components?: {
+    id: string;
+    name: string;
+    quantity: number;
+    originalProductId: string;
+    originalProductName: string;
+    dateExtracted: string;
+  }[];
 }
 
 export interface Labor {
