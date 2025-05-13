@@ -9,194 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      appointments: {
+      profiles: {
         Row: {
-          appointment_date: string
+          avatar_url: string | null
           created_at: string
+          full_name: string | null
           id: string
-          notes: string | null
-          status: string
-          surgeon_id: string | null
-          treatment_type: string | null
+          is_admin: boolean | null
           updated_at: string
-          user_id: string
+          username: string | null
         }
         Insert: {
-          appointment_date: string
+          avatar_url?: string | null
           created_at?: string
-          id?: string
-          notes?: string | null
-          status?: string
-          surgeon_id?: string | null
-          treatment_type?: string | null
+          full_name?: string | null
+          id: string
+          is_admin?: boolean | null
           updated_at?: string
-          user_id: string
+          username?: string | null
         }
         Update: {
-          appointment_date?: string
+          avatar_url?: string | null
           created_at?: string
+          full_name?: string | null
           id?: string
-          notes?: string | null
-          status?: string
-          surgeon_id?: string | null
-          treatment_type?: string | null
+          is_admin?: boolean | null
           updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "appointments_surgeon_id_fkey"
-            columns: ["surgeon_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "appointments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dental_records: {
-        Row: {
-          created_at: string
-          diagnosis: string | null
-          id: string
-          notes: string | null
-          record_date: string
-          surgeon_id: string | null
-          treatment: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          diagnosis?: string | null
-          id?: string
-          notes?: string | null
-          record_date?: string
-          surgeon_id?: string | null
-          treatment?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          diagnosis?: string | null
-          id?: string
-          notes?: string | null
-          record_date?: string
-          surgeon_id?: string | null
-          treatment?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dental_records_surgeon_id_fkey"
-            columns: ["surgeon_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dental_records_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notifications: {
-        Row: {
-          created_at: string
-          id: string
-          is_read: boolean | null
-          message: string
-          sent_at: string | null
-          sent_via: string[] | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          message: string
-          sent_at?: string | null
-          sent_via?: string[] | null
-          title: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_read?: boolean | null
-          message?: string
-          sent_at?: string | null
-          sent_via?: string[] | null
-          title?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      users: {
-        Row: {
-          address: string | null
-          created_at: string
-          date_of_birth: string | null
-          email: string
-          full_name: string
-          gender: string | null
-          id: string
-          medical_aid_number: string | null
-          medical_aid_provider: string | null
-          phone_number: string | null
-          role: string
-          updated_at: string
-        }
-        Insert: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email: string
-          full_name: string
-          gender?: string | null
-          id: string
-          medical_aid_number?: string | null
-          medical_aid_provider?: string | null
-          phone_number?: string | null
-          role?: string
-          updated_at?: string
-        }
-        Update: {
-          address?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          email?: string
-          full_name?: string
-          gender?: string | null
-          id?: string
-          medical_aid_number?: string | null
-          medical_aid_provider?: string | null
-          phone_number?: string | null
-          role?: string
-          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
