@@ -1,45 +1,49 @@
 
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '@/providers/AuthProvider';
-import { Skeleton } from '../ui/skeleton';
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/providers/AuthProvider";
+import { isUserAdmin } from "@/lib/utils";
 
 interface ProtectedRouteProps {
+  requiresAuth?: boolean;
   requiresAdmin?: boolean;
+  children?: React.ReactNode;
 }
 
-export const ProtectedRoute = ({ requiresAdmin = false }: ProtectedRouteProps) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+export const ProtectedRoute = ({
+  requiresAuth = true,
+  requiresAdmin = false,
+  children
+}: ProtectedRouteProps) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
-  // Show loading state if authentication is being checked
+  // Show loading state if still checking auth
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-32 w-80" />
-          <Skeleton className="h-6 w-60" />
-          <Skeleton className="h-6 w-12" />
+      <div className="min-h-screen flex items-center justify-center" aria-live="polite" aria-busy="true">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-16 h-16 bg-regimark-primary/20 rounded-full mb-4" role="progressbar"></div>
+          <div className="h-4 w-24 bg-regimark-primary/20 rounded">Loading...</div>
         </div>
       </div>
     );
   }
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" state={{ from: location }} replace />;
+  // If not authenticated and authentication is required, redirect to login
+  if (requiresAuth && !isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If admin access is required, check if user has admin role
-  if (requiresAdmin) {
-    // Implement admin role check
-    const isAdmin = user?.user_metadata?.is_admin || false;
-    
-    if (!isAdmin) {
-      return <Navigate to="/" replace />;
-    }
+  // If authentication is not required but user is authenticated, proceed
+  if (!requiresAuth && isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
-  // User is authenticated, render the protected route
-  return <Outlet />;
+  // Check admin access if required
+  if (requiresAdmin && (!user || !isUserAdmin(user.role))) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Render children if provided, otherwise outlet (for nested routes)
+  return <>{children ? children : <Outlet />}</>;
 };

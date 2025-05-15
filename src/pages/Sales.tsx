@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import CheckoutForm from "../components/sales/CheckoutForm";
@@ -5,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DebtorsList from "../components/sales/DebtorsList";
 import { motion } from "framer-motion";
 import ReceiptList from "../components/sales/receipts/ReceiptList";
-import { Button } from "@/components/ui/button";
 
 const Sales = () => {
   const [activeTab, setActiveTab] = useState("checkout");

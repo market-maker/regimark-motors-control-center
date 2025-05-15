@@ -15,7 +15,6 @@ import Settings from "./pages/Settings";
 import Stores from "./pages/Stores";
 import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
-import Auth from "./pages/Auth";
 import PersonalExpenses from "./pages/PersonalExpenses";
 import StoreManagement from "./pages/StoreManagement";
 import { ThemeProvider } from "./providers/ThemeProvider";
@@ -36,7 +35,6 @@ function App() {
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
-                <Route path="/auth" element={<Auth />} />
                 
                 {/* Protected routes */}
                 <Route element={<ProtectedRoute />}>

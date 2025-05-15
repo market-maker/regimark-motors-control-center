@@ -5,14 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Trash2, Plus, Info } from "lucide-react";
 import { toast } from "sonner";
-import { 
-  Dialog, 
-  DialogTrigger, 
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { 
   Tooltip,

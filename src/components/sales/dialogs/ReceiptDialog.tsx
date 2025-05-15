@@ -1,7 +1,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Receipt from "../Receipt";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { toast } from "@/components/ui/sonner";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { motion } from "framer-motion";
@@ -16,13 +16,10 @@ interface ReceiptDialogProps {
 
 const ReceiptDialog = ({ open, onOpenChange, saleData, onClose }: ReceiptDialogProps) => {
   const { addNotification } = useNotifications();
-  const hasAddedNotification = useRef(false);
   
   // Send notification based on sale status when receipt dialog opens
   useEffect(() => {
-    if (open && saleData && !hasAddedNotification.current) {
-      hasAddedNotification.current = true;
-      
+    if (open && saleData) {
       // Add notification based on sale status
       if (saleData.status === "Pending") {
         addNotification({
@@ -47,11 +44,6 @@ const ReceiptDialog = ({ open, onOpenChange, saleData, onClose }: ReceiptDialogP
         });
         toast.error(`Sale #${saleData.saleId} has been revoked.`);
       }
-    }
-    
-    // Reset the ref when the dialog is closed
-    if (!open) {
-      hasAddedNotification.current = false;
     }
   }, [open, saleData, addNotification]);
 

@@ -1,5 +1,4 @@
-
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 import { toast } from "@/components/ui/sonner";
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "@/providers/NotificationsProvider";
@@ -62,73 +61,61 @@ export const useCheckout = () => {
   const [showReceipt, setShowReceipt] = useState(false);
   const [adviceType, setAdviceType] = useState<"job" | "card" | "vehicle">("job");
   
-  // Calculate totals with memoization
-  const subtotal = useMemo(() => 
-    cartItems.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    ), 
-    [cartItems]
+  // Calculate totals
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
   );
-  
-  const tax = useMemo(() => subtotal * 0.07, [subtotal]);
-  const total = useMemo(() => subtotal + tax, [subtotal, tax]);
+  const tax = subtotal * 0.07; // Assuming 7% tax rate
+  const total = subtotal + tax;
 
-  // Memoized event handlers
-  const handleRemoveItem = useCallback((id: string) => {
-    setCartItems(prevItems => prevItems.filter((item) => item.id !== id));
+  // Event handlers
+  const handleRemoveItem = (id: string) => {
+    setCartItems(cartItems.filter((item) => item.id !== id));
     toast.success("Item removed from cart");
-  }, []);
+  };
 
-  const handleQuantityChange = useCallback((id: string, quantity: number) => {
-    setCartItems(prevItems =>
-      prevItems.map((item) =>
+  const handleQuantityChange = (id: string, quantity: number) => {
+    setCartItems(
+      cartItems.map((item) =>
         item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
       )
     );
-  }, []);
+  };
 
-  const handleAddProduct = useCallback((product: any) => {
+  const handleAddProduct = (product: any) => {
     // Check if product is already in cart
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      
-      if (existingItem) {
-        // Increment quantity if already in cart
-        const updatedItems = prevItems.map(item => 
-          item.id === existingItem.id 
-            ? { ...item, quantity: item.quantity + 1 } 
-            : item
-        );
-        toast.success(`Increased quantity of ${product.name}`);
-        return updatedItems;
-      } else {
-        // Add new item to cart
-        const newItem: CartItem = {
-          id: product.id,
-          name: product.name,
-          sku: product.sku,
-          price: product.price,
-          quantity: 1,
-        };
-        toast.success(`${product.name} added to cart`);
-        return [...prevItems, newItem];
-      }
-    });
+    const existingItem = cartItems.find(item => item.id === product.id);
     
+    if (existingItem) {
+      // Increment quantity if already in cart
+      handleQuantityChange(existingItem.id, existingItem.quantity + 1);
+      toast.success(`Increased quantity of ${product.name}`);
+    } else {
+      // Add new item to cart
+      const newItem: CartItem = {
+        id: product.id,
+        name: product.name,
+        sku: product.sku,
+        price: product.price,
+        quantity: 1,
+      };
+      setCartItems([...cartItems, newItem]);
+      toast.success(`${product.name} added to cart`);
+    }
     setIsAddProductDialogOpen(false);
-  }, []);
+  };
 
-  const handleSelectCustomer = useCallback((customer: Customer) => {
+  const handleSelectCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
     setCustomerName(customer.name);
     setCustomerPhone(customer.phone);
     setCustomerEmail(customer.email);
     setShowCustomerDialog(false);
     toast.success(`Selected customer: ${customer.name}`);
-  }, []);
+  };
 
-  const handleCompleteSale = useCallback(() => {
+  const handleCompleteSale = () => {
     if (cartItems.length === 0) {
       toast.error("Cannot complete sale with empty cart");
       return;
@@ -176,8 +163,19 @@ export const useCheckout = () => {
       minute: '2-digit'
     });
 
-    // Calculate discounted total - moved to a separate function for clarity
-    const { discountedTotal, discountAmount } = calculateDiscount(total, discountType, discountValue);
+    // Calculate discounted total
+    let discountedTotal = total;
+    let discountAmount = 0;
+    
+    if (discountType === "percentage" && discountValue > 0) {
+      discountAmount = total * (discountValue / 100);
+      discountedTotal = total - discountAmount;
+    } else if (discountType === "fixed" && discountValue > 0) {
+      discountAmount = discountValue;
+      discountedTotal = total - discountValue;
+      // Make sure discounted total is not negative
+      if (discountedTotal < 0) discountedTotal = 0;
+    }
 
     // Prepare sale data for receipt
     const saleData: SaleData = {
@@ -230,23 +228,15 @@ export const useCheckout = () => {
       });
     }
 
-    // Use requestAnimationFrame for smoother UI
-    requestAnimationFrame(() => {
-      // Simulate processing delay with a shorter timeout
-      setTimeout(() => {
-        setIsProcessing(false);
-        setCompletedSaleData(saleData);
-        setShowReceipt(true);
-      }, 500); // Reduced from 1500ms to 500ms
-    });
-  }, [
-    cartItems, customerName, isCredit, dueDate, selectedCustomer,
-    paymentMethod, cashReceived, total, cardNumber, 
-    discountType, discountValue, subtotal, tax, saleStatus,
-    addNotification
-  ]);
+    // Simulate processing delay
+    setTimeout(() => {
+      setIsProcessing(false);
+      setCompletedSaleData(saleData);
+      setShowReceipt(true);
+    }, 1500);
+  };
 
-  const handleCloseReceipt = useCallback(() => {
+  const handleCloseReceipt = () => {
     setShowReceipt(false);
     
     // Clear the form after successful completion
@@ -261,24 +251,6 @@ export const useCheckout = () => {
     setSelectedCustomer(null);
     
     toast.success("Sale completed successfully!");
-  }, []);
-
-  // Helper function to calculate discount
-  const calculateDiscount = (total: number, discountType: "none" | "percentage" | "fixed", discountValue: number) => {
-    let discountedTotal = total;
-    let discountAmount = 0;
-    
-    if (discountType === "percentage" && discountValue > 0) {
-      discountAmount = total * (discountValue / 100);
-      discountedTotal = total - discountAmount;
-    } else if (discountType === "fixed" && discountValue > 0) {
-      discountAmount = discountValue;
-      discountedTotal = total - discountValue;
-      // Make sure discounted total is not negative
-      if (discountedTotal < 0) discountedTotal = 0;
-    }
-
-    return { discountedTotal, discountAmount };
   };
 
   return {

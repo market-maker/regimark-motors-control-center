@@ -1,11 +1,10 @@
 
 import { useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
 import BoxGrid from "@/components/login/BoxGrid";
 import LoginCard from "@/components/login/LoginCard";
-import { Button } from "@/components/ui/button";
 
 const Login = () => {
   const [loginError, setLoginError] = useState("");
@@ -48,14 +47,6 @@ const Login = () => {
         loginError={loginError}
         handleLogin={handleLogin}
       />
-      
-      <div className="mt-6 relative z-10">
-        <Link to="/auth">
-          <Button variant="ghost" className="text-regimark-primary">
-            New Authentication Page
-          </Button>
-        </Link>
-      </div>
       
       {/* Copyright footer */}
       <div className="absolute bottom-4 text-center text-sm text-gray-500">
