@@ -1,10 +1,9 @@
 
 import React, { Suspense } from "react";
 
-interface LazyComponentProps {
-  children?: React.ReactNode;
-}
-
+/**
+ * Helper for lazy-loading components with proper typing
+ */
 export function lazyImport<
   T extends React.ComponentType<any>,
   I extends { [K2 in K]: T },
@@ -15,8 +14,10 @@ export function lazyImport<
   });
 }
 
-// Suspense wrapper for lazy-loaded components
-export const PageSuspense = ({ children }: LazyComponentProps) => {
+/**
+ * Suspense wrapper for lazy-loaded components
+ */
+export const PageSuspense = ({ children }: { children?: React.ReactNode }) => {
   return (
     <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
       {children}
