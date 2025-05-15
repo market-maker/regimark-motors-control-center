@@ -10,15 +10,21 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Index = () => {
   const { theme } = useTheme();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      navigate("/auth");
+    } catch (error) {
+      toast.error("Error logging out");
+    }
   };
   
   const containerAnimation = {
@@ -48,9 +54,16 @@ const Index = () => {
           className="flex justify-between items-center mb-8"
           variants={itemAnimation}
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent">
-            Dashboard Overview
-          </h1>
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-regimark-primary to-regimark-accent bg-clip-text text-transparent">
+              Dashboard Overview
+            </h1>
+            {user && (
+              <p className="text-sm text-muted-foreground">
+                Welcome, {user.user_metadata?.username || user.email}
+              </p>
+            )}
+          </div>
           
           <Button 
             onClick={handleLogout} 
