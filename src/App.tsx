@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Inventory from "./pages/Inventory";
 import Sales from "./pages/Sales";
@@ -26,46 +26,44 @@ import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
-    <React.StrictMode>
-      <ThemeProvider>
-        <AuthProvider>
-          <NotificationsProvider>
-            <Toaster richColors position="top-right" />
-            <Router>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/login" element={<Login />} />
-                
-                {/* Protected routes */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/inventory" element={<Inventory />} />
-                  <Route path="/sales" element={<Sales />} />
-                  <Route path="/customers" element={<Customers />} />
-                  <Route path="/suppliers" element={<Suppliers />} />
-                  <Route path="/reports" element={<Reports />} />
-                  <Route path="/receipt-templates" element={<ReceiptTemplates />} />
-                  <Route path="/stores" element={<Stores />} />
-                  <Route path="/jobs" element={<Jobs />} />
-                </Route>
-                
-                {/* Admin-only routes */}
-                <Route element={<ProtectedRoute requiresAdmin />}>
-                  <Route path="/import" element={<ImportData />} />
-                  <Route path="/accounting" element={<Accounting />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/expenses" element={<PersonalExpenses />} />
-                  <Route path="/store-management" element={<StoreManagement />} />
-                </Route>
-                
-                {/* Fallback routes */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Router>
-          </NotificationsProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </React.StrictMode>
+    <ThemeProvider>
+      <AuthProvider>
+        <NotificationsProvider>
+          <Toaster richColors position="top-right" />
+          <BrowserRouter>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              
+              {/* Protected routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Index />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/sales" element={<Sales />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/suppliers" element={<Suppliers />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/receipt-templates" element={<ReceiptTemplates />} />
+                <Route path="/stores" element={<Stores />} />
+                <Route path="/jobs" element={<Jobs />} />
+              </Route>
+              
+              {/* Admin-only routes */}
+              <Route element={<ProtectedRoute requiresAdmin />}>
+                <Route path="/import" element={<ImportData />} />
+                <Route path="/accounting" element={<Accounting />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/expenses" element={<PersonalExpenses />} />
+                <Route path="/store-management" element={<StoreManagement />} />
+              </Route>
+              
+              {/* Fallback routes */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </NotificationsProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

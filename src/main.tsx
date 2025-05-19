@@ -17,6 +17,7 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Ensure React is properly initialized before rendering
 const rootElement = document.getElementById("root");
 if (rootElement) {
   const root = createRoot(rootElement);
