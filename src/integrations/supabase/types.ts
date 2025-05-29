@@ -111,6 +111,45 @@ export type Database = {
           },
         ]
       }
+      invitations: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          invited_by: string | null
+          is_used: boolean | null
+          otp_code: string
+          otp_expires_at: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          invited_by?: string | null
+          is_used?: boolean | null
+          otp_code: string
+          otp_expires_at?: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          invited_by?: string | null
+          is_used?: boolean | null
+          otp_code?: string
+          otp_expires_at?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -154,6 +193,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pre_orders: {
+        Row: {
+          balance_due: number
+          contact_info: string
+          customer_name: string
+          date: string
+          deposit_amount: number
+          description: string | null
+          expected_delivery: string
+          id: string
+          id_document_path: string | null
+          item_name: string
+          payment_method: string
+          quantity: number
+          received_by: string
+          special_instructions: string | null
+          status: string
+          total_amount: number
+        }
+        Insert: {
+          balance_due: number
+          contact_info: string
+          customer_name: string
+          date: string
+          deposit_amount: number
+          description?: string | null
+          expected_delivery: string
+          id?: string
+          id_document_path?: string | null
+          item_name: string
+          payment_method?: string
+          quantity?: number
+          received_by: string
+          special_instructions?: string | null
+          status?: string
+          total_amount: number
+        }
+        Update: {
+          balance_due?: number
+          contact_info?: string
+          customer_name?: string
+          date?: string
+          deposit_amount?: number
+          description?: string | null
+          expected_delivery?: string
+          id?: string
+          id_document_path?: string | null
+          item_name?: string
+          payment_method?: string
+          quantity?: number
+          received_by?: string
+          special_instructions?: string | null
+          status?: string
+          total_amount?: number
+        }
+        Relationships: []
       }
       users: {
         Row: {
@@ -205,7 +301,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_user_manually: {
+        Args: {
+          p_email: string
+          p_password: string
+          p_full_name: string
+          p_role?: string
+        }
+        Returns: string
+      }
+      create_invitation: {
+        Args: { p_email: string; p_full_name: string; p_role?: string }
+        Returns: Json
+      }
+      generate_otp: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      list_all_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          email: string
+          full_name: string
+          role: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      verify_otp_and_create_user: {
+        Args: { p_email: string; p_otp_code: string; p_password: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
