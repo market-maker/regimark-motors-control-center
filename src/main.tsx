@@ -1,11 +1,10 @@
-
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Register service worker for offline capabilities
-if ('serviceWorker' in navigator) {
+// Only register service worker in production and supported environments
+if (import.meta.env.PROD && 'serviceWorker' in navigator && !window.location.host.includes('stackblitz')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/serviceWorker.js')
       .then(registration => {
