@@ -1,7 +1,8 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { Notification } from "@/types/customer";
 import { toast } from "@/components/ui/sonner";
+import { useAuth } from "@/providers/AuthProvider";
+import { useLocation } from "react-router-dom";
 
 type NotificationsContextType = {
   notifications: Notification[];
@@ -41,13 +42,21 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     const savedNotifications = localStorage.getItem("regimark-notifications");
     return savedNotifications ? JSON.parse(savedNotifications) : initialNotifications;
   });
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   useEffect(() => {
     localStorage.setItem("regimark-notifications", JSON.stringify(notifications));
   }, [notifications]);
 
-  // Show notifications on load for unread debtors
+  // Show notifications on load for unread debtors, but only if authenticated and not on login page
   useEffect(() => {
+    // Skip showing notifications if user is not authenticated or on login page
+    if (!isAuthenticated || isLoginPage) {
+      return;
+    }
+    
     const unreadDebtorNotifications = notifications.filter(
       n => n.type === "debtor" && !n.read
     );
@@ -60,7 +69,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         });
       });
     }
-  }, []);
+  }, [isAuthenticated, isLoginPage, notifications]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -88,11 +97,13 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     
     setNotifications(prev => [newNotification, ...prev]);
     
-    // Show toast for new notification
-    toast(notification.title, {
-      description: notification.message,
-      duration: 5000
-    });
+    // Show toast for new notification only if user is authenticated and not on login page
+    if (isAuthenticated && !isLoginPage) {
+      toast(notification.title, {
+        description: notification.message,
+        duration: 5000
+      });
+    }
   };
 
   const deleteNotification = (id: string) => {
