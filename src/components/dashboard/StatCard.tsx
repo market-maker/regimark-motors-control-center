@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -83,6 +82,7 @@ const StatCard = ({ title, value, icon, trend, className }: StatCardProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="stats-value text-2xl font-bold mt-1"
+                aria-live="polite"
               >
                 {value}
               </motion.p>
@@ -115,6 +115,7 @@ const StatCard = ({ title, value, icon, trend, className }: StatCardProps) => {
                 "p-3 rounded-full shadow-glow",
                 theme === "dark" ? "bg-white/5 text-white" : "bg-white/10 text-regimark-primary"
               )}
+              aria-hidden="true"
             >
               {icon}
             </motion.div>

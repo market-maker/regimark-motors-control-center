@@ -38,12 +38,65 @@ interface InventoryItem {
   status: "In Stock" | "Low Stock" | "Out of Stock";
 }
 
+// Mock inventory data
+const mockInventoryData: InventoryItem[] = [
+  {
+    id: "1",
+    sku: "BP-T19-001",
+    name: "Brake Pads - Toyota Camry 2019",
+    category: "Brakes",
+    price: 89.99,
+    cost: 45.00,
+    stock: 12,
+    status: "In Stock"
+  },
+  {
+    id: "2",
+    sku: "OF-H20-002",
+    name: "Oil Filter - Honda Civic 2020",
+    category: "Filters",
+    price: 12.99,
+    cost: 5.50,
+    stock: 8,
+    status: "In Stock"
+  },
+  {
+    id: "3",
+    sku: "SP-F18-003",
+    name: "Spark Plugs - Ford F-150 2018",
+    category: "Ignition",
+    price: 7.99,
+    cost: 3.25,
+    stock: 5,
+    status: "Low Stock"
+  },
+  {
+    id: "4",
+    sku: "AT-H19-004",
+    name: "Air Filter - Honda Accord 2019",
+    category: "Filters",
+    price: 15.99,
+    cost: 7.25,
+    stock: 0,
+    status: "Out of Stock"
+  },
+  {
+    id: "5",
+    sku: "TB-T20-005",
+    name: "Timing Belt - Toyota RAV4 2020",
+    category: "Engine",
+    price: 45.99,
+    cost: 22.50,
+    stock: 3,
+    status: "Low Stock"
+  }
+];
+
 // Categories for the dropdown
 const categories = ["Brakes", "Filters", "Ignition", "Engine", "Electrical", "Suspension", "Exhaust", "Other"];
 
 const InventoryTable = () => {
-  // Start with empty inventory instead of mock data
-  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>(mockInventoryData);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -190,6 +243,7 @@ const InventoryTable = () => {
             className="pl-10"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
+            aria-label="Search inventory"
           />
         </form>
 
@@ -230,13 +284,28 @@ const InventoryTable = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleView(item)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleView(item)}
+                        aria-label={`View details for ${item.name}`}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleEdit(item)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEdit(item)}
+                        aria-label={`Edit ${item.name}`}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleDelete(item)}
+                        aria-label={`Delete ${item.name}`}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -246,7 +315,7 @@ const InventoryTable = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-4">
-                  {searchTerm ? "No items match your search" : "No inventory items. Click 'Add Item' to create one."}
+                  No items match your search
                 </TableCell>
               </TableRow>
             )}

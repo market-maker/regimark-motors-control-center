@@ -1,37 +1,43 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useState } from "react";
+
+interface SaleItem {
+  id: string;
+  customer: {
+    name: string;
+    email: string;
+    avatar?: string;
+    initials: string;
+  };
+  amount: number;
+  status: "completed" | "pending" | "canceled";
+  date: string;
+}
+
+// Empty state for initial render
+const emptySales: SaleItem[] = [];
+
+const statusColors = {
+  completed: "bg-green-100 text-green-800",
+  pending: "bg-yellow-100 text-yellow-800",
+  canceled: "bg-red-100 text-red-800",
+};
 
 const RecentSales = () => {
-  // Empty initial state instead of mock data
-  const [sales, setSales] = useState<{
-    id: string;
-    customer: {
-      name: string;
-      email: string;
-      avatar?: string;
-      initials: string;
-    };
-    amount: number;
-    status: "completed" | "pending" | "canceled";
-    date: string;
-  }[]>([]);
-
-  const statusColors = {
-    completed: "bg-green-100 text-green-800",
-    pending: "bg-yellow-100 text-yellow-800",
-    canceled: "bg-red-100 text-red-800",
-  };
-
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle>Recent Sales</CardTitle>
       </CardHeader>
       <CardContent>
-        {sales.length > 0 ? (
+        {emptySales.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No recent sales data available.</p>
+            <p className="text-sm mt-2">Sales will appear here as they are processed.</p>
+          </div>
+        ) : (
           <div className="space-y-4">
-            {sales.map((sale) => (
+            {emptySales.map((sale) => (
               <div key={sale.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-9 w-9">
@@ -62,11 +68,6 @@ const RecentSales = () => {
                 </div>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="text-center py-6">
-            <p className="text-muted-foreground mb-4">No recent sales to display</p>
-            <p className="text-sm text-muted-foreground">Recent sales will appear here as they are processed</p>
           </div>
         )}
       </CardContent>

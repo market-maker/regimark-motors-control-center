@@ -2,18 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
-// Empty initial state instead of mock data
+// Empty state for initial render
+const emptyLowStockItems: any[] = [];
+
 const LowStockAlert = () => {
-  const [lowStockItems, setLowStockItems] = useState<{
-    id: string;
-    name: string;
-    currentStock: number;
-    minStockLevel: number;
-    category: string;
-  }[]>([]);
-
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -23,9 +16,14 @@ const LowStockAlert = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {lowStockItems.length > 0 ? (
+        {emptyLowStockItems.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No low stock items to display.</p>
+            <p className="text-sm mt-2">Items will appear here when inventory levels drop below minimum thresholds.</p>
+          </div>
+        ) : (
           <div className="space-y-4">
-            {lowStockItems.map((item) => (
+            {emptyLowStockItems.map((item) => (
               <div key={item.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
                 <div className="flex justify-between items-start mb-1">
                   <div>
@@ -46,11 +44,6 @@ const LowStockAlert = () => {
                 </div>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="text-center py-6">
-            <p className="text-muted-foreground mb-4">No low stock items to display</p>
-            <p className="text-sm text-muted-foreground">Low stock items will appear here when inventory levels fall below minimum thresholds</p>
           </div>
         )}
         <div className="mt-4">
