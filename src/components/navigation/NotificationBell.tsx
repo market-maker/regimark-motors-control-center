@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import {
   Popover,
@@ -40,7 +39,7 @@ const NotificationBell = () => {
           variant="ghost" 
           size="icon" 
           className="relative"
-          aria-label="Notifications"
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         >
           <Bell className="h-5 w-5" />
           <AnimatePresence>
@@ -111,6 +110,7 @@ const NotificationBell = () => {
                           e.stopPropagation();
                           deleteNotification(notification.id);
                         }}
+                        aria-label="Delete notification"
                       >
                         <span className="sr-only">Delete</span>
                         <span aria-hidden className="text-xs">&times;</span>

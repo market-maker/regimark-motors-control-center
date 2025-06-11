@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Menu, Search, LogOut, Settings as SettingsIcon, User, Wifi, WifiOff } from "lucide-react";
 import { Button } from "../ui/button";

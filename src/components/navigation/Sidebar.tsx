@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -21,7 +20,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
@@ -70,7 +68,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   // Primary navigation items
   const primaryNavItems = [
     { path: "/", icon: <Home size={20} />, label: "Dashboard" },
-    { path: "/inventory", icon: <Package size={20} />, label: "Inventory", badge: <Badge variant="outline" className="bg-amber-500 text-white">7</Badge> },
+    { path: "/inventory", icon: <Package size={20} />, label: "Inventory" },
     { path: "/sales", icon: <ShoppingCart size={20} />, label: "Sales" },
     { path: "/jobs", icon: <Wrench size={20} />, label: "Jobs" },
     { path: "/customers", icon: <Users size={20} />, label: "Customers" },
@@ -153,7 +151,6 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                 title={item.label}
                 href={item.path}
                 isActive={isActive(item.path)}
-                badge={item.badge}
                 activeClasses="bg-primary/20 text-primary glow-primary"
                 onClick={isMobile ? onClose : undefined}
               />
