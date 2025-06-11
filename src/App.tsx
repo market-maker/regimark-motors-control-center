@@ -21,8 +21,8 @@ import { ThemeProvider } from "./providers/ThemeProvider";
 import { NotificationsProvider } from "./providers/NotificationsProvider";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
+import { Toaster } from "sonner";
 import "./App.css";
-import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
@@ -59,7 +59,16 @@ function App() {
               {/* Fallback routes */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <Toaster />
+            <Toaster 
+              position="top-center"
+              expand={false}
+              closeButton
+              richColors
+              toastOptions={{
+                duration: 6000,
+                className: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg"
+              }}
+            />
           </NotificationsProvider>
         </BrowserRouter>
       </AuthProvider>

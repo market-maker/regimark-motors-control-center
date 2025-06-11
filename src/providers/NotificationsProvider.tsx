@@ -1,6 +1,7 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { Notification } from "@/types/customer";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { useAuth } from "@/providers/AuthProvider";
 import { useLocation } from "react-router-dom";
 
@@ -15,7 +16,6 @@ type NotificationsContextType = {
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
-// Start with empty notifications instead of mock data
 const initialNotifications: Notification[] = [];
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
@@ -30,9 +30,6 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     localStorage.setItem("regimark-notifications", JSON.stringify(notifications));
   }, [notifications]);
-
-  // Remove automatic notification generation on load
-  // Only user-triggered notifications will be shown
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

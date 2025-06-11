@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/navigation/Header";
 import Sidebar from "../components/navigation/Sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useNotifications } from "@/providers/NotificationsProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
 import { Wifi, WifiOff } from "lucide-react";
@@ -13,7 +13,6 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-// Creating a complete layout component with integrated sidebar and header
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -61,8 +60,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
-  
-  // Removed automatic notification generation for overdue debtors
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
