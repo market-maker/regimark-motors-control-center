@@ -1,4 +1,3 @@
-
 export type JobStatus = "Pending" | "pending" | "Completed" | "completed" | "In Progress" | "in progress" | "in-progress" | "On Hold" | "on hold" | "Canceled" | "canceled" | "Scheduled" | "scheduled";
 export type JobPriority = "Low" | "Medium" | "High" | "Critical" | "none" | "low" | "medium";
 
@@ -8,6 +7,8 @@ export interface Part {
   quantity: number;
   cost: number;
   price?: number;
+  isSplit?: boolean;
+  notes?: string;
 }
 
 export interface Labor {
