@@ -1,43 +1,20 @@
-
 import MainLayout from "../layouts/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { motion } from "framer-motion";
 import { useTheme } from "@/providers/ThemeProvider";
-
-const salesData = [
-  { name: 'Jan', sales: 4000 },
-  { name: 'Feb', sales: 3000 },
-  { name: 'Mar', sales: 2000 },
-  { name: 'Apr', sales: 2780 },
-  { name: 'May', sales: 1890 },
-  { name: 'Jun', sales: 2390 },
-  { name: 'Jul', sales: 3490 },
-];
-
-const inventoryData = [
-  { name: 'Brakes', value: 35 },
-  { name: 'Filters', value: 25 },
-  { name: 'Engine', value: 20 },
-  { name: 'Ignition', value: 15 },
-  { name: 'Other', value: 5 },
-];
-
-const profitData = [
-  { name: 'Jan', revenue: 4000, cost: 2400, profit: 1600 },
-  { name: 'Feb', revenue: 3000, cost: 1398, profit: 1602 },
-  { name: 'Mar', revenue: 2000, cost: 980, profit: 1020 },
-  { name: 'Apr', revenue: 2780, cost: 1908, profit: 872 },
-  { name: 'May', revenue: 1890, cost: 1800, profit: 90 },
-  { name: 'Jun', revenue: 2390, cost: 1800, profit: 590 },
-  { name: 'Jul', revenue: 3490, cost: 2300, profit: 1190 },
-];
+import { useState } from "react";
 
 const COLORS = ['#E30613', '#333333', '#FF5A5A', '#771D1D', '#FFCCCB'];
 
 const Reports = () => {
   const { theme } = useTheme();
+  
+  // Empty initial state for report data
+  const [salesData, setSalesData] = useState<{ name: string; sales: number }[]>([]);
+  const [inventoryData, setInventoryData] = useState<{ name: string; value: number }[]>([]);
+  const [profitData, setProfitData] = useState<{ name: string; revenue: number; cost: number; profit: number }[]>([]);
   
   return (
     <MainLayout>
@@ -110,21 +87,30 @@ const Reports = () => {
                   <CardTitle>Monthly Sales Report</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={salesData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip contentStyle={{ backgroundColor: theme === 'dark' ? '#333' : '#fff', borderRadius: '0.5rem' }} />
-                        <Legend />
-                        <Bar dataKey="sales" name="Monthly Sales" fill="#E30613" barSize={40} radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {salesData.length > 0 ? (
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={salesData}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip contentStyle={{ backgroundColor: theme === 'dark' ? '#333' : '#fff', borderRadius: '0.5rem' }} />
+                          <Legend />
+                          <Bar dataKey="sales" name="Monthly Sales" fill="#E30613" barSize={40} radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div className="h-80 flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-muted-foreground mb-4">No sales data available</p>
+                        <p className="text-sm text-muted-foreground">Sales data will appear here as transactions are processed</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -142,28 +128,37 @@ const Reports = () => {
                     <CardTitle>Inventory by Category</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-80">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={inventoryData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {inventoryData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value, name) => [`${value} items`, name]} />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
+                    {inventoryData.length > 0 ? (
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={inventoryData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {inventoryData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip formatter={(value, name) => [`${value} items`, name]} />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    ) : (
+                      <div className="h-80 flex items-center justify-center">
+                        <div className="text-center">
+                          <p className="text-muted-foreground mb-4">No inventory data available</p>
+                          <p className="text-sm text-muted-foreground">Inventory data will appear here as items are added</p>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -186,8 +181,8 @@ const Reports = () => {
                         transition={{ duration: 0.5, delay: 0.2 }}
                       >
                         <p className="text-muted-foreground mb-2">Total Inventory Value</p>
-                        <p className="text-4xl font-bold text-regimark-primary">$45,672.89</p>
-                        <p className="text-sm text-regimark-secondary mt-2">125 SKUs in stock</p>
+                        <p className="text-4xl font-bold text-regimark-primary">$0.00</p>
+                        <p className="text-sm text-regimark-secondary mt-2">0 SKUs in stock</p>
                       </motion.div>
                     </div>
                   </CardContent>
@@ -207,39 +202,48 @@ const Reports = () => {
                   <CardTitle>Revenue vs. Cost Analysis</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={profitData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip contentStyle={{ backgroundColor: theme === 'dark' ? '#333' : '#fff', borderRadius: '0.5rem' }} />
-                        <Legend />
-                        <Line 
-                          type="monotone" 
-                          dataKey="revenue" 
-                          stroke="#E30613" 
-                          strokeWidth={2} 
-                          activeDot={{ r: 8 }} 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="cost" 
-                          stroke="#333333" 
-                          strokeWidth={2} 
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="profit" 
-                          stroke="#38A169" 
-                          strokeWidth={2} 
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {profitData.length > 0 ? (
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={profitData}
+                          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip contentStyle={{ backgroundColor: theme === 'dark' ? '#333' : '#fff', borderRadius: '0.5rem' }} />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="revenue" 
+                            stroke="#E30613" 
+                            strokeWidth={2} 
+                            activeDot={{ r: 8 }} 
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="cost" 
+                            stroke="#333333" 
+                            strokeWidth={2} 
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="profit" 
+                            stroke="#38A169" 
+                            strokeWidth={2} 
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <div className="h-80 flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-muted-foreground mb-4">No financial data available</p>
+                        <p className="text-sm text-muted-foreground">Financial data will appear here as sales and expenses are recorded</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>

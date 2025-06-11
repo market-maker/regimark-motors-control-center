@@ -22,64 +22,22 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Store, ArrowRight } from "lucide-react";
 import { Store as StoreType } from "@/types/customer";
 
-// Mock data for stores
-const initialStores: StoreType[] = [
-  {
-    id: "1",
-    name: "Main Store",
-    type: "Main",
-    address: "123 Main Street, City",
-    phone: "555-123-4567",
-    email: "main@example.com"
-  },
-  {
-    id: "2",
-    name: "Downtown Branch",
-    type: "Secondary",
-    address: "456 Downtown Ave, City",
-    phone: "555-987-6543",
-    email: "downtown@example.com"
-  },
-  {
-    id: "3",
-    name: "Westside Location",
-    type: "Secondary",
-    address: "789 West Blvd, City",
-    phone: "555-456-7890",
-    email: "westside@example.com"
-  }
-];
-
-// Mock data for inventory in each store
-const storeInventory: Record<string, {id: string, name: string, sku: string, stock: number}[]> = {
-  "1": [
-    { id: "1", name: "Brake Pads - Toyota Camry", sku: "BP-T19-001", stock: 15 },
-    { id: "2", name: "Oil Filter - Honda Civic", sku: "OF-H20-002", stock: 8 },
-    { id: "3", name: "Spark Plugs - Ford F-150", sku: "SP-F18-003", stock: 24 }
-  ],
-  "2": [
-    { id: "1", name: "Brake Pads - Toyota Camry", sku: "BP-T19-001", stock: 5 },
-    { id: "2", name: "Oil Filter - Honda Civic", sku: "OF-H20-002", stock: 3 },
-    { id: "4", name: "Air Filter - Honda Accord", sku: "AT-H19-004", stock: 7 }
-  ],
-  "3": [
-    { id: "1", name: "Brake Pads - Toyota Camry", sku: "BP-T19-001", stock: 2 },
-    { id: "3", name: "Spark Plugs - Ford F-150", sku: "SP-F18-003", stock: 10 },
-    { id: "5", name: "Timing Belt - Toyota RAV4", sku: "TB-T20-005", stock: 4 }
-  ]
-};
-
 const Stores = () => {
-  const [stores, setStores] = useState<StoreType[]>(initialStores);
+  // Empty initial state instead of mock data
+  const [stores, setStores] = useState<StoreType[]>([]);
   const [showAddStoreDialog, setShowAddStoreDialog] = useState(false);
   const [showInventoryDialog, setShowInventoryDialog] = useState(false);
   const [selectedStore, setSelectedStore] = useState<StoreType | null>(null);
-  const [isCurrentStoreMain, setIsCurrentStoreMain] = useState(true);
+  const [selectedStoreId, setSelectedStoreId] = useState<string>("");
+  const [isCurrentStoreMain, setIsCurrentStoreMain] = useState(false);
+  
+  // Empty initial state for inventory data
+  const [storeInventory, setStoreInventory] = useState<Record<string, {id: string, name: string, sku: string, stock: number}[]>>({});
   
   // Form fields for new store
   const [storeName, setStoreName] = useState("");
@@ -130,6 +88,7 @@ const Stores = () => {
   const handleViewInventory = (store: StoreType) => {
     setSelectedStore(store);
     setIsCurrentStoreMain(store.type === "Main");
+    setSelectedStoreId(store.id);
     setShowInventoryDialog(true);
   };
   
@@ -140,6 +99,10 @@ const Stores = () => {
     setStorePhone("");
     setStoreEmail("");
   };
+
+  // Filter stores based on type
+  const mainStore = stores.find(store => store.type === "Main");
+  const secondaryStores = stores.filter(store => store.type === "Secondary");
 
   return (
     <MainLayout>
@@ -163,53 +126,63 @@ const Stores = () => {
             </Button>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Store Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Address</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {stores.map((store) => (
-                  <TableRow key={store.id}>
-                    <TableCell className="font-medium">{store.name}</TableCell>
-                    <TableCell>
-                      <Badge className={store.type === "Main" ? "bg-regimark-primary" : "bg-gray-500"}>
-                        {store.type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{store.address || "—"}</TableCell>
-                    <TableCell>
-                      {store.phone && <div>{store.phone}</div>}
-                      {store.email && <div className="text-xs text-muted-foreground">{store.email}</div>}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewInventory(store)}
-                        >
-                          <Store className="h-4 w-4 mr-1" />
-                          Inventory
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleDeleteStore(store.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            {stores.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Store Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Address</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {stores.map((store) => (
+                    <TableRow key={store.id}>
+                      <TableCell className="font-medium">{store.name}</TableCell>
+                      <TableCell>
+                        <Badge className={store.type === "Main" ? "bg-regimark-primary" : "bg-gray-500"}>
+                          {store.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{store.address || "—"}</TableCell>
+                      <TableCell>
+                        {store.phone && <div>{store.phone}</div>}
+                        {store.email && <div className="text-xs text-muted-foreground">{store.email}</div>}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleViewInventory(store)}
+                          >
+                            <Store className="h-4 w-4 mr-1" />
+                            Inventory
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteStore(store.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">No stores have been added yet</p>
+                <Button variant="outline" onClick={() => setShowAddStoreDialog(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Store
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
         
@@ -346,35 +319,42 @@ const Stores = () => {
                 {/* Current store inventory */}
                 <div>
                   <h3 className="text-lg font-medium mb-3">{selectedStore.name} Stock</h3>
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Product Name</TableHead>
-                          <TableHead>SKU</TableHead>
-                          <TableHead className="text-right">Stock</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {storeInventory[selectedStore.id]?.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>{item.sku}</TableCell>
-                            <TableCell className="text-right">{item.stock}</TableCell>
+                  {storeInventory[selectedStoreId]?.length > 0 ? (
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Product Name</TableHead>
+                            <TableHead>SKU</TableHead>
+                            <TableHead className="text-right">Stock</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        </TableHeader>
+                        <TableBody>
+                          {storeInventory[selectedStoreId]?.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>{item.name}</TableCell>
+                              <TableCell>{item.sku}</TableCell>
+                              <TableCell className="text-right">{item.stock}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 border rounded-md">
+                      <p className="text-muted-foreground mb-4">No inventory items found</p>
+                      <p className="text-sm text-muted-foreground">Add inventory items to see them here</p>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Other stores inventory (only visible to main store) */}
-                {isCurrentStoreMain && (
+                {isCurrentStoreMain && stores.length > 1 && (
                   <div className="mt-8">
                     <h3 className="text-lg font-medium mb-3">Other Locations Stock</h3>
                     
                     {stores
-                      .filter(store => store.id !== selectedStore.id)
+                      .filter(store => store.id !== selectedStoreId)
                       .map(store => (
                         <div key={store.id} className="mb-6">
                           <div className="flex items-center justify-between mb-2">
@@ -385,26 +365,32 @@ const Stores = () => {
                             <Badge variant="outline">{store.type}</Badge>
                           </div>
                           
-                          <div className="rounded-md border">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Product Name</TableHead>
-                                  <TableHead>SKU</TableHead>
-                                  <TableHead className="text-right">Stock</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {storeInventory[store.id]?.map((item) => (
-                                  <TableRow key={item.id}>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.sku}</TableCell>
-                                    <TableCell className="text-right">{item.stock}</TableCell>
+                          {storeInventory[store.id]?.length > 0 ? (
+                            <div className="rounded-md border">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Product Name</TableHead>
+                                    <TableHead>SKU</TableHead>
+                                    <TableHead className="text-right">Stock</TableHead>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
+                                </TableHeader>
+                                <TableBody>
+                                  {storeInventory[store.id]?.map((item) => (
+                                    <TableRow key={item.id}>
+                                      <TableCell>{item.name}</TableCell>
+                                      <TableCell>{item.sku}</TableCell>
+                                      <TableCell className="text-right">{item.stock}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 border rounded-md">
+                              <p className="text-muted-foreground">No inventory items found</p>
+                            </div>
+                          )}
                         </div>
                       ))
                     }

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,78 +14,8 @@ const ReceiptList = () => {
   const [selectedReceipt, setSelectedReceipt] = useState<SaleData | null>(null);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   
-  // Sample receipts data - in a real application this would be fetched from an API
-  const receipts: SaleData[] = [
-    {
-      saleId: "INV-123456",
-      date: "May 9, 2025, 10:30 AM",
-      customerName: "John Doe",
-      customerEmail: "john@example.com",
-      paymentMethod: "cash",
-      items: [
-        {
-          id: "1",
-          name: "Oil Change Service",
-          sku: "OIL-CHANGE-1",
-          price: 49.99,
-          quantity: 1,
-        },
-        {
-          id: "2",
-          name: "Oil Filter",
-          sku: "FILTER-1",
-          price: 12.99,
-          quantity: 1,
-        }
-      ],
-      subtotal: 62.98,
-      tax: 4.41,
-      total: 67.39,
-      status: "Completed"
-    },
-    {
-      saleId: "INV-123457",
-      date: "May 8, 2025, 3:15 PM",
-      customerName: "Jane Smith",
-      customerEmail: "jane@example.com",
-      paymentMethod: "card",
-      items: [
-        {
-          id: "3",
-          name: "Brake Inspection",
-          sku: "BRAKE-INSP-1",
-          price: 29.99,
-          quantity: 1,
-        }
-      ],
-      subtotal: 29.99,
-      tax: 2.10,
-      total: 32.09,
-      status: "Completed"
-    },
-    {
-      saleId: "INV-123458",
-      date: "May 7, 2025, 2:45 PM",
-      customerName: "Robert Johnson",
-      customerEmail: "robert@example.com",
-      paymentMethod: "credit",
-      items: [
-        {
-          id: "4",
-          name: "Tire Rotation",
-          sku: "TIRE-ROT-1",
-          price: 39.99,
-          quantity: 4,
-        }
-      ],
-      subtotal: 159.96,
-      tax: 11.20,
-      total: 171.16,
-      isCredit: true,
-      dueDate: "May 21, 2025",
-      status: "Pending"
-    }
-  ];
+  // Empty initial state instead of mock data
+  const [receipts, setReceipts] = useState<SaleData[]>([]);
   
   // Filter receipts based on search term
   const filteredReceipts = receipts.filter(receipt => 
@@ -192,7 +121,7 @@ const ReceiptList = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-6 text-muted-foreground">
-                      No receipts found matching your search
+                      No receipts found. Process a sale to generate receipts.
                     </TableCell>
                   </TableRow>
                 )}

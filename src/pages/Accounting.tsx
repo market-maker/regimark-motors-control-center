@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { motion } from "framer-motion";
@@ -24,40 +23,13 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { PersonalExpense } from "@/types/customer";
 import { Plus, Trash2, FileText } from "lucide-react";
 
-const initialExpenses: PersonalExpense[] = [
-  {
-    id: "1",
-    date: "2023-05-01",
-    category: "Office Supplies",
-    amount: 125.50,
-    description: "Printer ink and paper",
-    userId: "admin"
-  },
-  {
-    id: "2",
-    date: "2023-05-03",
-    category: "Travel",
-    amount: 350.00,
-    description: "Client meeting travel expenses",
-    userId: "admin"
-  },
-  {
-    id: "3",
-    date: "2023-05-10",
-    category: "Meals",
-    amount: 45.75,
-    description: "Lunch with supplier",
-    userId: "admin"
-  }
-];
-
 const Accounting = () => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [personalExpenses, setPersonalExpenses] = useState<PersonalExpense[]>(initialExpenses);
+  const [personalExpenses, setPersonalExpenses] = useState<PersonalExpense[]>([]);
   const [showAddExpenseDialog, setShowAddExpenseDialog] = useState(false);
   
   // New expense form fields
@@ -139,7 +111,7 @@ const Accounting = () => {
                   <CardTitle>Total Sales</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">$12,450.75</div>
+                  <div className="text-3xl font-bold">$0.00</div>
                   <p className="text-muted-foreground text-sm">Last 30 days</p>
                 </CardContent>
               </Card>
@@ -149,8 +121,8 @@ const Accounting = () => {
                   <CardTitle>Outstanding Debts</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">$3,245.50</div>
-                  <p className="text-muted-foreground text-sm">From 5 customers</p>
+                  <div className="text-3xl font-bold">$0.00</div>
+                  <p className="text-muted-foreground text-sm">From 0 customers</p>
                 </CardContent>
               </Card>
               
@@ -159,7 +131,7 @@ const Accounting = () => {
                   <CardTitle>Total Expenses</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">$4,125.00</div>
+                  <div className="text-3xl font-bold">${totalExpenses.toFixed(2)}</div>
                   <p className="text-muted-foreground text-sm">Including inventory purchases</p>
                 </CardContent>
               </Card>
@@ -291,39 +263,9 @@ const Accounting = () => {
                   <CardTitle>Recent Reports</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b pb-2">
-                      <div>
-                        <p className="font-medium">Profit & Loss</p>
-                        <p className="text-sm text-muted-foreground">April 2023</p>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <FileText className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center justify-between border-b pb-2">
-                      <div>
-                        <p className="font-medium">Sales & Tax</p>
-                        <p className="text-sm text-muted-foreground">Q1 2023</p>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <FileText className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pb-2">
-                      <div>
-                        <p className="font-medium">Inventory Valuation</p>
-                        <p className="text-sm text-muted-foreground">March 2023</p>
-                      </div>
-                      <Button variant="outline" size="sm">
-                        <FileText className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                    </div>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p className="mb-4">No reports have been generated yet</p>
+                    <p className="text-sm">Generated reports will appear here</p>
                   </div>
                 </CardContent>
               </Card>

@@ -1,4 +1,3 @@
-
 import MainLayout from "../layouts/MainLayout";
 import StatCard from "../components/dashboard/StatCard";
 import RecentSales from "../components/dashboard/RecentSales";
@@ -10,11 +9,23 @@ import { useTheme } from "@/providers/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Index = () => {
   const { theme } = useTheme();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  
+  // Empty initial state for dashboard stats
+  const [stats, setStats] = useState({
+    totalSales: "0.00",
+    inventoryItems: "0",
+    activeCustomers: "0",
+    netProfit: "0.00",
+    salesTrend: { value: 0, isPositive: true },
+    customersTrend: { value: 0, isPositive: true },
+    profitTrend: { value: 0, isPositive: true }
+  });
   
   const handleLogout = () => {
     logout();
@@ -66,16 +77,16 @@ const Index = () => {
           <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Total Sales" 
-              value="$12,452.75" 
+              value={`$${stats.totalSales}`} 
               icon={<BarChart3 className="h-5 w-5" />} 
-              trend={{ value: 12.5, isPositive: true }}
+              trend={stats.salesTrend}
               className="dashboard-card-glow red-glow"
             />
           </motion.div>
           <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Inventory Items" 
-              value="1,245" 
+              value={stats.inventoryItems} 
               icon={<Package className="h-5 w-5" />}
               className="dashboard-card-glow black-glow"
             />
@@ -83,18 +94,18 @@ const Index = () => {
           <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Active Customers" 
-              value="348" 
+              value={stats.activeCustomers} 
               icon={<Users className="h-5 w-5" />} 
-              trend={{ value: 8.2, isPositive: true }}
+              trend={stats.customersTrend}
               className="dashboard-card-glow red-glow"
             />
           </motion.div>
           <motion.div variants={itemAnimation} whileHover={{ scale: 1.03, y: -5 }} transition={{ type: "spring" }}>
             <StatCard 
               title="Net Profit" 
-              value="$4,325.90" 
+              value={`$${stats.netProfit}`} 
               icon={<DollarSign className="h-5 w-5" />} 
-              trend={{ value: 2.1, isPositive: false }}
+              trend={stats.profitTrend}
               className="dashboard-card-glow black-glow"
             />
           </motion.div>
