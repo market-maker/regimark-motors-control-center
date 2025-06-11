@@ -22,9 +22,10 @@ import { Label } from "@/components/ui/label";
 import { Edit, Trash2, Eye, Plus, Search } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { determineStatus } from "@/utils/inventoryUtils";
 import { mapImportedStatus, transformImportedInventory } from "../inventory/FixInventoryTypes";
+import { useNotifications } from "@/providers/NotificationsProvider";
 
 // Define our own interface to avoid conflict with imported one
 interface InventoryItem {
@@ -38,71 +39,18 @@ interface InventoryItem {
   status: "In Stock" | "Low Stock" | "Out of Stock";
 }
 
-// Mock inventory data
-const mockInventoryData: InventoryItem[] = [
-  {
-    id: "1",
-    sku: "BP-T19-001",
-    name: "Brake Pads - Toyota Camry 2019",
-    category: "Brakes",
-    price: 89.99,
-    cost: 45.00,
-    stock: 12,
-    status: "In Stock"
-  },
-  {
-    id: "2",
-    sku: "OF-H20-002",
-    name: "Oil Filter - Honda Civic 2020",
-    category: "Filters",
-    price: 12.99,
-    cost: 5.50,
-    stock: 8,
-    status: "In Stock"
-  },
-  {
-    id: "3",
-    sku: "SP-F18-003",
-    name: "Spark Plugs - Ford F-150 2018",
-    category: "Ignition",
-    price: 7.99,
-    cost: 3.25,
-    stock: 5,
-    status: "Low Stock"
-  },
-  {
-    id: "4",
-    sku: "AT-H19-004",
-    name: "Air Filter - Honda Accord 2019",
-    category: "Filters",
-    price: 15.99,
-    cost: 7.25,
-    stock: 0,
-    status: "Out of Stock"
-  },
-  {
-    id: "5",
-    sku: "TB-T20-005",
-    name: "Timing Belt - Toyota RAV4 2020",
-    category: "Engine",
-    price: 45.99,
-    cost: 22.50,
-    stock: 3,
-    status: "Low Stock"
-  }
-];
-
 // Categories for the dropdown
 const categories = ["Brakes", "Filters", "Ignition", "Engine", "Electrical", "Suspension", "Exhaust", "Other"];
 
 const InventoryTable = () => {
-  const [items, setItems] = useState<InventoryItem[]>(mockInventoryData);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<InventoryItem | null>(null);
+  const { addNotification } = useNotifications();
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     defaultValues: {
@@ -146,6 +94,14 @@ const InventoryTable = () => {
       setItems(items.filter(item => item.id !== currentItem.id));
       setIsDeleteDialogOpen(false);
       toast.success("Item deleted successfully");
+      
+      // Add notification for item deletion
+      addNotification({
+        title: "Inventory Item Deleted",
+        message: `${currentItem.name} has been removed from inventory`,
+        type: "inventory",
+        linkTo: "/inventory"
+      });
     }
   };
 
@@ -173,6 +129,14 @@ const InventoryTable = () => {
     setIsAddDialogOpen(false);
     reset();
     toast.success("Item added successfully");
+    
+    // Add notification for new item
+    addNotification({
+      title: "New Inventory Item Added",
+      message: `${newItem.name} has been added to inventory`,
+      type: "inventory",
+      linkTo: "/inventory"
+    });
   };
 
   const filteredItems = items.filter(
@@ -200,6 +164,7 @@ const InventoryTable = () => {
     
     const stock = parseInt(data.stock);
     const status = determineStatus(stock);
+    const oldStock = currentItem.stock;
     
     const updatedItems = items.map(item => {
       if (item.id === currentItem.id) {
@@ -220,6 +185,17 @@ const InventoryTable = () => {
     setItems(updatedItems);
     setIsEditDialogOpen(false);
     toast.success("Item updated successfully");
+    
+    // Add notification for low stock if applicable
+    if (stock < 5 && stock < oldStock) {
+      addNotification({
+        title: "Low Stock Alert",
+        message: `${data.name} is running low (${stock} remaining)`,
+        type: "inventory",
+        linkTo: "/inventory",
+        priority: "high"
+      });
+    }
   };
 
   const handleImportData = (importedData: any[]) => {
@@ -230,6 +206,26 @@ const InventoryTable = () => {
     setItems([...items, ...transformedData]);
     
     toast.success(`Imported ${transformedData.length} inventory items`);
+    
+    // Add notification for import
+    addNotification({
+      title: "Inventory Import Complete",
+      message: `${transformedData.length} items have been imported`,
+      type: "inventory",
+      linkTo: "/inventory"
+    });
+    
+    // Check for low stock items in the imported data
+    const lowStockItems = transformedData.filter(item => item.status === "Low Stock");
+    if (lowStockItems.length > 0) {
+      addNotification({
+        title: "Low Stock Alert",
+        message: `${lowStockItems.length} imported items have low stock levels`,
+        type: "inventory",
+        linkTo: "/inventory",
+        priority: "high"
+      });
+    }
   };
 
   return (
@@ -315,7 +311,7 @@ const InventoryTable = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-4">
-                  No items match your search
+                  {searchTerm ? "No items match your search" : "No inventory items found. Add your first item."}
                 </TableCell>
               </TableRow>
             )}

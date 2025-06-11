@@ -1,6 +1,5 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
-import { Notification } from "@/types/customer";
+import { Notification } from "@/types/notification";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/AuthProvider";
 import { useLocation } from "react-router-dom";
@@ -16,6 +15,7 @@ type NotificationsContextType = {
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
+// Start with empty notifications
 const initialNotifications: Notification[] = [];
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
@@ -23,10 +23,12 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     const savedNotifications = localStorage.getItem("regimark-notifications");
     return savedNotifications ? JSON.parse(savedNotifications) : initialNotifications;
   });
-  const { isAuthenticated } = useAuth();
+  
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
 
+  // Persist notifications to localStorage
   useEffect(() => {
     localStorage.setItem("regimark-notifications", JSON.stringify(notifications));
   }, [notifications]);
@@ -48,6 +50,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   };
 
   const addNotification = (notification: Omit<Notification, 'id' | 'read' | 'date'>) => {
+    // Only add notification if it's relevant to the current user's data
+    // For example, if it's an inventory notification, check if the user has inventory items
+    // If it's a debtor notification, check if the user has debtors
+    
     const newNotification: Notification = {
       ...notification,
       id: Date.now().toString(),

@@ -32,10 +32,15 @@ export const useDebtors = () => {
     );
     
     if (hasOverdueDebts) {
+      // Count overdue debts
+      const overdueCount = updatedCustomers.reduce((count, customer) => {
+        return count + (customer.debtRecords || []).filter(debt => debt.status === "Overdue").length;
+      }, 0);
+      
       // Send notification about overdue debts
       addNotification({
         title: "Overdue Debts Alert",
-        message: "There are customers with overdue debts that need attention.",
+        message: `There are ${overdueCount} overdue debts that need attention.`,
         type: "debtor",
         linkTo: "/sales?tab=debtors"
       });
@@ -77,6 +82,14 @@ export const useDebtors = () => {
     setDebtDueDate("");
     setDebtNotes("");
     toast.success(`Debt record added for ${selectedCustomer.name}`);
+    
+    // Add notification for new debt
+    addNotification({
+      title: "New Debt Record",
+      message: `A new debt of $${parseFloat(debtAmount).toFixed(2)} has been added for ${selectedCustomer.name}`,
+      type: "debtor",
+      linkTo: "/sales?tab=debtors"
+    });
   };
   
   const handleRecordPayment = () => {
@@ -91,6 +104,28 @@ export const useDebtors = () => {
     setShowPaymentDialog(false);
     setPaymentAmount("");
     toast.success(`Payment recorded successfully`);
+    
+    // Add notification for payment
+    if (selectedCustomer && selectedDebt) {
+      const paymentAmountNum = parseFloat(paymentAmount);
+      const remainingAmount = selectedDebt.amount - paymentAmountNum;
+      
+      if (remainingAmount <= 0) {
+        addNotification({
+          title: "Debt Fully Paid",
+          message: `${selectedCustomer.name} has fully paid their debt of $${selectedDebt.amount.toFixed(2)}`,
+          type: "debtor",
+          linkTo: "/sales?tab=debtors"
+        });
+      } else {
+        addNotification({
+          title: "Partial Payment Received",
+          message: `${selectedCustomer.name} made a payment of $${paymentAmountNum.toFixed(2)}. Remaining: $${remainingAmount.toFixed(2)}`,
+          type: "debtor",
+          linkTo: "/sales?tab=debtors"
+        });
+      }
+    }
   };
 
   return {

@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/providers/ThemeProvider";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNotifications } from "@/providers/NotificationsProvider";
 import { 
   Sidebar as UISidebar,
   SidebarContext,
@@ -34,6 +35,7 @@ import {
   SidebarUser
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface SidebarProps {
   onClose: () => void;
@@ -45,6 +47,12 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const { notifications } = useNotifications();
+  
+  // Count unread notifications by type
+  const unreadInventoryCount = notifications.filter(n => n.type === "inventory" && !n.read).length;
+  const unreadSalesCount = notifications.filter(n => n.type === "sale" && !n.read).length;
+  const unreadDebtorCount = notifications.filter(n => n.type === "debtor" && !n.read).length;
   
   useEffect(() => {
     if (isMobile) {
@@ -68,10 +76,37 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   // Primary navigation items
   const primaryNavItems = [
     { path: "/", icon: <Home size={20} />, label: "Dashboard" },
-    { path: "/inventory", icon: <Package size={20} />, label: "Inventory" },
-    { path: "/sales", icon: <ShoppingCart size={20} />, label: "Sales" },
+    { 
+      path: "/inventory", 
+      icon: <Package size={20} />, 
+      label: "Inventory",
+      badge: unreadInventoryCount > 0 ? (
+        <Badge variant="outline" className="bg-amber-500 text-white">
+          {unreadInventoryCount}
+        </Badge>
+      ) : null
+    },
+    { 
+      path: "/sales", 
+      icon: <ShoppingCart size={20} />, 
+      label: "Sales",
+      badge: unreadSalesCount > 0 ? (
+        <Badge variant="outline" className="bg-green-500 text-white">
+          {unreadSalesCount}
+        </Badge>
+      ) : null
+    },
     { path: "/jobs", icon: <Wrench size={20} />, label: "Jobs" },
-    { path: "/customers", icon: <Users size={20} />, label: "Customers" },
+    { 
+      path: "/customers", 
+      icon: <Users size={20} />, 
+      label: "Customers",
+      badge: unreadDebtorCount > 0 ? (
+        <Badge variant="outline" className="bg-red-500 text-white">
+          {unreadDebtorCount}
+        </Badge>
+      ) : null
+    },
     { path: "/suppliers", icon: <TruckIcon size={20} />, label: "Suppliers" },
   ];
 
@@ -151,6 +186,7 @@ const Sidebar = ({ onClose }: SidebarProps) => {
                 title={item.label}
                 href={item.path}
                 isActive={isActive(item.path)}
+                badge={item.badge}
                 activeClasses="bg-primary/20 text-primary glow-primary"
                 onClick={isMobile ? onClose : undefined}
               />

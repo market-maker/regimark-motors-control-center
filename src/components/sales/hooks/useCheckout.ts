@@ -186,9 +186,6 @@ export const useCheckout = () => {
 
     // If this is a credit sale, add it to the customer's debt records
     if (isCredit && selectedCustomer) {
-      // This would normally update a database
-      toast.info(`Added ${discountType !== "none" ? discountedTotal.toFixed(2) : total.toFixed(2)} to ${selectedCustomer.name}'s account as credit`);
-      
       // Add notification for credit sale
       addNotification({
         title: "New Credit Sale",
@@ -203,13 +200,22 @@ export const useCheckout = () => {
       addNotification({
         title: "Pending Sale",
         message: `Sale #${receiptNumber} has been marked as pending.`,
-        type: "sale"
+        type: "sale",
+        linkTo: `/sales?invoice=${receiptNumber}`
       });
     } else if (saleStatus === "Completed") {
       addNotification({
         title: "Sale Completed",
         message: `Sale #${receiptNumber} has been completed successfully.`,
-        type: "sale"
+        type: "sale",
+        linkTo: `/sales?invoice=${receiptNumber}`
+      });
+    } else if (saleStatus === "Revoked") {
+      addNotification({
+        title: "Sale Revoked",
+        message: `Sale #${receiptNumber} has been revoked.`,
+        type: "sale",
+        linkTo: `/sales?invoice=${receiptNumber}`
       });
     }
 
