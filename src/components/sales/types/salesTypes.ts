@@ -20,6 +20,8 @@ export interface Product {
   price: number;
   category: string;
   stock: number;
+  description?: string;
+  image?: string;
   isSplit?: boolean;
   components?: ProductComponent[];
   notes?: string;

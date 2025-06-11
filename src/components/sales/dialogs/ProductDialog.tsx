@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,16 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Search, Package, Plus } from "lucide-react";
 import { motion } from "framer-motion";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  image: string;
-}
+import { Product } from "../types/salesTypes";
 
 interface ProductDialogProps {
   open: boolean;
@@ -74,7 +66,9 @@ const ProductDialog: React.FC<ProductDialogProps> = ({ open, onOpenChange, onAdd
                   <Package className="w-5 h-5 text-gray-500" />
                   <div>
                     <p className="text-sm font-medium">{product.name}</p>
-                    <p className="text-xs text-muted-foreground">{product.description}</p>
+                    {product.description && (
+                      <p className="text-xs text-muted-foreground">{product.description}</p>
+                    )}
                   </div>
                 </div>
                 <Badge variant="secondary">${product.price}</Badge>

@@ -11,6 +11,8 @@ export const availableProducts: Product[] = [
     price: 89.99,
     category: "Brakes",
     stock: 15,
+    description: "High-quality brake pads for Toyota Camry 2019 model",
+    image: "/placeholder.svg",
   },
   {
     id: "2",
@@ -19,6 +21,8 @@ export const availableProducts: Product[] = [
     price: 12.99,
     category: "Filters",
     stock: 8,
+    description: "Premium oil filter for Honda Civic 2020 model",
+    image: "/placeholder.svg",
   },
   {
     id: "3",
@@ -27,6 +31,8 @@ export const availableProducts: Product[] = [
     price: 7.99,
     category: "Ignition",
     stock: 24,
+    description: "OEM spark plugs for Ford F-150 2018 model",
+    image: "/placeholder.svg",
   },
   {
     id: "4",
@@ -35,6 +41,8 @@ export const availableProducts: Product[] = [
     price: 15.99,
     category: "Filters",
     stock: 3,
+    description: "High-performance air filter for Honda Accord 2019",
+    image: "/placeholder.svg",
   },
   {
     id: "5",
@@ -43,6 +51,8 @@ export const availableProducts: Product[] = [
     price: 45.99,
     category: "Engine",
     stock: 5,
+    description: "Durable timing belt for Toyota RAV4 2020 model",
+    image: "/placeholder.svg",
   },
   {
     id: "6",
@@ -51,6 +61,8 @@ export const availableProducts: Product[] = [
     price: 24.99,
     category: "Exterior",
     stock: 12,
+    description: "All-weather windshield wipers for Subaru Outback",
+    image: "/placeholder.svg",
   },
   {
     id: "7",
@@ -59,6 +71,8 @@ export const availableProducts: Product[] = [
     price: 18.99,
     category: "Filters",
     stock: 9,
+    description: "Cabin air filter for Nissan Altima, improves air quality",
+    image: "/placeholder.svg",
   },
 ];
 
