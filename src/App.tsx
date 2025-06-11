@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -17,12 +16,13 @@ import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
 import PersonalExpenses from "./pages/PersonalExpenses";
 import StoreManagement from "./pages/StoreManagement";
+import IconDemo from "./pages/IconDemo";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { NotificationsProvider } from "./providers/NotificationsProvider";
 import { AuthProvider } from "./providers/AuthProvider";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
-import { Toaster } from "sonner";
 import "./App.css";
+import { Toaster } from "sonner";
 
 function App() {
   return (
@@ -45,6 +45,7 @@ function App() {
                 <Route path="/receipt-templates" element={<ReceiptTemplates />} />
                 <Route path="/stores" element={<Stores />} />
                 <Route path="/jobs" element={<Jobs />} />
+                <Route path="/icons" element={<IconDemo />} />
               </Route>
               
               {/* Admin-only routes */}
