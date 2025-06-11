@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -29,7 +30,6 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <NotificationsProvider>
-            <Toaster richColors position="top-right" />
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
@@ -59,6 +59,7 @@ function App() {
               {/* Fallback routes */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <Toaster />
           </NotificationsProvider>
         </BrowserRouter>
       </AuthProvider>
