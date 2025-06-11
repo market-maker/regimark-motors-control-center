@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 import { FileInput, FileSpreadsheet, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/providers/ThemeProvider';
 

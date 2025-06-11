@@ -1,5 +1,4 @@
-
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export const getStatusColor = (status: string, highlighted: boolean = false) => {
   if (highlighted) {
