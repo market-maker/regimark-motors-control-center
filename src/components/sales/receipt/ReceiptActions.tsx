@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Printer, Mail, Download } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface ReceiptActionsProps {
   printRef: React.RefObject<HTMLDivElement>;

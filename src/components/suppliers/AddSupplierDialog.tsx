@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Supplier } from "@/types/supplier";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface AddSupplierDialogProps {
   open: boolean;

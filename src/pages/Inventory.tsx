@@ -1,4 +1,3 @@
-
 import MainLayout from "../layouts/MainLayout";
 import InventoryTable from "../components/inventory/InventoryTable";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { FileSpreadsheet, Scissors } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const Inventory = () => {
   const navigate = useNavigate();

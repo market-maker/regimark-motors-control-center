@@ -1,6 +1,5 @@
-
 import { Customer, DebtRecord } from "@/types/customer";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 export const addDebtRecord = (
   customers: Customer[], 

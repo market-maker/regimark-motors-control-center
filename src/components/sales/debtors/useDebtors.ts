@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Customer, DebtRecord } from "@/types/customer";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { DebtSummary, DebtorRecord } from "./types";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { calculateDebtSummary, prepareDebtorsList, updateDebtStatus } from "./utils/debtCalculations";
 import { addDebtRecord, recordDebtPayment } from "./utils/debtOperations";
 
@@ -42,7 +42,7 @@ export const useDebtors = () => {
     }
     
     setCustomers(updatedCustomers);
-  }, [addNotification]);
+  }, [addNotification, customers]);
   
   // Filter customers based on search term
   const filteredCustomers = customers.filter(customer => 

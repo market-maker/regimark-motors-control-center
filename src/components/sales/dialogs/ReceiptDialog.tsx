@@ -2,7 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Receipt from "../Receipt";
 import { useEffect } from "react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { motion } from "framer-motion";
 import { SaleData } from "../types/salesTypes";
