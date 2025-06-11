@@ -113,8 +113,10 @@ const LoginForm = ({ onSubmit, isLoggingIn, loginError }: LoginFormProps) => {
 
       <div className="mt-6 text-center text-sm text-gray-500">
         <p>Demo credentials:</p>
-        <p>Email: admin@regimark.com</p>
-        <p>Password: admin123</p>
+        <div className="space-y-1">
+          <p><strong>Admin:</strong> admin@regimark.com / admin123</p>
+          <p><strong>Sales:</strong> sales@regimark.com / sales123</p>
+        </div>
       </div>
     </form>
   );

@@ -44,6 +44,11 @@ export const ProtectedRoute = ({
     return <Navigate to="/" replace />;
   }
 
+  // Special check for sales users trying to access personal expenses
+  if (user?.role === "sales" && location.pathname === "/expenses") {
+    return <Navigate to="/" replace />;
+  }
+
   // Render children if provided, otherwise outlet (for nested routes)
   return <>{children ? children : <Outlet />}</>;
 };

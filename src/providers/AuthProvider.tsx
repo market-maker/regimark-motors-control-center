@@ -18,23 +18,19 @@ type AuthContextType = {
   isAdmin: boolean;
 };
 
-// Predefined admin account
-const ADMIN_EMAIL = "admin@regimark.com";
-const ADMIN_PASSWORD = "admin123"; // In a real app, this would be stored securely
-
-// Predefined users
+// Predefined users - only admin and sales
 const PREDEFINED_USERS = [
   {
-    email: ADMIN_EMAIL,
-    password: ADMIN_PASSWORD,
+    email: "admin@regimark.com",
+    password: "admin123",
     role: "admin",
     token: "admin-token-12345"
   },
   {
-    email: "user@regimark.com",
-    password: "user123",
-    role: "user",
-    token: "user-token-67890"
+    email: "sales@regimark.com",
+    password: "sales123",
+    role: "sales",
+    token: "sales-token-67890"
   }
 ];
 
@@ -107,7 +103,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
 
-    // In a real app, this would be an API call
     // Simulating network delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
