@@ -15,27 +15,8 @@ type NotificationsContextType = {
 
 const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
-// Sample initial notifications
-const initialNotifications: Notification[] = [
-  {
-    id: "1",
-    title: "Overdue Payment",
-    message: "John Smith has an overdue payment of $250.50",
-    type: "debtor",
-    read: false,
-    date: new Date().toISOString(),
-    linkTo: "/sales?tab=debtors"
-  },
-  {
-    id: "2",
-    title: "Low Stock Alert",
-    message: "5 items are running low on stock",
-    type: "inventory",
-    read: false,
-    date: new Date().toISOString(),
-    linkTo: "/inventory"
-  }
-];
+// Start with empty notifications instead of mock data
+const initialNotifications: Notification[] = [];
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>(() => {
@@ -50,26 +31,8 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     localStorage.setItem("regimark-notifications", JSON.stringify(notifications));
   }, [notifications]);
 
-  // Show notifications on load for unread debtors, but only if authenticated and not on login page
-  useEffect(() => {
-    // Skip showing notifications if user is not authenticated or on login page
-    if (!isAuthenticated || isLoginPage) {
-      return;
-    }
-    
-    const unreadDebtorNotifications = notifications.filter(
-      n => n.type === "debtor" && !n.read
-    );
-    
-    if (unreadDebtorNotifications.length > 0) {
-      unreadDebtorNotifications.forEach(notification => {
-        toast(notification.title, {
-          description: notification.message,
-          duration: 5000
-        });
-      });
-    }
-  }, [isAuthenticated, isLoginPage, notifications]);
+  // Remove automatic notification generation on load
+  // Only user-triggered notifications will be shown
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/navigation/Header";
@@ -19,7 +18,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const isMobile = useIsMobile();
-  const { addNotification } = useNotifications();
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   
@@ -64,39 +62,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     };
   }, []);
   
-  // Check for overdue debtors on component mount and send notifications
-  useEffect(() => {
-    // This would normally be an API call to get actual overdue debtors
-    const mockOverdueDebtors = [
-      { id: "d1", customerName: "John Smith", amount: 450, daysOverdue: 15 },
-      { id: "d2", customerName: "Mary Johnson", amount: 780.25, daysOverdue: 30 }
-    ];
-    
-    if (mockOverdueDebtors.length > 0) {
-      // Add a notification for overdue debtors
-      addNotification({
-        title: "Overdue Debts Alert",
-        message: `There are ${mockOverdueDebtors.length} customers with overdue payments`,
-        type: "debtor",
-        linkTo: "/sales?tab=debtors"
-      });
-      
-      // Show a toast alert for the first overdue debtor
-      if (mockOverdueDebtors[0]) {
-        const debtor = mockOverdueDebtors[0];
-        toast.warning(
-          `${debtor.customerName} has an overdue payment of $${debtor.amount} (${debtor.daysOverdue} days)`,
-          {
-            duration: 5000,
-            action: {
-              label: "View Debtors",
-              onClick: () => window.location.href = "/sales?tab=debtors"
-            }
-          }
-        );
-      }
-    }
-  }, [addNotification]);
+  // Removed automatic notification generation for overdue debtors
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

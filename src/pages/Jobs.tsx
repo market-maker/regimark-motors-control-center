@@ -13,119 +13,9 @@ const Jobs = () => {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [jobCards, setJobCards] = useState<JobCardType[]>([]);
 
-  // Sample job cards for demonstration
-  const jobCards: JobCardType[] = [
-    {
-      id: "1",
-      customerName: "John Doe",
-      customerEmail: "john@example.com",
-      status: "pending",
-      priority: "High",
-      technicianName: "Mike Smith",
-      createdDate: new Date().toISOString(),
-      description: "Engine overhaul for Toyota Corolla",
-      estimatedCost: 2500,
-      completedDate: null,
-      vehicleMake: "Toyota",
-      vehicleModel: "Corolla",
-      vehicleYear: "2018",
-      vehicleRegistration: "ABC123",
-      jobDescription: "Complete engine overhaul required due to oil leakage",
-      technicianNotes: "Requires new gaskets and timing belt",
-      scheduledDate: new Date(Date.now() + 86400000).toISOString(),
-      parts: [
-        { name: "Engine Gasket Set", quantity: 1, cost: 189.99 },
-        { name: "Timing Belt", quantity: 1, cost: 79.99 },
-        { name: "Oil Filter", quantity: 1, cost: 15.99 }
-      ],
-      labor: { hours: 8, rate: 95 },
-      totalCost: 1045.97,
-      vehicleAdvice: [
-        { 
-          type: "maintenance", 
-          description: "Replace brake pads", 
-          priority: "Medium",
-          id: "advice1",
-          item: "Brakes",
-          condition: "Fair",
-          notes: "Front pads worn to 30%",
-          estimatedCost: 150
-        },
-        { 
-          type: "repair", 
-          description: "Fix air conditioning", 
-          priority: "Low",
-          id: "advice2",
-          item: "AC System",
-          condition: "Poor",
-          notes: "Not cooling properly",
-          estimatedCost: 350
-        }
-      ]
-    },
-    {
-      id: "2",
-      customerName: "Jane Smith",
-      customerEmail: "jane@example.com",
-      status: "completed",
-      priority: "Medium",
-      technicianName: "Robert Johnson",
-      createdDate: new Date().toISOString(),
-      completedDate: new Date().toISOString(),
-      description: "Brake replacement and wheel alignment",
-      estimatedCost: 450,
-      vehicleMake: "Honda",
-      vehicleModel: "Civic",
-      vehicleYear: "2020",
-      vehicleRegistration: "XYZ789",
-      jobDescription: "Front and rear brake replacement with wheel alignment",
-      technicianNotes: "Completed with premium brake pads",
-      scheduledDate: new Date(Date.now() - 86400000).toISOString(),
-      parts: [
-        { name: "Front Brake Pads", quantity: 1, cost: 89.99 },
-        { name: "Rear Brake Pads", quantity: 1, cost: 79.99 }
-      ],
-      labor: { hours: 3, rate: 95 },
-      totalCost: 454.98,
-      vehicleAdvice: [
-        { 
-          type: "maintenance", 
-          description: "Change engine oil", 
-          priority: "Low",
-          id: "advice3",
-          item: "Engine",
-          condition: "Good",
-          notes: "Due in 1000 km",
-          estimatedCost: 50
-        }
-      ]
-    },
-    {
-      id: "3",
-      customerName: "Robert Brown",
-      customerEmail: "robert@example.com",
-      status: "in-progress",
-      priority: "Critical",
-      technicianName: "Sarah Wilson",
-      createdDate: new Date().toISOString(),
-      description: "Electrical system troubleshooting",
-      estimatedCost: 350,
-      completedDate: null,
-      vehicleMake: "Ford",
-      vehicleModel: "Focus",
-      vehicleYear: "2019",
-      vehicleRegistration: "DEF456",
-      jobDescription: "Diagnose and fix intermittent electrical issues",
-      technicianNotes: "Suspecting alternator or battery problems",
-      scheduledDate: new Date().toISOString(),
-      parts: [],
-      labor: { hours: 2, rate: 95 },
-      totalCost: 190,
-      vehicleAdvice: []
-    }
-  ];
-
+  // Filter jobs based on the selected tab
   const filteredJobs = jobCards.filter(job => {
     const normalizedStatus = job.status.toLowerCase();
     // Filter by status tab
@@ -144,10 +34,40 @@ const Jobs = () => {
   
   // Handle job update
   const handleJobUpdate = (updatedJob: JobCardType) => {
-    // In a real app this would update the job in the database
-    console.log("Job updated:", updatedJob);
-    // For now we'll just close the details view
+    // Update the job in the state
+    setJobCards(jobCards.map(job => job.id === updatedJob.id ? updatedJob : job));
     setSelectedJobId(null);
+  };
+
+  // Handle creating a new job
+  const handleCreateJob = () => {
+    // This would open a form to create a new job
+    // For now, we'll just add a placeholder job
+    const newJob: JobCardType = {
+      id: `job-${Date.now()}`,
+      customerName: "New Customer",
+      customerEmail: "customer@example.com",
+      status: "pending",
+      priority: "Medium",
+      technicianName: "Unassigned",
+      createdDate: new Date().toISOString(),
+      description: "New job description",
+      estimatedCost: 0,
+      completedDate: null,
+      vehicleMake: "Unknown",
+      vehicleModel: "Unknown",
+      vehicleYear: "Unknown",
+      vehicleRegistration: "Unknown",
+      jobDescription: "New job description",
+      technicianNotes: "",
+      scheduledDate: new Date().toISOString(),
+      parts: [],
+      labor: { hours: 0, rate: 0 },
+      totalCost: 0,
+      vehicleAdvice: []
+    };
+    
+    setJobCards([...jobCards, newJob]);
   };
 
   return (
@@ -156,7 +76,7 @@ const Jobs = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-regimark-primary">Job Management</h1>
           <div className="flex space-x-2">
-            <Button className="btn-3d">
+            <Button className="btn-3d" onClick={handleCreateJob}>
               <Plus className="mr-2 h-4 w-4" /> Create New Job
             </Button>
           </div>
@@ -213,7 +133,9 @@ const Jobs = () => {
                 ))
               ) : (
                 <div className="text-center py-10 text-muted-foreground col-span-full">
-                  No jobs found matching your criteria
+                  {searchTerm || activeTab !== "all" 
+                    ? "No jobs found matching your criteria" 
+                    : "No jobs found. Click 'Create New Job' to add your first job."}
                 </div>
               )}
             </div>

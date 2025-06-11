@@ -9,23 +9,8 @@ export const useCheckout = () => {
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
   
-  // Cart state
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: "1",
-      name: "Brake Pads - Toyota Camry 2019",
-      sku: "BP-T19-001",
-      price: 89.99,
-      quantity: 1,
-    },
-    {
-      id: "2",
-      name: "Oil Filter - Honda Civic 2020",
-      sku: "OF-H20-002",
-      price: 12.99,
-      quantity: 2,
-    },
-  ]);
+  // Cart state - start with empty cart
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // Customer information
   const [customerName, setCustomerName] = useState("");

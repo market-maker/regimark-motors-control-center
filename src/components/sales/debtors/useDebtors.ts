@@ -1,16 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Customer, DebtRecord } from "@/types/customer";
 import { useNotifications } from "@/providers/NotificationsProvider";
 import { DebtSummary, DebtorRecord } from "./types";
 import { toast } from "@/components/ui/sonner";
-import { mockCustomers } from "./data/mockDebtCustomers";
 import { calculateDebtSummary, prepareDebtorsList, updateDebtStatus } from "./utils/debtCalculations";
 import { addDebtRecord, recordDebtPayment } from "./utils/debtOperations";
 
 export const useDebtors = () => {
   const { addNotification } = useNotifications();
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
+  // Start with empty customers array instead of mock data
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showAddDebtDialog, setShowAddDebtDialog] = useState(false);
