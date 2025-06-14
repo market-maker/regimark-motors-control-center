@@ -1,146 +1,119 @@
-import React, { useState } from "react";
-import DashboardIcon from "./DashboardIcon";
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
-import { useTheme } from "@/providers/ThemeProvider";
-import { Button } from "./button";
-import { Slider } from "./slider";
-import { Label } from "./label";
+
+import React from "react";
+import { DashboardIcon } from "./icons";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const DashboardIconDemo = () => {
-  const { theme } = useTheme();
-  const [size, setSize] = useState(24);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-  
+  const sizes = [16, 24, 32, 48];
+  const colors = [
+    { name: "Default", class: "text-current" },
+    { name: "Primary", class: "text-regimark-primary" },
+    { name: "Accent", class: "text-regimark-accent" },
+    { name: "Muted", class: "text-muted-foreground" },
+  ];
+
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle>Dashboard Icon</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs defaultValue="preview">
-          <TabsList className="mb-4">
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-            <TabsTrigger value="sizes">Sizes</TabsTrigger>
-            <TabsTrigger value="states">States</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="preview" className="space-y-4">
-            <div className="flex flex-col items-center justify-center p-8 border rounded-md">
+    <div className="space-y-6">
+      {/* Size Variations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Size Variations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-6">
+            {sizes.map(size => (
+              <div key={size} className="flex flex-col items-center space-y-2">
+                <DashboardIcon size={size} />
+                <span className="text-xs text-muted-foreground">{size}px</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Color Variations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Color Variations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {colors.map(color => (
+              <div key={color.name} className="flex flex-col items-center space-y-2 p-4 border rounded-lg">
+                <DashboardIcon size={32} className={color.class} />
+                <span className="text-xs text-muted-foreground">{color.name}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage Examples */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Usage Examples</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 border rounded-lg">
+              <DashboardIcon size={20} className="text-regimark-primary" />
+              <span className="font-medium">Navigation Item</span>
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 bg-regimark-primary text-white rounded-lg">
+              <DashboardIcon size={20} className="text-white" />
+              <span className="font-medium">Active State</span>
+            </div>
+            
+            <div className="flex items-center space-x-3 p-3 border-l-4 border-regimark-accent bg-regimark-accent/5 rounded-r-lg">
+              <DashboardIcon size={24} className="text-regimark-accent" />
+              <div>
+                <div className="font-medium">Dashboard Section</div>
+                <div className="text-sm text-muted-foreground">Overview and analytics</div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Accessibility Features */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Accessibility Features</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-medium mb-2">ARIA Support</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                The icon includes proper ARIA attributes for screen readers.
+              </p>
               <DashboardIcon 
-                size={48} 
-                className={theme === "dark" ? "text-white" : "text-regimark-primary"} 
+                size={24} 
+                title="Main Dashboard" 
+                description="Navigate to the main dashboard overview page"
+                className="text-regimark-primary"
               />
-              <p className="mt-4 text-sm text-muted-foreground">Dashboard Icon</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col items-center justify-center p-4 border rounded-md bg-white">
-                <DashboardIcon size={32} className="text-regimark-primary" />
-                <p className="mt-2 text-xs text-muted-foreground">Light Mode</p>
-              </div>
-              
-              <div className="flex flex-col items-center justify-center p-4 border rounded-md bg-gray-900">
-                <DashboardIcon size={32} className="text-white" />
-                <p className="mt-2 text-xs text-gray-400">Dark Mode</p>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="sizes" className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-center space-x-8 p-4 border rounded-md">
-                <div className="flex flex-col items-center">
-                  <DashboardIcon size={16} />
-                  <p className="mt-2 text-xs text-muted-foreground">16px</p>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-medium mb-2">High Contrast Support</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                The icon adapts to dark and light themes automatically.
+              </p>
+              <div className="flex space-x-4">
+                <div className="p-2 bg-white border rounded">
+                  <DashboardIcon size={24} className="text-black" />
                 </div>
-                <div className="flex flex-col items-center">
-                  <DashboardIcon size={24} />
-                  <p className="mt-2 text-xs text-muted-foreground">24px</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <DashboardIcon size={32} />
-                  <p className="mt-2 text-xs text-muted-foreground">32px</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <DashboardIcon size={48} />
-                  <p className="mt-2 text-xs text-muted-foreground">48px</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <DashboardIcon size={64} />
-                  <p className="mt-2 text-xs text-muted-foreground">64px</p>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="size-slider">Custom Size: {size}px</Label>
-                <Slider 
-                  id="size-slider"
-                  min={12} 
-                  max={96} 
-                  step={1} 
-                  value={[size]} 
-                  onValueChange={(value) => setSize(value[0])} 
-                />
-                <div className="flex items-center justify-center p-4 border rounded-md mt-4">
-                  <DashboardIcon size={size} />
+                <div className="p-2 bg-black border rounded">
+                  <DashboardIcon size={24} className="text-white" />
                 </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="states" className="space-y-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center p-4 border rounded-md">
-                <DashboardIcon 
-                  size={32} 
-                  className="text-regimark-primary" 
-                />
-                <p className="mt-2 text-xs text-muted-foreground">Normal</p>
-              </div>
-              
-              <div className="flex flex-col items-center p-4 border rounded-md">
-                <DashboardIcon 
-                  size={32} 
-                  className={`text-regimark-primary ${isHovered ? 'scale-110' : ''}`}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                />
-                <p className="mt-2 text-xs text-muted-foreground">Hover</p>
-              </div>
-              
-              <div className="flex flex-col items-center p-4 border rounded-md">
-                <DashboardIcon 
-                  size={32} 
-                  className={`${isActive ? 'text-white bg-regimark-primary p-1 rounded-md' : 'text-regimark-primary'}`}
-                  onClick={() => setIsActive(!isActive)}
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {isActive ? 'Active' : 'Click to Activate'}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex justify-center mt-4">
-              <Button 
-                variant="outline" 
-                className="flex items-center space-x-2"
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                onClick={() => setIsActive(!isActive)}
-              >
-                <DashboardIcon 
-                  size={20} 
-                  className={isActive ? 'text-regimark-primary' : ''}
-                />
-                <span>Dashboard</span>
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
