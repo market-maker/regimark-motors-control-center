@@ -39,9 +39,13 @@ export const showLoadingToast = async <T,>(
     error: string;
   }
 ): Promise<T> => {
-  return toast.promise(promise, {
+  // Show the toast promise for UI feedback
+  toast.promise(promise, {
     loading: messages.loading,
     success: messages.success,
     error: messages.error,
   });
+  
+  // Return the actual promise result
+  return promise;
 };
