@@ -31,7 +31,7 @@ export const showInfoToast = (message: string, description?: string) => {
 };
 
 // Loading toast with promise handling
-export const showLoadingToast = async <T>(
+export const showLoadingToast = async <T,>(
   promise: Promise<T>,
   messages: {
     loading: string;

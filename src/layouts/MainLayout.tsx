@@ -14,8 +14,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <Header onMenuClick={() => setSidebarOpen(true)} />
+        <Sidebar onClose={() => setSidebarOpen(false)} />
+        <Header setSidebarOpen={setSidebarOpen} />
         <main className="lg:pl-64 pt-16">
           <ErrorBoundary>
             {children}
