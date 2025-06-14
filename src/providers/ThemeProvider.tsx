@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, createContext, ReactNode } from "react";
 
 type Theme = "light" | "dark";
 
@@ -8,9 +8,9 @@ type ThemeContextType = {
   toggleTheme: () => void;
 };
 
-const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   
   // Load theme from localStorage on initial load
