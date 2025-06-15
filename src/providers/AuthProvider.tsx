@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+
+import React from "react";
 import { getAuthFromLocalStorage, saveAuthToLocalStorage, clearAuth, isAuthExpired } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -33,14 +34,14 @@ const PREDEFINED_USERS = [
   }
 ];
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   // Check for existing session on mount
-  useEffect(() => {
+  React.useEffect(() => {
     const checkAuth = () => {
       if (isAuthExpired()) {
         clearAuth();
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Handle online/offline status
-  useEffect(() => {
+  React.useEffect(() => {
     const handleOnline = () => {
       console.log("Application is online");
       if (user) {
@@ -157,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
